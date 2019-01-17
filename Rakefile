@@ -12,8 +12,8 @@ else
   File.expand_path("tmp/rubygems")
 end
 
-def bundler_spec
-  @bundler_spec ||= Gem::Specification.load("bundler.gemspec")
+def lic_spec
+  @lic_spec ||= Gem::Specification.load("lic.gemspec")
 end
 
 def safe_task(&block)
@@ -40,7 +40,7 @@ end
 namespace :spec do
   desc "Ensure spec dependencies are installed"
   task :deps do
-    deps = Hash[bundler_spec.development_dependencies.map do |d|
+    deps = Hash[lic_spec.development_dependencies.map do |d|
       [d.name, d.requirement.to_s]
     end]
     deps["rubocop"] ||= "= 0.50.0" if RUBY_VERSION >= "2.0.0" # can't go in the gemspec because of the ruby version requirement
@@ -87,7 +87,7 @@ namespace :spec do
 end
 
 begin
-  rspec = bundler_spec.development_dependencies.find {|d| d.name == "rspec" }
+  rspec = lic_spec.development_dependencies.find {|d| d.name == "rspec" }
   gem "rspec", rspec.requirement.to_s
   require "rspec/core/rake_task"
 
@@ -116,19 +116,19 @@ begin
       task :record => %w[set_record realworld]
 
       task :set_record do
-        ENV["BUNDLER_SPEC_FORCE_RECORD"] = "TRUE"
+        ENV["LIC_SPEC_FORCE_RECORD"] = "TRUE"
       end
     end
 
     task :set_realworld do
-      ENV["BUNDLER_REALWORLD_TESTS"] = "1"
+      ENV["LIC_REALWORLD_TESTS"] = "1"
     end
 
     desc "Run the spec suite with the sudo tests"
     task :sudo => %w[set_sudo spec clean_sudo]
 
     task :set_sudo do
-      ENV["BUNDLER_SUDO_TESTS"] = "1"
+      ENV["LIC_SUDO_TESTS"] = "1"
     end
 
     task :clean_sudo do
@@ -172,7 +172,7 @@ begin
               hash = `git rev-parse HEAD`.chomp
             end
           elsif rg != "master"
-            raise "need to be running against master with bundler as a submodule"
+            raise "need to be running against master with lic as a submodule"
           end
 
           puts "Checked out rubygems '#{rg}' at #{hash}"
@@ -205,21 +205,21 @@ begin
       rg = ENV["RGV"] || raise("RubyGems version is required on Travis!")
 
       # disallow making network requests on CI
-      ENV["BUNDLER_SPEC_PRE_RECORDED"] = "TRUE"
+      ENV["LIC_SPEC_PRE_RECORDED"] = "TRUE"
 
-      puts "\n\e[1;33m[Travis CI] Running bundler specs against RubyGems #{rg}\e[m\n\n"
+      puts "\n\e[1;33m[Travis CI] Running lic specs against RubyGems #{rg}\e[m\n\n"
       specs = safe_task { Rake::Task["spec:rubygems:#{rg}"].invoke }
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
-      puts "\n\e[1;33m[Travis CI] Running bundler sudo specs against RubyGems #{rg}\e[m\n\n"
+      puts "\n\e[1;33m[Travis CI] Running lic sudo specs against RubyGems #{rg}\e[m\n\n"
       sudos = system("sudo -E rake spec:rubygems:#{rg}:sudo")
       # clean up by chowning the newly root-owned tmp directory back to the travis user
       system("sudo chown -R #{ENV["USER"]} #{File.join(File.dirname(__FILE__), "tmp")}")
 
       Rake::Task["spec:rubygems:#{rg}"].reenable
 
-      puts "\n\e[1;33m[Travis CI] Running bundler real world specs against RubyGems #{rg}\e[m\n\n"
+      puts "\n\e[1;33m[Travis CI] Running lic real world specs against RubyGems #{rg}\e[m\n\n"
       realworld = safe_task { Rake::Task["spec:rubygems:#{rg}:realworld"].invoke }
 
       { "specs" => specs, "sudo" => sudos, "realworld" => realworld }.each do |name, passed|
@@ -297,7 +297,7 @@ begin
 
     desc "Remove all built man pages"
     task :clobber do
-      rm_rf "lib/bundler/man"
+      rm_rf "lib/lic/man"
     end
 
     task(:require) {}
@@ -315,29 +315,29 @@ begin
   Automatiek::RakeTask.new("molinillo") do |lib|
     lib.download = { :github => "https://github.com/CocoaPods/Molinillo" }
     lib.namespace = "Molinillo"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/molinillo"
+    lib.prefix = "Lic"
+    lib.vendor_lib = "lib/lic/vendor/molinillo"
   end
 
   Automatiek::RakeTask.new("thor") do |lib|
     lib.download = { :github => "https://github.com/erikhuda/thor" }
     lib.namespace = "Thor"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/thor"
+    lib.prefix = "Lic"
+    lib.vendor_lib = "lib/lic/vendor/thor"
   end
 
   Automatiek::RakeTask.new("fileutils") do |lib|
     lib.download = { :github => "https://github.com/ruby/fileutils" }
     lib.namespace = "FileUtils"
-    lib.prefix = "Bundler"
-    lib.vendor_lib = "lib/bundler/vendor/fileutils"
+    lib.prefix = "Lic"
+    lib.vendor_lib = "lib/lic/vendor/fileutils"
   end
 
   Automatiek::RakeTask.new("net-http-persistent") do |lib|
     lib.download = { :github => "https://github.com/drbrain/net-http-persistent" }
     lib.namespace = "Net::HTTP::Persistent"
-    lib.prefix = "Bundler::Persistent"
-    lib.vendor_lib = "lib/bundler/vendor/net-http-persistent"
+    lib.prefix = "Lic::Persistent"
+    lib.vendor_lib = "lib/lic/vendor/net-http-persistent"
 
     mixin = Module.new do
       def namespace_files
@@ -359,23 +359,23 @@ rescue LoadError
 end
 
 task :override_version do
-  next unless version = ENV["BUNDLER_SPEC_SUB_VERSION"]
-  version_file = File.expand_path("../lib/bundler/version.rb", __FILE__)
+  next unless version = ENV["LIC_SPEC_SUB_VERSION"]
+  version_file = File.expand_path("../lib/lic/version.rb", __FILE__)
   contents = File.read(version_file)
   unless contents.sub!(/(^\s+VERSION\s*=\s*)"#{Gem::Version::VERSION_PATTERN}"/, %(\\1"#{version}"))
-    abort("Failed to change bundler version")
+    abort("Failed to change lic version")
   end
   File.open(version_file, "w") {|f| f << contents }
 end
 
 desc "Update vendored SSL certs to match the certs vendored by RubyGems"
 task :update_certs => "spec:rubygems:clone_rubygems_master" do
-  require "bundler/ssl_certs/certificate_manager"
-  Bundler::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
+  require "lic/ssl_certs/certificate_manager"
+  Lic::SSLCerts::CertificateManager.update_from!(RUBYGEMS_REPO)
 end
 
 task :default => :spec
 
 Dir["task/*.{rb,rake}"].each(&method(:load))
 
-task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/bundler/generated") }
+task :generate_files => Rake::Task.tasks.select {|t| t.name.start_with?("lib/lic/generated") }

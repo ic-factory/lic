@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "bundler/ssl_certs/certificate_manager"
+require "lic/ssl_certs/certificate_manager"
 
-RSpec.describe Bundler::SSLCerts::CertificateManager do
+RSpec.describe Lic::SSLCerts::CertificateManager do
   let(:rubygems_path)      { root }
   let(:stub_cert)          { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "rubygems.org", "ssl-cert.pem") }
   let(:rubygems_certs_dir) { File.join(root.to_s, "lib", "rubygems", "ssl_certs", "rubygems.org") }
 
   subject { described_class.new(rubygems_path) }
 
-  # Pretend bundler root is rubygems root
+  # Pretend lic root is rubygems root
   before do
     # Backing up rubygems certificates
     FileUtils.mv(rubygems_certs_dir, rubygems_certs_dir + ".back") if ruby_core?
@@ -37,13 +37,13 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
   end
 
   describe "#initialize" do
-    it "should set bundler_cert_path as path of the subdir with bundler ssl certs" do
-      expect(subject.bundler_cert_path).to eq(File.join(root, "lib/bundler/ssl_certs"))
+    it "should set lic_cert_path as path of the subdir with lic ssl certs" do
+      expect(subject.lic_cert_path).to eq(File.join(root, "lib/lic/ssl_certs"))
     end
 
-    it "should set bundler_certs as the paths of the bundler ssl certs" do
-      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/rubygems.global.ssl.fastly.net/DigiCertHighAssuranceEVRootCA.pem"))
-      expect(subject.bundler_certs).to include(File.join(root, "lib/bundler/ssl_certs/index.rubygems.org/GlobalSignRootCA.pem"))
+    it "should set lic_certs as the paths of the lic ssl certs" do
+      expect(subject.lic_certs).to include(File.join(root, "lib/lic/ssl_certs/rubygems.global.ssl.fastly.net/DigiCertHighAssuranceEVRootCA.pem"))
+      expect(subject.lic_certs).to include(File.join(root, "lib/lic/ssl_certs/index.rubygems.org/GlobalSignRootCA.pem"))
     end
 
     context "when rubygems_path is not nil" do
@@ -54,11 +54,11 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
   end
 
   describe "#up_to_date?" do
-    context "when bundler certs and rubygems certs are the same" do
+    context "when lic certs and rubygems certs are the same" do
       before do
-        bundler_certs = Dir[File.join(root.to_s, "lib", "bundler", "ssl_certs", "**", "*.pem")]
+        lic_certs = Dir[File.join(root.to_s, "lib", "lic", "ssl_certs", "**", "*.pem")]
         FileUtils.rm(stub_cert)
-        FileUtils.cp(bundler_certs, rubygems_certs_dir)
+        FileUtils.cp(lic_certs, rubygems_certs_dir)
       end
 
       it "should return true" do
@@ -66,7 +66,7 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
       end
     end
 
-    context "when bundler certs and rubygems certs are not the same" do
+    context "when lic certs and rubygems certs are not the same" do
       it "should return false" do
         expect(subject).to_not be_up_to_date
       end
@@ -77,17 +77,17 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
     context "when certificate manager is not up to date" do
       before do
         allow(subject).to receive(:up_to_date?).and_return(false)
-        allow(bundler_fileutils).to receive(:rm)
-        allow(bundler_fileutils).to receive(:cp)
+        allow(lic_fileutils).to receive(:rm)
+        allow(lic_fileutils).to receive(:cp)
       end
 
-      it "should remove the current bundler certs" do
-        expect(bundler_fileutils).to receive(:rm).with(subject.bundler_certs)
+      it "should remove the current lic certs" do
+        expect(lic_fileutils).to receive(:rm).with(subject.lic_certs)
         subject.update!
       end
 
-      it "should copy the rubygems certs into bundler certs" do
-        expect(bundler_fileutils).to receive(:cp).with(subject.rubygems_certs, subject.bundler_cert_path)
+      it "should copy the rubygems certs into lic certs" do
+        expect(lic_fileutils).to receive(:cp).with(subject.rubygems_certs, subject.lic_cert_path)
         subject.update!
       end
 
@@ -127,7 +127,7 @@ RSpec.describe Bundler::SSLCerts::CertificateManager do
       subject.connect_to(host)
     end
 
-    it "set its cert store as a OpenSSL::X509::Store populated with bundler certs" do
+    it "set its cert store as a OpenSSL::X509::Store populated with lic certs" do
       expect(cert_store).to receive(:add_file).at_least(:once)
       expect(http).to receive(:cert_store=).with(cert_store)
       subject.connect_to(host)

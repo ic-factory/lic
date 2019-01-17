@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "Bundler.setup" do
+RSpec.describe "Lic.setup" do
   describe "with no arguments" do
     it "makes all groups available" do
       install_gemfile <<-G
@@ -10,8 +10,8 @@ RSpec.describe "Bundler.setup" do
 
       ruby <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup
+        require 'lic'
+        Lic.setup
 
         require 'rack'
         puts RACK
@@ -33,8 +33,8 @@ RSpec.describe "Bundler.setup" do
     it "doesn't make all groups available" do
       ruby <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup(:default)
+        require 'lic'
+        Lic.setup(:default)
 
         begin
           require 'rack'
@@ -49,8 +49,8 @@ RSpec.describe "Bundler.setup" do
     it "accepts string for group name" do
       ruby <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup(:default, 'test')
+        require 'lic'
+        Lic.setup(:default, 'test')
 
         require 'rack'
         puts RACK
@@ -62,9 +62,9 @@ RSpec.describe "Bundler.setup" do
     it "leaves all groups available if they were already" do
       ruby <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup
-        Bundler.setup(:default)
+        require 'lic'
+        Lic.setup
+        Lic.setup(:default)
 
         require 'rack'
         puts RACK
@@ -76,9 +76,9 @@ RSpec.describe "Bundler.setup" do
     it "leaves :default available if setup is called twice" do
       ruby <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup(:default)
-        Bundler.setup(:default, :test)
+        require 'lic'
+        Lic.setup(:default)
+        Lic.setup(:default, :test)
 
         begin
           require 'yard'
@@ -93,9 +93,9 @@ RSpec.describe "Bundler.setup" do
 
     it "handles multiple non-additive invocations" do
       ruby <<-RUBY
-        require 'bundler'
-        Bundler.setup(:default, :test)
-        Bundler.setup(:default)
+        require 'lic'
+        Lic.setup(:default, :test)
+        Lic.setup(:default)
         require 'rack'
 
         puts "FAIL"
@@ -109,14 +109,14 @@ RSpec.describe "Bundler.setup" do
 
   context "load order" do
     def clean_load_path(lp)
-      without_bundler_load_path = ruby!("puts $LOAD_PATH").split("\n")
+      without_lic_load_path = ruby!("puts $LOAD_PATH").split("\n")
       lp = lp - [
-        bundler_path.to_s,
-        bundler_path.join("gems/bundler-#{Bundler::VERSION}/lib").to_s,
+        lic_path.to_s,
+        lic_path.join("gems/lic-#{Lic::VERSION}/lib").to_s,
         tmp("rubygems/lib").to_s,
         root.join("../lib").expand_path.to_s,
-      ] - without_bundler_load_path
-      lp.map! {|p| p.sub(/^#{Regexp.union system_gem_path.to_s, default_bundle_path.to_s}/i, "") }
+      ] - without_lic_load_path
+      lp.map! {|p| p.sub(/^#{Regexp.union system_gem_path.to_s, default_lic_path.to_s}/i, "") }
     end
 
     it "puts loaded gems after -I and RUBYLIB", :ruby_repo do
@@ -130,8 +130,8 @@ RSpec.describe "Bundler.setup" do
 
       ruby <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup
+        require 'lic'
+        Lic.setup
         puts $LOAD_PATH
       RUBY
 
@@ -152,8 +152,8 @@ RSpec.describe "Bundler.setup" do
 
       ruby! <<-RUBY
         require 'rubygems'
-        require 'bundler'
-        Bundler.setup
+        require 'lic'
+        Lic.setup
         puts $LOAD_PATH
       RUBY
 
@@ -180,7 +180,7 @@ RSpec.describe "Bundler.setup" do
 
       ruby! <<-RUBY
         require 'rubygems'
-        require 'bundler/setup'
+        require 'lic/setup'
         puts $LOAD_PATH
       RUBY
 
@@ -202,12 +202,12 @@ RSpec.describe "Bundler.setup" do
 
     ruby <<-R
       require 'rubygems'
-      require 'bundler'
+      require 'lic'
 
       begin
-        Bundler.setup
+        Lic.setup
         puts "FAIL"
-      rescue Bundler::GemNotFound
+      rescue Lic::GemNotFound
         puts "WIN"
       end
     R
@@ -223,12 +223,12 @@ RSpec.describe "Bundler.setup" do
 
     ruby <<-R
       require 'rubygems'
-      require 'bundler'
+      require 'lic'
 
-      Bundler.setup
+      Lic.setup
     R
 
-    expect(bundled_app("Gemfile.lock")).not_to exist
+    expect(licd_app("Gemfile.lock")).not_to exist
   end
 
   it "doesn't change the Gemfile.lock if the setup fails" do
@@ -237,7 +237,7 @@ RSpec.describe "Bundler.setup" do
       gem "rack"
     G
 
-    lockfile = File.read(bundled_app("Gemfile.lock"))
+    lockfile = File.read(licd_app("Gemfile.lock"))
 
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -247,12 +247,12 @@ RSpec.describe "Bundler.setup" do
 
     ruby <<-R
       require 'rubygems'
-      require 'bundler'
+      require 'lic'
 
-      Bundler.setup
+      Lic.setup
     R
 
-    expect(File.read(bundled_app("Gemfile.lock"))).to eq(lockfile)
+    expect(File.read(licd_app("Gemfile.lock"))).to eq(lockfile)
   end
 
   it "makes a Gemfile.lock if setup succeeds" do
@@ -261,50 +261,50 @@ RSpec.describe "Bundler.setup" do
       gem "rack"
     G
 
-    File.read(bundled_app("Gemfile.lock"))
+    File.read(licd_app("Gemfile.lock"))
 
-    FileUtils.rm(bundled_app("Gemfile.lock"))
+    FileUtils.rm(licd_app("Gemfile.lock"))
 
     run "1"
-    expect(bundled_app("Gemfile.lock")).to exist
+    expect(licd_app("Gemfile.lock")).to exist
   end
 
-  describe "$BUNDLE_GEMFILE" do
+  describe "$LIC_GEMFILE" do
     context "user provides an absolute path" do
-      it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
+      it "uses LIC_GEMFILE to locate the gemfile if present" do
         gemfile <<-G
           source "file://#{gem_repo1}"
           gem "rack"
         G
 
-        gemfile bundled_app("4realz"), <<-G
+        gemfile licd_app("4realz"), <<-G
           source "file://#{gem_repo1}"
           gem "activesupport", "2.3.5"
         G
 
-        ENV["BUNDLE_GEMFILE"] = bundled_app("4realz").to_s
-        bundle :install
+        ENV["LIC_GEMFILE"] = licd_app("4realz").to_s
+        lic :install
 
-        expect(the_bundle).to include_gems "activesupport 2.3.5"
+        expect(the_lic).to include_gems "activesupport 2.3.5"
       end
     end
 
     context "an absolute path is not provided" do
-      it "uses BUNDLE_GEMFILE to locate the gemfile if present" do
+      it "uses LIC_GEMFILE to locate the gemfile if present" do
         gemfile <<-G
           source "file://#{gem_repo1}"
         G
 
-        bundle "install"
-        bundle "install --deployment"
+        lic "install"
+        lic "install --deployment"
 
-        ENV["BUNDLE_GEMFILE"] = "Gemfile"
+        ENV["LIC_GEMFILE"] = "Gemfile"
         ruby <<-R
           require 'rubygems'
-          require 'bundler'
+          require 'lic'
 
           begin
-            Bundler.setup
+            Lic.setup
             puts "WIN"
           rescue ArgumentError => e
             puts "FAIL"
@@ -316,8 +316,8 @@ RSpec.describe "Bundler.setup" do
     end
   end
 
-  it "prioritizes gems in BUNDLE_PATH over gems in GEM_HOME" do
-    ENV["BUNDLE_PATH"] = bundled_app(".bundle").to_s
+  it "prioritizes gems in LIC_PATH over gems in GEM_HOME" do
+    ENV["LIC_PATH"] = licd_app(".lic").to_s
     install_gemfile <<-G
       source "file://#{gem_repo1}"
       gem "rack", "1.0.0"
@@ -327,7 +327,7 @@ RSpec.describe "Bundler.setup" do
       s.write "lib/rack.rb", "RACK = 'FAIL'"
     end
 
-    expect(the_bundle).to include_gems "rack 1.0.0"
+    expect(the_lic).to include_gems "rack 1.0.0"
   end
 
   describe "integrate with rubygems" do
@@ -403,7 +403,7 @@ RSpec.describe "Bundler.setup" do
 
       it "removes system gems from Gem.source_index" do
         run "require 'yard'"
-        expect(out).to eq("bundler-#{Bundler::VERSION}\nyard-1.0")
+        expect(out).to eq("lic-#{Lic::VERSION}\nyard-1.0")
       end
 
       context "when the ruby stdlib is a substring of Gem.path" do
@@ -447,20 +447,20 @@ RSpec.describe "Bundler.setup" do
 
     it "provides a useful exception when the git repo is not checked out yet" do
       run "1"
-      expect(err).to match(/the git source #{lib_path('rack-1.0.0')} is not yet checked out. Please run `bundle install`/i)
+      expect(err).to match(/the git source #{lib_path('rack-1.0.0')} is not yet checked out. Please run `lic install`/i)
     end
 
     it "does not hit the git binary if the lockfile is available and up to date" do
-      bundle "install"
+      lic "install"
 
       break_git!
 
       ruby <<-R
         require 'rubygems'
-        require 'bundler'
+        require 'lic'
 
         begin
-          Bundler.setup
+          Lic.setup
           puts "WIN"
         rescue Exception => e
           puts "FAIL"
@@ -471,20 +471,20 @@ RSpec.describe "Bundler.setup" do
     end
 
     it "provides a good exception if the lockfile is unavailable" do
-      bundle "install"
+      lic "install"
 
-      FileUtils.rm(bundled_app("Gemfile.lock"))
+      FileUtils.rm(licd_app("Gemfile.lock"))
 
       break_git!
 
       ruby <<-R
         require "rubygems"
-        require "bundler"
+        require "lic"
 
         begin
-          Bundler.setup
+          Lic.setup
           puts "FAIL"
-        rescue Bundler::GitError => e
+        rescue Lic::GitError => e
           puts e.message
         end
       R
@@ -495,24 +495,24 @@ RSpec.describe "Bundler.setup" do
     end
 
     it "works even when the cache directory has been deleted" do
-      bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
+      lic! :install, forgotten_command_line_options(:path => "vendor/lic")
       FileUtils.rm_rf vendored_gems("cache")
-      expect(the_bundle).to include_gems "rack 1.0.0"
+      expect(the_lic).to include_gems "rack 1.0.0"
     end
 
-    it "does not randomly change the path when specifying --path and the bundle directory becomes read only" do
-      bundle! :install, forgotten_command_line_options(:path => "vendor/bundle")
+    it "does not randomly change the path when specifying --path and the lic directory becomes read only" do
+      lic! :install, forgotten_command_line_options(:path => "vendor/lic")
 
       with_read_only("**/*") do
-        expect(the_bundle).to include_gems "rack 1.0.0"
+        expect(the_lic).to include_gems "rack 1.0.0"
       end
     end
 
-    it "finds git gem when default bundle path becomes read only" do
-      bundle "install"
+    it "finds git gem when default lic path becomes read only" do
+      lic "install"
 
-      with_read_only("#{Bundler.bundle_path}/**/*") do
-        expect(the_bundle).to include_gems "rack 1.0.0"
+      with_read_only("#{Lic.lic_path}/**/*") do
+        expect(the_lic).to include_gems "rack 1.0.0"
       end
     end
   end
@@ -528,8 +528,8 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
-      bundle! :install
+      lic %(config local.rack #{lib_path("local-rack")})
+      lic! :install
 
       FileUtils.rm_rf(lib_path("local-rack"))
       run "require 'rack'"
@@ -546,8 +546,8 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
-      bundle! :install
+      lic %(config local.rack #{lib_path("local-rack")})
+      lic! :install
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -568,8 +568,8 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :branch => "master"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
-      bundle! :install
+      lic %(config local.rack #{lib_path("local-rack")})
+      lic! :install
 
       gemfile <<-G
         source "file://#{gem_repo1}"
@@ -595,7 +595,7 @@ RSpec.describe "Bundler.setup" do
         gem "rack", :git => "#{lib_path("rack-0.8")}", :ref => "master", :branch => "nonexistant"
       G
 
-      bundle %(config local.rack #{lib_path("local-rack")})
+      lic %(config local.rack #{lib_path("local-rack")})
       run "require 'rack'"
       expect(err).to match(/is using branch master but Gemfile specifies nonexistant/)
     end
@@ -614,10 +614,10 @@ RSpec.describe "Bundler.setup" do
 
       install_gems "activesupport-2.3.5"
 
-      expect(the_bundle).to include_gems "activesupport 2.3.2", :groups => :default
+      expect(the_lic).to include_gems "activesupport 2.3.2", :groups => :default
     end
 
-    it "remembers --without and does not bail on bare Bundler.setup" do
+    it "remembers --without and does not bail on bare Lic.setup" do
       install_gemfile <<-G, forgotten_command_line_options(:without => :rails)
         source "file://#{gem_repo1}"
         gem "activesupport"
@@ -629,10 +629,10 @@ RSpec.describe "Bundler.setup" do
 
       install_gems "activesupport-2.3.5"
 
-      expect(the_bundle).to include_gems "activesupport 2.3.2"
+      expect(the_lic).to include_gems "activesupport 2.3.2"
     end
 
-    it "remembers --without and does not include groups passed to Bundler.setup" do
+    it "remembers --without and does not include groups passed to Lic.setup" do
       install_gemfile <<-G, forgotten_command_line_options(:without => :rails)
         source "file://#{gem_repo1}"
         gem "activesupport"
@@ -646,8 +646,8 @@ RSpec.describe "Bundler.setup" do
         end
       G
 
-      expect(the_bundle).not_to include_gems "activesupport 2.3.2", :groups => :rack
-      expect(the_bundle).to include_gems "rack 1.0.0", :groups => :rack
+      expect(the_lic).not_to include_gems "activesupport 2.3.2", :groups => :rack
+      expect(the_lic).to include_gems "rack 1.0.0", :groups => :rack
     end
   end
 
@@ -655,7 +655,7 @@ RSpec.describe "Bundler.setup" do
   # activated gems, so this test cannot work on 1.9 :(
   if RUBY_VERSION < "1.9"
     describe "preactivated gems" do
-      it "raises an exception if a pre activated gem conflicts with the bundle" do
+      it "raises an exception if a pre activated gem conflicts with the lic" do
         system_gems "thin-1.0", "rack-1.0.0"
         build_gem "thin", "1.1", :to_system => true do |s|
           s.add_dependency "rack"
@@ -668,16 +668,16 @@ RSpec.describe "Bundler.setup" do
         ruby <<-R
           require 'rubygems'
           gem "thin"
-          require 'bundler'
+          require 'lic'
           begin
-            Bundler.setup
+            Lic.setup
             puts "FAIL"
           rescue Gem::LoadError => e
             puts e.message
           end
         R
 
-        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `bundle exec` to your command may solve this.")
+        expect(out).to eq("You have already activated thin 1.1, but your Gemfile requires thin 1.0. Prepending `lic exec` to your command may solve this.")
       end
 
       it "version_requirement is now deprecated in rubygems 1.4.0+" do
@@ -693,9 +693,9 @@ RSpec.describe "Bundler.setup" do
         ruby <<-R
           require 'rubygems'
           gem "thin"
-          require 'bundler'
+          require 'lic'
           begin
-            Bundler.setup
+            Lic.setup
             puts "FAIL"
           rescue Gem::LoadError => e
             puts e.message
@@ -763,7 +763,7 @@ end
     G
 
     ENV["GEM_HOME"] = ""
-    bundle %(exec ruby -e "require 'set'"), :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+    lic %(exec ruby -e "require 'set'"), :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
 
     expect(err).to lack_errors
   end
@@ -787,7 +787,7 @@ end
         G
 
         run! "puts ENV['MANPATH']"
-        expect(out).to eq("#{default_bundle_path("gems/with_man-1.0/man")}:/foo")
+        expect(out).to eq("#{default_lic_path("gems/with_man-1.0/man")}:/foo")
       end
     end
 
@@ -801,7 +801,7 @@ end
         G
 
         run! "puts ENV['MANPATH']"
-        expect(out).to eq(default_bundle_path("gems/with_man-1.0/man").to_s)
+        expect(out).to eq(default_lic_path("gems/with_man-1.0/man").to_s)
       end
     end
   end
@@ -844,12 +844,12 @@ end
         s.class.send(:define_method, :build_extensions) { nil }
       end
 
-      require 'bundler'
+      require 'lic'
       gem '#{gem_name}'
 
       puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
 
-      Bundler.setup
+      Lic.setup
 
       puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} == 0
     R
@@ -857,11 +857,11 @@ end
     expect(out).to eq("true\ntrue")
   end
 
-  context "with bundler is located in symlinked GEM_HOME" do
+  context "with lic is located in symlinked GEM_HOME" do
     let(:gem_home) { Dir.mktmpdir }
     let(:symlinked_gem_home) { Tempfile.new("gem_home").path }
-    let(:bundler_dir) { ruby_core? ? File.expand_path("../../../..", __FILE__) : File.expand_path("../../..", __FILE__) }
-    let(:bundler_lib) { File.join(bundler_dir, "lib") }
+    let(:lic_dir) { ruby_core? ? File.expand_path("../../../..", __FILE__) : File.expand_path("../../..", __FILE__) }
+    let(:lic_lib) { File.join(lic_dir, "lib") }
 
     before do
       FileUtils.ln_sf(gem_home, symlinked_gem_home)
@@ -870,29 +870,29 @@ end
       Dir.mkdir(gems_dir)
       Dir.mkdir(specifications_dir)
 
-      FileUtils.ln_s(bundler_dir, File.join(gems_dir, "bundler-#{Bundler::VERSION}"))
+      FileUtils.ln_s(lic_dir, File.join(gems_dir, "lic-#{Lic::VERSION}"))
 
-      gemspec_file = ruby_core? ? "#{bundler_dir}/lib/bundler.gemspec" : "#{bundler_dir}/bundler.gemspec"
+      gemspec_file = ruby_core? ? "#{lic_dir}/lib/lic.gemspec" : "#{lic_dir}/lic.gemspec"
       gemspec = File.read(gemspec_file).
-                sub("Bundler::VERSION", %("#{Bundler::VERSION}"))
-      gemspec = gemspec.lines.reject {|line| line =~ %r{lib/bundler/version} }.join
+                sub("Lic::VERSION", %("#{Lic::VERSION}"))
+      gemspec = gemspec.lines.reject {|line| line =~ %r{lib/lic/version} }.join
 
-      File.open(File.join(specifications_dir, "bundler.gemspec"), "wb") do |f|
+      File.open(File.join(specifications_dir, "lic.gemspec"), "wb") do |f|
         f.write(gemspec)
       end
     end
 
     # Can't make this pass on 2.6 since the ruby standard library has the same $LOAD_PATH
-    # entry as bundler (since it's a default gem)
-    it "should successfully require 'bundler/setup'", :ruby_repo, :ruby => "< 2.6" do
+    # entry as lic (since it's a default gem)
+    it "should successfully require 'lic/setup'", :ruby_repo, :ruby => "< 2.6" do
       install_gemfile ""
 
       ruby <<-'R', :env => { "GEM_PATH" => symlinked_gem_home }, :no_lib => true
-        # Remove any bundler that's not the current bundler from $LOAD_PATH
+        # Remove any lic that's not the current lic from $LOAD_PATH
         $LOAD_PATH.each do |path|
-          $LOAD_PATH.delete(path) if File.exist?("#{path}/bundler.rb")
+          $LOAD_PATH.delete(path) if File.exist?("#{path}/lic.rb")
         end
-        puts (require 'bundler/setup')
+        puts (require 'lic/setup')
       R
 
       expect(out).to eql("true")
@@ -908,9 +908,9 @@ end
     G
 
     run <<-R
-      puts Bundler.rubygems.find_name("rack").inspect
+      puts Lic.rubygems.find_name("rack").inspect
       Gem.refresh
-      puts Bundler.rubygems.find_name("rack").inspect
+      puts Lic.rubygems.find_name("rack").inspect
     R
 
     expect(out).to eq("[]\n[]")
@@ -918,10 +918,10 @@ end
 
   describe "when a vendored gem specification uses the :path option" do
     it "should resolve paths relative to the Gemfile" do
-      path = bundled_app(File.join("vendor", "foo"))
+      path = licd_app(File.join("vendor", "foo"))
       build_lib "foo", :path => path
 
-      # If the .gemspec exists, then Bundler handles the path differently.
+      # If the .gemspec exists, then Lic handles the path differently.
       # See Source::Path.load_spec_files for details.
       FileUtils.rm(File.join(path, "foo.gemspec"))
 
@@ -929,21 +929,21 @@ end
         gem 'foo', '1.2.3', :path => 'vendor/foo'
       G
 
-      Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+      Dir.chdir(licd_app.parent) do
+        run <<-R, :env => { "LIC_GEMFILE" => licd_app("Gemfile") }
           require 'foo'
         R
       end
       expect(err).to lack_errors
     end
 
-    it "should make sure the Bundler.root is really included in the path relative to the Gemfile" do
+    it "should make sure the Lic.root is really included in the path relative to the Gemfile" do
       relative_path = File.join("vendor", Dir.pwd[1..-1], "foo")
-      absolute_path = bundled_app(relative_path)
+      absolute_path = licd_app(relative_path)
       FileUtils.mkdir_p(absolute_path)
       build_lib "foo", :path => absolute_path
 
-      # If the .gemspec exists, then Bundler handles the path differently.
+      # If the .gemspec exists, then Lic handles the path differently.
       # See Source::Path.load_spec_files for details.
       FileUtils.rm(File.join(absolute_path, "foo.gemspec"))
 
@@ -951,10 +951,10 @@ end
         gem 'foo', '1.2.3', :path => '#{relative_path}'
       G
 
-      bundle :install
+      lic :install
 
-      Dir.chdir(bundled_app.parent) do
-        run <<-R, :env => { "BUNDLE_GEMFILE" => bundled_app("Gemfile") }
+      Dir.chdir(licd_app.parent) do
+        run <<-R, :env => { "LIC_GEMFILE" => licd_app("Gemfile") }
           require 'foo'
         R
       end
@@ -982,7 +982,7 @@ end
     end
   end
 
-  describe "with bundled and system gems" do
+  describe "with licd and system gems" do
     before :each do
       system_gems "rack-1.0.0"
 
@@ -1017,7 +1017,7 @@ end
       expect(out).to eq("2.3.5")
     end
 
-    it "raises an exception if gem is used to invoke a system gem not in the bundle" do
+    it "raises an exception if gem is used to invoke a system gem not in the lic" do
       run <<-R
         begin
           gem 'rack'
@@ -1026,18 +1026,18 @@ end
         end
       R
 
-      expect(out).to eq("rack is not part of the bundle. Add it to your Gemfile.")
+      expect(out).to eq("rack is not part of the lic. Add it to your Gemfile.")
     end
 
     it "sets GEM_HOME appropriately" do
       run "puts ENV['GEM_HOME']"
-      expect(out).to eq(default_bundle_path.to_s)
+      expect(out).to eq(default_lic_path.to_s)
     end
   end
 
-  describe "with system gems in the bundle" do
+  describe "with system gems in the lic" do
     before :each do
-      bundle! "config path.system true"
+      lic! "config path.system true"
       system_gems "rack-1.0.0"
 
       install_gemfile <<-G
@@ -1079,7 +1079,7 @@ end
     end
 
     it "evals each gemspec in the context of its parent directory" do
-      bundle :install
+      lic :install
       run "require 'bar'; puts BAR"
       expect(out).to eq("1.0")
     end
@@ -1088,25 +1088,25 @@ end
       ref = update_git "bar", :gemspec => false do |s|
         s.write "bar.gemspec", "require 'foobarbaz'"
       end.ref_for("HEAD")
-      bundle :install
+      lic :install
 
       expect(out.lines.map(&:chomp)).to include(
         a_string_starting_with("[!] There was an error while loading `bar.gemspec`:"),
         RUBY_VERSION >= "1.9" ? a_string_starting_with("Does it try to require a relative path? That's been removed in Ruby 1.9.") : "",
-        " #  from #{default_bundle_path "bundler", "gems", "bar-1.0-#{ref[0, 12]}", "bar.gemspec"}:1",
+        " #  from #{default_lic_path "lic", "gems", "bar-1.0-#{ref[0, 12]}", "bar.gemspec"}:1",
         " >  require 'foobarbaz'"
       )
     end
 
     it "evals each gemspec with a binding from the top level" do
-      bundle "install"
+      lic "install"
 
       ruby <<-RUBY
-        require 'bundler'
-        def Bundler.require(path)
+        require 'lic'
+        def Lic.require(path)
           raise "LOSE"
         end
-        Bundler.load
+        Lic.load
       RUBY
 
       expect(err).to lack_errors
@@ -1114,19 +1114,19 @@ end
     end
   end
 
-  describe "when Bundler is bundled" do
+  describe "when Lic is licd" do
     it "doesn't blow up" do
       install_gemfile <<-G
-        gem "bundler", :path => "#{File.expand_path("..", lib)}"
+        gem "lic", :path => "#{File.expand_path("..", lib)}"
       G
 
-      bundle %(exec ruby -e "require 'bundler'; Bundler.setup"), :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+      lic %(exec ruby -e "require 'lic'; Lic.setup"), :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
       expect(err).to lack_errors
     end
   end
 
-  describe "when BUNDLED WITH" do
-    def lock_with(bundler_version = nil)
+  describe "when LICD WITH" do
+    def lock_with(lic_version = nil)
       lock = <<-L
         GEM
           remote: file:#{gem_repo1}/
@@ -1140,8 +1140,8 @@ end
           rack
       L
 
-      if bundler_version
-        lock += "\n        BUNDLED WITH\n           #{bundler_version}\n"
+      if lic_version
+        lock += "\n        LICD WITH\n           #{lic_version}\n"
       end
 
       lock
@@ -1157,25 +1157,25 @@ end
     context "is not present" do
       it "does not change the lock" do
         lockfile lock_with(nil)
-        ruby "require 'bundler/setup'"
+        ruby "require 'lic/setup'"
         lockfile_should_be lock_with(nil)
       end
     end
 
     context "is newer" do
       it "does not change the lock or warn" do
-        lockfile lock_with(Bundler::VERSION.succ)
-        ruby "require 'bundler/setup'"
+        lockfile lock_with(Lic::VERSION.succ)
+        ruby "require 'lic/setup'"
         expect(out).to eq("")
         expect(err).to eq("")
-        lockfile_should_be lock_with(Bundler::VERSION.succ)
+        lockfile_should_be lock_with(Lic::VERSION.succ)
       end
     end
 
     context "is older" do
       it "does not change the lock" do
         lockfile lock_with("1.10.1")
-        ruby "require 'bundler/setup'"
+        ruby "require 'lic/setup'"
         lockfile_should_be lock_with("1.10.1")
       end
     end
@@ -1204,8 +1204,8 @@ end
 
       lock += <<-L
 
-        BUNDLED WITH
-           #{Bundler::VERSION}
+        LICD WITH
+           #{Lic::VERSION}
       L
 
       normalize_uri_file(lock)
@@ -1222,14 +1222,14 @@ end
 
     context "is not present" do
       it "does not change the lock" do
-        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect { ruby! "require 'lic/setup'" }.not_to change { lockfile }
       end
     end
 
     context "is newer" do
       let(:ruby_version) { "5.5.5" }
       it "does not change the lock or warn" do
-        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect { ruby! "require 'lic/setup'" }.not_to change { lockfile }
         expect(out).to eq("")
         expect(err).to eq("")
       end
@@ -1238,7 +1238,7 @@ end
     context "is older" do
       let(:ruby_version) { "1.0.0" }
       it "does not change the lock" do
-        expect { ruby! "require 'bundler/setup'" }.not_to change { lockfile }
+        expect { ruby! "require 'lic/setup'" }.not_to change { lockfile }
       end
     end
   end
@@ -1247,20 +1247,20 @@ end
     it "does not load Psych", :ruby => "~> 2.2" do
       gemfile ""
       ruby <<-RUBY
-        require 'bundler/setup'
+        require 'lic/setup'
         puts defined?(Psych::VERSION) ? Psych::VERSION : "undefined"
         require 'psych'
         puts Psych::VERSION
       RUBY
-      pre_bundler, post_bundler = out.split("\n")
-      expect(pre_bundler).to eq("undefined")
-      expect(post_bundler).to match(/\d+\.\d+\.\d+/)
+      pre_lic, post_lic = out.split("\n")
+      expect(pre_lic).to eq("undefined")
+      expect(post_lic).to match(/\d+\.\d+\.\d+/)
     end
 
     it "does not load openssl" do
       install_gemfile! ""
       ruby! <<-RUBY
-        require "bundler/setup"
+        require "lic/setup"
         puts defined?(OpenSSL) || "undefined"
         require "openssl"
         puts defined?(OpenSSL) || "undefined"
@@ -1274,7 +1274,7 @@ end
           []
         else
           %w[io-console openssl]
-        end << "bundler"
+        end << "lic"
       end
 
       let(:activation_warning_hack) { strip_whitespace(<<-RUBY) }
@@ -1282,7 +1282,7 @@ end
         require "rubygems"
 
         if Gem::Specification.instance_methods.map(&:to_sym).include?(:activate)
-          Gem::Specification.send(:alias_method, :bundler_spec_activate, :activate)
+          Gem::Specification.send(:alias_method, :lic_spec_activate, :activate)
           Gem::Specification.send(:define_method, :activate) do
             unless #{exemptions.inspect}.include?(name)
               warn '-' * 80
@@ -1290,14 +1290,14 @@ end
               warn *caller
               warn '*' * 80
             end
-            bundler_spec_activate
+            lic_spec_activate
           end
         end
       RUBY
 
       let(:activation_warning_hack_rubyopt) do
         create_file("activation_warning_hack.rb", activation_warning_hack)
-        "-r#{bundled_app("activation_warning_hack.rb")} #{ENV["RUBYOPT"]}"
+        "-r#{licd_app("activation_warning_hack.rb")} #{ENV["RUBYOPT"]}"
       end
 
       let(:code) { strip_whitespace(<<-RUBY) }
@@ -1313,24 +1313,24 @@ end
         end
       RUBY
 
-      it "activates no gems with -rbundler/setup" do
+      it "activates no gems with -rlic/setup" do
         install_gemfile! ""
-        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -rbundler/setup" }
+        ruby! code, :env => { :RUBYOPT => activation_warning_hack_rubyopt + " -rlic/setup" }
         expect(last_command.stdout).to eq("{}")
       end
 
-      it "activates no gems with bundle exec" do
+      it "activates no gems with lic exec" do
         install_gemfile! ""
         create_file("script.rb", code)
-        bundle! "exec ruby ./script.rb", :env => { :RUBYOPT => activation_warning_hack_rubyopt }
+        lic! "exec ruby ./script.rb", :env => { :RUBYOPT => activation_warning_hack_rubyopt }
         expect(last_command.stdout).to eq("{}")
       end
 
-      it "activates no gems with bundle exec that is loaded" do
+      it "activates no gems with lic exec that is loaded" do
         install_gemfile! ""
         create_file("script.rb", "#!/usr/bin/env ruby\n\n#{code}")
-        FileUtils.chmod(0o777, bundled_app("script.rb"))
-        bundle! "exec ./script.rb", :artifice => nil, :env => { :RUBYOPT => activation_warning_hack_rubyopt }
+        FileUtils.chmod(0o777, licd_app("script.rb"))
+        lic! "exec ./script.rb", :artifice => nil, :env => { :RUBYOPT => activation_warning_hack_rubyopt }
         expect(last_command.stdout).to eq("{}")
       end
 
@@ -1358,7 +1358,7 @@ end
           end
         G
 
-        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 999999" })
+        expect(the_lic).to include_gems(*default_gems.map {|g| "#{g} 999999" })
       end
 
       it "activates older versions of default gems" do
@@ -1377,20 +1377,20 @@ end
           end
         G
 
-        expect(the_bundle).to include_gems(*default_gems.map {|g| "#{g} 0.0.0.a" })
+        expect(the_lic).to include_gems(*default_gems.map {|g| "#{g} 0.0.0.a" })
       end
     end
   end
 
   describe "after setup" do
-    it "allows calling #gem on random objects", :bundler => "< 2" do
+    it "allows calling #gem on random objects", :lic => "< 2" do
       install_gemfile <<-G
         source "file:#{gem_repo1}"
         gem "rack"
       G
 
       ruby! <<-RUBY
-        require "bundler/setup"
+        require "lic/setup"
         Object.new.gem "rack"
         puts Gem.loaded_specs["rack"].full_name
       RUBY
@@ -1398,14 +1398,14 @@ end
       expect(out).to eq("rack-1.0.0")
     end
 
-    it "keeps Kernel#gem private", :bundler => "2" do
+    it "keeps Kernel#gem private", :lic => "2" do
       install_gemfile! <<-G
         source "file:#{gem_repo1}"
         gem "rack"
       G
 
       ruby <<-RUBY
-        require "bundler/setup"
+        require "lic/setup"
         Object.new.gem "rack"
         puts "FAIL"
       RUBY
@@ -1421,7 +1421,7 @@ end
       G
 
       ruby <<-RUBY
-        require "bundler/setup"
+        require "lic/setup"
         Object.new.require "rack"
         puts "FAIL"
       RUBY

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Source do
-  class ExampleSource < Bundler::Source
+RSpec.describe Lic::Source do
+  class ExampleSource < Lic::Source
   end
 
   subject { ExampleSource.new }
@@ -32,7 +32,7 @@ RSpec.describe Bundler::Source do
     context "when there are locked gems" do
       let(:locked_gems) { double(:locked_gems) }
 
-      before { allow(Bundler).to receive(:locked_gems).and_return(locked_gems) }
+      before { allow(Lic).to receive(:locked_gems).and_return(locked_gems) }
 
       context "that contain the relevant gem spec" do
         before do
@@ -57,7 +57,7 @@ RSpec.describe Bundler::Source do
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "< 1.5") }
 
           context "with color" do
-            before { Bundler.ui = Bundler::UI::Shell.new }
+            before { Lic.ui = Lic::UI::Shell.new }
 
             it "should return a string with the spec name and version and locked spec version" do
               expect(subject.version_message(spec)).to eq("nokogiri >= 1.6\e[32m (was < 1.5)\e[0m")
@@ -76,7 +76,7 @@ RSpec.describe Bundler::Source do
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "1.7.0") }
 
           context "with color" do
-            before { Bundler.ui = Bundler::UI::Shell.new }
+            before { Lic.ui = Lic::UI::Shell.new }
 
             it "should return a string with the locked spec version in yellow" do
               expect(subject.version_message(spec)).to eq("nokogiri 1.6.1\e[33m (was 1.7.0)\e[0m")
@@ -89,7 +89,7 @@ RSpec.describe Bundler::Source do
           let(:locked_gem) { double(:locked_gem, :name => "nokogiri", :version => "1.7.0") }
 
           context "with color" do
-            before { Bundler.ui = Bundler::UI::Shell.new }
+            before { Lic.ui = Lic::UI::Shell.new }
 
             it "should return a string with the locked spec version in green" do
               expect(subject.version_message(spec)).to eq("nokogiri 1.7.1\e[32m (was 1.7.0)\e[0m")
@@ -110,7 +110,7 @@ RSpec.describe Bundler::Source do
     end
 
     context "when there are no locked gems" do
-      before { allow(Bundler).to receive(:locked_gems).and_return(nil) }
+      before { allow(Lic).to receive(:locked_gems).and_return(nil) }
 
       it_behaves_like "the lockfile specs are not relevant"
     end

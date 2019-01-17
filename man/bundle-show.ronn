@@ -1,9 +1,9 @@
-bundle-show(1) -- Shows all the gems in your bundle, or the path to a gem
+lic-show(1) -- Shows all the gems in your lic, or the path to a gem
 =========================================================================
 
 ## SYNOPSIS
 
-`bundle show` [GEM]
+`lic show` [GEM]
               [--paths]
 
 ## DESCRIPTION

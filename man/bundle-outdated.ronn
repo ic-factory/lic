@@ -1,9 +1,9 @@
-bundle-outdated(1) -- List installed gems with newer versions available
+lic-outdated(1) -- List installed gems with newer versions available
 =======================================================================
 
 ## SYNOPSIS
 
-`bundle outdated` [GEM] [--local]
+`lic outdated` [GEM] [--local]
                         [--pre]
                         [--source]
                         [--strict]
@@ -22,7 +22,7 @@ bundle-outdated(1) -- List installed gems with newer versions available
 Outdated lists the names and versions of gems that have a newer version available
 in the given source. Calling outdated with [GEM [GEM]] will only check for newer
 versions of the given gems. Prerelease gems are ignored by default. If your gems
-are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
+are up to date, Lic will exit with a status of 0. Otherwise, it will exit 1.
 
 ## OPTIONS
 
@@ -73,12 +73,12 @@ are up to date, Bundler will exit with a status of 0. Otherwise, it will exit 1.
 
 ## PATCH LEVEL OPTIONS
 
-See [bundle update(1)](bundle-update.1.html) for details.
+See [lic update(1)](lic-update.1.html) for details.
 
-One difference between the patch level options in `bundle update` and here is the `--strict` option.
+One difference between the patch level options in `lic update` and here is the `--strict` option.
 `--strict` was already an option on outdated before the patch level options were added. `--strict`
 wasn't altered, and the `--update-strict` option on `outdated` reflects what `--strict` does on
-`bundle update`.
+`lic update`.
 
 ## FILTERING OUTPUT
 

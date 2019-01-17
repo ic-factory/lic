@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle cache with multiple platforms" do
+RSpec.describe "lic cache with multiple platforms" do
   before :each do
     gemfile <<-G
       source "file://#{gem_repo1}"
@@ -33,17 +33,17 @@ RSpec.describe "bundle cache with multiple platforms" do
     cache_gems "rack-1.0.0", "activesupport-2.3.5"
   end
 
-  it "ensures that a successful bundle install does not delete gems for other platforms" do
-    bundle! "install"
+  it "ensures that a successful lic install does not delete gems for other platforms" do
+    lic! "install"
 
-    expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
-    expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
+    expect(licd_app("vendor/cache/rack-1.0.0.gem")).to exist
+    expect(licd_app("vendor/cache/activesupport-2.3.5.gem")).to exist
   end
 
-  it "ensures that a successful bundle update does not delete gems for other platforms" do
-    bundle! "update", :all => bundle_update_requires_all?
+  it "ensures that a successful lic update does not delete gems for other platforms" do
+    lic! "update", :all => lic_update_requires_all?
 
-    expect(bundled_app("vendor/cache/rack-1.0.0.gem")).to exist
-    expect(bundled_app("vendor/cache/activesupport-2.3.5.gem")).to exist
+    expect(licd_app("vendor/cache/rack-1.0.0.gem")).to exist
+    expect(licd_app("vendor/cache/activesupport-2.3.5.gem")).to exist
   end
 end

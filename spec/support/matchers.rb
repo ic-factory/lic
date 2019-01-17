@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "forwardable"
-require "support/the_bundle"
+require "support/the_lic"
 module Spec
   module Matchers
     extend RSpec::Matchers
@@ -91,7 +91,7 @@ module Spec
     end
 
     RSpec::Matchers.define :have_dep do |*args|
-      dep = Bundler::Dependency.new(*args)
+      dep = Lic::Dependency.new(*args)
 
       match do |actual|
         actual.length == 1 && actual.all? {|d| d == dep }
@@ -132,7 +132,7 @@ module Spec
       diffable
 
       match do |actual|
-        @actual = Bundler.read_file(actual)
+        @actual = Lic.read_file(actual)
         values_match?(file_contents, @actual)
       end
     end
@@ -149,7 +149,7 @@ module Spec
         groups << opts
         @errors = names.map do |name|
           name, version, platform = name.split(/\s+/)
-          version_const = name == "bundler" ? "Bundler::VERSION" : Spec::Builders.constantize(name)
+          version_const = name == "lic" ? "Lic::VERSION" : Spec::Builders.constantize(name)
           begin
             run! "require '#{name}.rb'; puts #{version_const}", *groups
           rescue => e
@@ -223,24 +223,24 @@ module Spec
 
     def plugin_should_be_installed(*names)
       names.each do |name|
-        expect(Bundler::Plugin).to be_installed(name)
-        path = Pathname.new(Bundler::Plugin.installed?(name))
+        expect(Lic::Plugin).to be_installed(name)
+        path = Pathname.new(Lic::Plugin.installed?(name))
         expect(path + "plugins.rb").to exist
       end
     end
 
     def plugin_should_not_be_installed(*names)
       names.each do |name|
-        expect(Bundler::Plugin).not_to be_installed(name)
+        expect(Lic::Plugin).not_to be_installed(name)
       end
     end
 
     def lockfile_should_be(expected)
-      expect(bundled_app("Gemfile.lock")).to read_as(normalize_uri_file(strip_whitespace(expected)))
+      expect(licd_app("Gemfile.lock")).to read_as(normalize_uri_file(strip_whitespace(expected)))
     end
 
     def gemfile_should_be(expected)
-      expect(bundled_app("Gemfile")).to read_as(strip_whitespace(expected))
+      expect(licd_app("Gemfile")).to read_as(strip_whitespace(expected))
     end
   end
 end

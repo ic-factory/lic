@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "bundler/mirror"
+require "lic/mirror"
 
-RSpec.describe Bundler::Settings::Mirror do
-  let(:mirror) { Bundler::Settings::Mirror.new }
+RSpec.describe Lic::Settings::Mirror do
+  let(:mirror) { Lic::Settings::Mirror.new }
 
   it "returns zero when fallback_timeout is not set" do
     expect(mirror.fallback_timeout).to eq(0)
@@ -135,8 +135,8 @@ RSpec.describe Bundler::Settings::Mirror do
     describe "#==" do
       it "returns true if uri and fallback timeout are the same" do
         uri = "https://ruby.taobao.org"
-        mirror = Bundler::Settings::Mirror.new(uri, 1)
-        another_mirror = Bundler::Settings::Mirror.new(uri, 1)
+        mirror = Lic::Settings::Mirror.new(uri, 1)
+        another_mirror = Lic::Settings::Mirror.new(uri, 1)
 
         expect(mirror == another_mirror).to be true
       end
@@ -144,19 +144,19 @@ RSpec.describe Bundler::Settings::Mirror do
   end
 end
 
-RSpec.describe Bundler::Settings::Mirrors do
+RSpec.describe Lic::Settings::Mirrors do
   let(:localhost_uri) { URI("http://localhost:9292") }
 
   context "with a just created mirror" do
     let(:mirrors) do
       probe = double
       allow(probe).to receive(:replies?).and_return(true)
-      Bundler::Settings::Mirrors.new(probe)
+      Lic::Settings::Mirrors.new(probe)
     end
 
     it "returns a mirror that contains the source uri for an unknown uri" do
       mirror = mirrors.for("http://rubygems.org/")
-      expect(mirror).to eq(Bundler::Settings::Mirror.new("http://rubygems.org/"))
+      expect(mirror).to eq(Lic::Settings::Mirror.new("http://rubygems.org/"))
     end
 
     it "parses a mirror key and returns a mirror for the parsed uri" do
@@ -198,7 +198,7 @@ RSpec.describe Bundler::Settings::Mirrors do
     let(:mirrors) do
       probe = double
       allow(probe).to receive(:replies?).and_return(true)
-      Bundler::Settings::Mirrors.new(probe)
+      Lic::Settings::Mirrors.new(probe)
     end
 
     context "with a default fallback_timeout for rubygems.org" do
@@ -244,7 +244,7 @@ RSpec.describe Bundler::Settings::Mirrors do
     let(:mirrors) do
       probe = double
       allow(probe).to receive(:replies?).and_return(false)
-      Bundler::Settings::Mirrors.new(probe)
+      Lic::Settings::Mirrors.new(probe)
     end
 
     context "with a localhost mirror for all" do
@@ -293,13 +293,13 @@ RSpec.describe Bundler::Settings::Mirrors do
   end
 end
 
-RSpec.describe Bundler::Settings::TCPSocketProbe do
-  let(:probe) { Bundler::Settings::TCPSocketProbe.new }
+RSpec.describe Lic::Settings::TCPSocketProbe do
+  let(:probe) { Lic::Settings::TCPSocketProbe.new }
 
   context "with a listening TCP Server" do
     def with_server_and_mirror
       server = TCPServer.new("127.0.0.1", 0)
-      mirror = Bundler::Settings::Mirror.new("http://localhost:#{server.addr[1]}", 1)
+      mirror = Lic::Settings::Mirror.new("http://localhost:#{server.addr[1]}", 1)
       yield server, mirror
       server.close unless server.closed?
     end
@@ -320,7 +320,7 @@ RSpec.describe Bundler::Settings::TCPSocketProbe do
   end
 
   context "with an invalid mirror" do
-    let(:mirror) { Bundler::Settings::Mirror.new("http://127.0.0.127:9292", true) }
+    let(:mirror) { Lic::Settings::Mirror.new("http://127.0.0.127:9292", true) }
 
     it "fails with a timeout when there is nothing to tcp handshake" do
       expect(probe.replies?(mirror)).to be_falsey

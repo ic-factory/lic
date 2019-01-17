@@ -9,7 +9,7 @@ module Spec
     end
 
     def gemspec
-      @gemspec ||= root.join(ruby_core? ? "lib/bundler.gemspec" : "bundler.gemspec")
+      @gemspec ||= root.join(ruby_core? ? "lib/lic.gemspec" : "lic.gemspec")
     end
 
     def bindir
@@ -17,7 +17,7 @@ module Spec
     end
 
     def spec_dir
-      @spec_dir ||= root.join(ruby_core? ? "spec/bundler" : "spec")
+      @spec_dir ||= root.join(ruby_core? ? "spec/lic" : "spec")
     end
 
     def tmp(*path)
@@ -28,34 +28,34 @@ module Spec
       tmp.join("home", *path)
     end
 
-    def default_bundle_path(*path)
-      if Bundler::VERSION.split(".").first.to_i < 2
+    def default_lic_path(*path)
+      if Lic::VERSION.split(".").first.to_i < 2
         system_gem_path(*path)
       else
-        bundled_app(*[".bundle", ENV.fetch("BUNDLER_SPEC_RUBY_ENGINE", Gem.ruby_engine), Gem::ConfigMap[:ruby_version], *path].compact)
+        licd_app(*[".lic", ENV.fetch("LIC_SPEC_RUBY_ENGINE", Gem.ruby_engine), Gem::ConfigMap[:ruby_version], *path].compact)
       end
     end
 
-    def bundled_app(*path)
-      root = tmp.join("bundled_app")
+    def licd_app(*path)
+      root = tmp.join("licd_app")
       FileUtils.mkdir_p(root)
       root.join(*path)
     end
 
-    alias_method :bundled_app1, :bundled_app
+    alias_method :licd_app1, :licd_app
 
-    def bundled_app2(*path)
-      root = tmp.join("bundled_app2")
+    def licd_app2(*path)
+      root = tmp.join("licd_app2")
       FileUtils.mkdir_p(root)
       root.join(*path)
     end
 
     def vendored_gems(path = nil)
-      bundled_app(*["vendor/bundle", Gem.ruby_engine, Gem::ConfigMap[:ruby_version], path].compact)
+      licd_app(*["vendor/lic", Gem.ruby_engine, Gem::ConfigMap[:ruby_version], path].compact)
     end
 
     def cached_gem(path)
-      bundled_app("vendor/cache/#{path}.gem")
+      licd_app("vendor/cache/#{path}.gem")
     end
 
     def base_system_gems
@@ -90,24 +90,24 @@ module Spec
       tmp("gems/system", *path)
     end
 
-    def system_bundle_bin_path
-      system_gem_path("bin/bundle")
+    def system_lic_bin_path
+      system_gem_path("bin/lic")
     end
 
     def lib_path(*args)
       tmp("libs", *args)
     end
 
-    def bundler_path
+    def lic_path
       root.join("lib")
     end
 
     def global_plugin_gem(*args)
-      home ".bundle", "plugin", "gems", *args
+      home ".lic", "plugin", "gems", *args
     end
 
     def local_plugin_gem(*args)
-      bundled_app ".bundle", "plugin", "gems", *args
+      licd_app ".lic", "plugin", "gems", *args
     end
 
     def tmpdir(*args)
@@ -119,7 +119,7 @@ module Spec
       @ruby_core ||= nil
 
       if @ruby_core.nil?
-        @ruby_core = true & (ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"])
+        @ruby_core = true & (ENV["LIC_RUBY"] && ENV["LIC_GEM"])
       else
         @ruby_core
       end

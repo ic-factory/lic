@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "bundler/yaml_serializer"
+require "lic/yaml_serializer"
 
-RSpec.describe Bundler::YAMLSerializer do
-  subject(:serializer) { Bundler::YAMLSerializer }
+RSpec.describe Lic::YAMLSerializer do
+  subject(:serializer) { Lic::YAMLSerializer }
 
   describe "#dump" do
     it "works for simple hash" do
@@ -99,10 +99,10 @@ RSpec.describe Bundler::YAMLSerializer do
 
     it "handles colon in key/value" do
       yaml = strip_whitespace <<-YAML
-        BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/: http://rubygems-mirror.org
+        LIC_MIRROR__HTTPS://RUBYGEMS__ORG/: http://rubygems-mirror.org
       YAML
 
-      expect(serializer.load(yaml)).to eq("BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/" => "http://rubygems-mirror.org")
+      expect(serializer.load(yaml)).to eq("LIC_MIRROR__HTTPS://RUBYGEMS__ORG/" => "http://rubygems-mirror.org")
     end
 
     it "handles arrays inside hashes" do

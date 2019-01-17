@@ -1,7 +1,7 @@
 language: ruby
 script: rake spec:travis
 before_script:
-  - travis_retry rake -E 'module ::Bundler; VERSION = "0.0.0"; end' override_version
+  - travis_retry rake -E 'module ::Lic; VERSION = "0.0.0"; end' override_version
   - travis_retry rake spec:travis:deps
   - travis_retry rake man:build
   - travis_retry rake spec:rubygems:clone_rubygems_$RGV
@@ -39,7 +39,7 @@ stages:
 # Rubygems versions MUST be available as rake tasks
 # see Rakefile:125 for the list of possible RGV values
 env:
-  # We need to know if changes to rubygems will break bundler on release
+  # We need to know if changes to rubygems will break lic on release
   - RGV=master
   # Test the latest rubygems release with all of our supported rubies
   - RGV=v3.0.1
@@ -76,10 +76,10 @@ jobs:
       stage: test
     # 1.x mode (we want to keep stuff passing in 1.x mode for now)
     - rvm: 2.6.0
-      env: RGV=v2.7.7 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v2.7.7 LIC_SPEC_SUB_VERSION=1.98
       stage: test
     - rvm: 1.8.7
-      env: RGV=v2.7.7 BUNDLER_SPEC_SUB_VERSION=1.98
+      env: RGV=v2.7.7 LIC_SPEC_SUB_VERSION=1.98
       stage: test
 
   allow_failures:

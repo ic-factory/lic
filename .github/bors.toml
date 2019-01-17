@@ -6,5 +6,5 @@ timeout_sec = 14400
 delete_merged_branches = true
 
 [committer]
-name = "Bundlerbot"
-email = "bot@bundler.io"
+name = "Licbot"
+email = "bot@lic.io"

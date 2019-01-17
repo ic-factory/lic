@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "bundler/fetcher"
+require "lic/fetcher"
 
-RSpec.describe Bundler::Fetcher do
+RSpec.describe Lic::Fetcher do
   let(:uri) { URI("https://example.com") }
   let(:remote) { double("remote", :uri => uri, :original_uri => nil) }
 
-  subject(:fetcher) { Bundler::Fetcher.new(remote) }
+  subject(:fetcher) { Lic::Fetcher.new(remote) }
 
   before do
-    allow(Bundler).to receive(:root) { Pathname.new("root") }
+    allow(Lic).to receive(:root) { Pathname.new("root") }
   end
 
   describe "#connection" do
@@ -26,7 +26,7 @@ RSpec.describe Bundler::Fetcher do
     context "when Gem.configuration specifies http_proxy " do
       let(:proxy) { "http://proxy-example2.com" }
       before do
-        allow(Bundler.rubygems.configuration).to receive(:[]).with(:http_proxy).and_return(proxy)
+        allow(Lic.rubygems.configuration).to receive(:[]).with(:http_proxy).and_return(proxy)
       end
       it "consider Gem.configuration when determine proxy" do
         expect(fetcher.http_proxy).to match("http://proxy-example2.com")
@@ -50,7 +50,7 @@ RSpec.describe Bundler::Fetcher do
         double("remote", :uri => uri, :original_uri => orig_uri, :anonymized_uri => uri)
       end
 
-      let(:fetcher) { Bundler::Fetcher.new(remote_with_mirror) }
+      let(:fetcher) { Lic::Fetcher.new(remote_with_mirror) }
 
       it "sets the 'X-Gemfile-Source' header containing the original source" do
         expect(
@@ -64,7 +64,7 @@ RSpec.describe Bundler::Fetcher do
         double("remote", :uri => uri, :original_uri => nil, :anonymized_uri => uri)
       end
 
-      let(:fetcher) { Bundler::Fetcher.new(remote_no_mirror) }
+      let(:fetcher) { Lic::Fetcher.new(remote_no_mirror) }
 
       it "does not set the 'X-Gemfile-Source' header" do
         expect(fetcher.send(:connection).override_headers["X-Gemfile-Source"]).to be_nil
@@ -97,15 +97,15 @@ RSpec.describe Bundler::Fetcher do
       before do
         cert = File.join(Spec::Path.tmpdir, "cert")
         File.open(cert, "w") {|f| f.write "PEM" }
-        allow(Bundler.settings).to receive(:[]).and_return(nil)
-        allow(Bundler.settings).to receive(:[]).with(:ssl_client_cert).and_return(cert)
+        allow(Lic.settings).to receive(:[]).and_return(nil)
+        allow(Lic.settings).to receive(:[]).with(:ssl_client_cert).and_return(cert)
         expect(OpenSSL::X509::Certificate).to receive(:new).with("PEM").and_return("cert")
         expect(OpenSSL::PKey::RSA).to receive(:new).with("PEM").and_return("key")
       end
       after do
         FileUtils.rm File.join(Spec::Path.tmpdir, "cert")
       end
-      it "use bundler configuration" do
+      it "use lic configuration" do
         expect(fetcher.send(:connection).cert).to eq("cert")
         expect(fetcher.send(:connection).key).to eq("key")
       end
@@ -113,7 +113,7 @@ RSpec.describe Bundler::Fetcher do
 
     context "when gem ssl configuration is set" do
       before do
-        allow(Bundler.rubygems.configuration).to receive_messages(
+        allow(Lic.rubygems.configuration).to receive_messages(
           :http_proxy => nil,
           :ssl_client_cert => "cert",
           :ssl_ca_cert => "ca"
@@ -133,9 +133,9 @@ RSpec.describe Bundler::Fetcher do
   end
 
   describe "#user_agent" do
-    it "builds user_agent with current ruby version and Bundler settings" do
-      allow(Bundler.settings).to receive(:all).and_return(%w[foo bar])
-      expect(fetcher.user_agent).to match(%r{bundler/(\d.)})
+    it "builds user_agent with current ruby version and Lic settings" do
+      allow(Lic.settings).to receive(:all).and_return(%w[foo bar])
+      expect(fetcher.user_agent).to match(%r{lic/(\d.)})
       expect(fetcher.user_agent).to match(%r{rubygems/(\d.)})
       expect(fetcher.user_agent).to match(%r{ruby/(\d.)})
       expect(fetcher.user_agent).to match(%r{options/foo,bar})

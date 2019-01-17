@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Plugin::API::Source do
+RSpec.describe Lic::Plugin::API::Source do
   let(:uri) { "uri://to/test" }
   let(:type) { "spec_type" }
 
   subject(:source) do
     klass = Class.new
-    klass.send :include, Bundler::Plugin::API::Source
+    klass.send :include, Lic::Plugin::API::Source
     klass.new("uri" => uri, "type" => type)
   end
 
@@ -24,7 +24,7 @@ RSpec.describe Bundler::Plugin::API::Source do
     let(:installer) { double(:installer) }
 
     before do
-      allow(Bundler::Source::Path::Installer).to receive(:new) { installer }
+      allow(Lic::Source::Path::Installer).to receive(:new) { installer }
     end
 
     it "calls Path::Installer's post_install" do
@@ -37,10 +37,10 @@ RSpec.describe Bundler::Plugin::API::Source do
   context "install_path" do
     let(:uri) { "uri://to/a/repository-name" }
     let(:hash) { Digest(:SHA1).hexdigest(uri) }
-    let(:install_path) { Pathname.new "/bundler/install/path" }
+    let(:install_path) { Pathname.new "/lic/install/path" }
 
     before do
-      allow(Bundler).to receive(:install_path) { install_path }
+      allow(Lic).to receive(:install_path) { install_path }
     end
 
     it "returns basename with uri_hash" do

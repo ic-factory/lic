@@ -108,7 +108,7 @@ RSpec.describe "The library itself" do
     exempt = /\.gitmodules|\.marshal|fixtures|vendor|ssl_certs|LICENSE|vcr_cassettes/
     error_messages = []
     Dir.chdir(root) do
-      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler` : `git ls-files -z -- lib`
+      lib_files = ruby_core? ? `git ls-files -z -- lib/lic lib/lic.rb spec/lic` : `git ls-files -z -- lib`
       lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_tab_characters(filename)
@@ -122,7 +122,7 @@ RSpec.describe "The library itself" do
     exempt = %r{quality_spec.rb|support/helpers|vcr_cassettes|\.md|\.ronn}
     error_messages = []
     Dir.chdir(root) do
-      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler` : `git ls-files -z -- lib`
+      lib_files = ruby_core? ? `git ls-files -z -- lib/lic lib/lic.rb spec/lic` : `git ls-files -z -- lib`
       lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_debugging_mechanisms(filename)
@@ -133,9 +133,9 @@ RSpec.describe "The library itself" do
 
   it "does not include any unresolved merge conflicts" do
     error_messages = []
-    exempt = %r{lock/lockfile_(bundler_1_)?spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
+    exempt = %r{lock/lockfile_(lic_1_)?spec|quality_spec|vcr_cassettes|\.ronn|lockfile_parser\.rb}
     Dir.chdir(root) do
-      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb spec/bundler` : `git ls-files -z -- lib`
+      lib_files = ruby_core? ? `git ls-files -z -- lib/lic lib/lic.rb spec/lic` : `git ls-files -z -- lib`
       lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_git_merge_conflicts(filename)
@@ -161,7 +161,7 @@ RSpec.describe "The library itself" do
     error_messages = []
     exempt = /vendor/
     Dir.chdir(root) do
-      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files = ruby_core? ? `git ls-files -z -- lib/lic lib/lic.rb` : `git ls-files -z -- lib`
       lib_files.split("\x0").each do |filename|
         next if filename =~ exempt
         error_messages << check_for_expendable_words(filename)
@@ -189,19 +189,19 @@ RSpec.describe "The library itself" do
     all_settings = Hash.new {|h, k| h[k] = [] }
     documented_settings = []
 
-    Bundler::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::BOOL_KEYS" }
-    Bundler::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::NUMBER_KEYS" }
-    Bundler::Settings::ARRAY_KEYS.each {|k| all_settings[k] << "in Bundler::Settings::ARRAY_KEYS" }
+    Lic::Settings::BOOL_KEYS.each {|k| all_settings[k] << "in Lic::Settings::BOOL_KEYS" }
+    Lic::Settings::NUMBER_KEYS.each {|k| all_settings[k] << "in Lic::Settings::NUMBER_KEYS" }
+    Lic::Settings::ARRAY_KEYS.each {|k| all_settings[k] << "in Lic::Settings::ARRAY_KEYS" }
 
     Dir.chdir(root) do
       key_pattern = /([a-z\._-]+)/i
-      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files = ruby_core? ? `git ls-files -z -- lib/lic lib/lic.rb` : `git ls-files -z -- lib`
       lib_files.split("\x0").each do |filename|
         File.readlines(filename).each_with_index do |line, number|
-          line.scan(/Bundler\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
+          line.scan(/Lic\.settings\[:#{key_pattern}\]/).flatten.each {|s| all_settings[s] << "referenced at `#{filename}:#{number.succ}`" }
         end
       end
-      documented_settings = File.read("man/bundle-config.ronn")[/LIST OF AVAILABLE KEYS.*/m].scan(/^\* `#{key_pattern}`/).flatten
+      documented_settings = File.read("man/lic-config.ronn")[/LIST OF AVAILABLE KEYS.*/m].scan(/^\* `#{key_pattern}`/).flatten
     end
 
     documented_settings.each do |s|
@@ -225,18 +225,18 @@ RSpec.describe "The library itself" do
     Dir.chdir(root) do
       begin
         gem_command! :build, gemspec
-        if Bundler.rubygems.provides?(">= 2.4")
+        if Lic.rubygems.provides?(">= 2.4")
           # there's no way around this warning
           last_command.stderr.sub!(/^YAML safe loading.*/, "")
 
           # older rubygems have weird warnings, and we won't actually be using them
           # to build the gem for releases anyways
-          expect(last_command.stderr).to be_empty, "bundler should build as a gem without warnings, but\n#{err}"
+          expect(last_command.stderr).to be_empty, "lic should build as a gem without warnings, but\n#{err}"
         end
       ensure
         # clean up the .gem generated
         path_prefix = ruby_core? ? "lib/" : "./"
-        FileUtils.rm("#{path_prefix}bundler-#{Bundler::VERSION}.gem")
+        FileUtils.rm("#{path_prefix}lic-#{Lic::VERSION}.gem")
       end
     end
   end
@@ -244,15 +244,15 @@ RSpec.describe "The library itself" do
   it "does not contain any warnings" do
     Dir.chdir(root) do
       exclusions = %w[
-        lib/bundler/capistrano.rb
-        lib/bundler/deployment.rb
-        lib/bundler/gem_tasks.rb
-        lib/bundler/vlad.rb
-        lib/bundler/templates/gems.rb
+        lib/lic/capistrano.rb
+        lib/lic/deployment.rb
+        lib/lic/gem_tasks.rb
+        lib/lic/vlad.rb
+        lib/lic/templates/gems.rb
       ]
-      lib_files = ruby_core? ? `git ls-files -z -- lib/bundler lib/bundler.rb` : `git ls-files -z -- lib`
+      lib_files = ruby_core? ? `git ls-files -z -- lib/lic lib/lic.rb` : `git ls-files -z -- lib`
       lib_files = lib_files.split("\x0").grep(/\.rb$/) - exclusions
-      lib_files.reject! {|f| f.start_with?("lib/bundler/vendor") }
+      lib_files.reject! {|f| f.start_with?("lib/lic/vendor") }
       lib_files.map! {|f| f.chomp(".rb") }
       sys_exec!("ruby -w -Ilib") do |input, _, _|
         lib_files.each do |f|

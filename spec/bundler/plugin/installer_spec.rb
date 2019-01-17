@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Plugin::Installer do
-  subject(:installer) { Bundler::Plugin::Installer.new }
+RSpec.describe Lic::Plugin::Installer do
+  subject(:installer) { Lic::Plugin::Installer.new }
 
   describe "cli install" do
     it "uses Gem.sources when non of the source is provided" do
       sources = double(:sources)
-      Bundler.settings # initialize it before we have to touch rubygems.ext_lock
-      allow(Bundler).to receive_message_chain("rubygems.sources") { sources }
+      Lic.settings # initialize it before we have to touch rubygems.ext_lock
+      allow(Lic).to receive_message_chain("rubygems.sources") { sources }
 
       allow(installer).to receive(:install_rubygems).
         with("new-plugin", [">= 0"], sources).once
@@ -69,7 +69,7 @@ RSpec.describe Bundler::Plugin::Installer do
         it "has expected full gem path" do
           rev = revision_for(lib_path("ga-plugin"))
           expect(result["ga-plugin"].full_gem_path).
-            to eq(Bundler::Plugin.root.join("bundler", "gems", "ga-plugin-#{rev[0..11]}").to_s)
+            to eq(Lic::Plugin.root.join("lic", "gems", "ga-plugin-#{rev[0..11]}").to_s)
         end
       end
 
@@ -92,7 +92,7 @@ RSpec.describe Bundler::Plugin::Installer do
         it "has expected full gem path" do
           rev = revision_for(lib_path("ga-plugin"))
           expect(result["ga-plugin"].full_gem_path).
-            to eq(Bundler::Plugin.root.join("bundler", "gems", "ga-plugin-#{rev[0..11]}").to_s)
+            to eq(Lic::Plugin.root.join("lic", "gems", "ga-plugin-#{rev[0..11]}").to_s)
         end
       end
 
@@ -102,7 +102,7 @@ RSpec.describe Bundler::Plugin::Installer do
         end
 
         it "returns the installed spec after installing " do
-          expect(result["re-plugin"]).to be_kind_of(Bundler::RemoteSpecification)
+          expect(result["re-plugin"]).to be_kind_of(Lic::RemoteSpecification)
         end
 
         it "has expected full_gem)path" do
@@ -117,8 +117,8 @@ RSpec.describe Bundler::Plugin::Installer do
         end
 
         it "returns the installed spec after installing " do
-          expect(result["re-plugin"]).to be_kind_of(Bundler::RemoteSpecification)
-          expect(result["ma-plugin"]).to be_kind_of(Bundler::RemoteSpecification)
+          expect(result["re-plugin"]).to be_kind_of(Lic::RemoteSpecification)
+          expect(result["ma-plugin"]).to be_kind_of(Lic::RemoteSpecification)
         end
 
         it "has expected full_gem)path" do

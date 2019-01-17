@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Fetcher::CompactIndex do
+RSpec.describe Lic::Fetcher::CompactIndex do
   let(:downloader)  { double(:downloader) }
   let(:display_uri) { URI("http://sampleuri.com") }
   let(:remote)      { double(:remote, :cache_slug => "lsjdf", :uri => display_uri) }
@@ -19,7 +19,7 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
     end
 
     it "calls worker#stop during the run" do
-      expect_any_instance_of(Bundler::Worker).to receive(:stop).at_least(:once)
+      expect_any_instance_of(Lic::Worker).to receive(:stop).at_least(:once)
 
       compact_index.specs_for_names(["lskdjf"])
     end
@@ -46,8 +46,8 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
 
       context "when OpenSSL is FIPS-enabled", :ruby => ">= 2.0.0" do
         def remove_cached_md5_availability
-          return unless Bundler::SharedHelpers.instance_variable_defined?(:@md5_available)
-          Bundler::SharedHelpers.remove_instance_variable(:@md5_available)
+          return unless Lic::SharedHelpers.instance_variable_defined?(:@md5_available)
+          Lic::SharedHelpers.remove_instance_variable(:@md5_available)
         end
 
         before do
@@ -79,22 +79,22 @@ RSpec.describe Bundler::Fetcher::CompactIndex do
 
       context "with debug on" do
         before do
-          allow(Bundler).to receive_message_chain(:ui, :debug?).and_return(true)
+          allow(Lic).to receive_message_chain(:ui, :debug?).and_return(true)
         end
 
         it "should log at info level" do
-          expect(Bundler).to receive_message_chain(:ui, :debug).with('Looking up gems ["lskdjf"]')
+          expect(Lic).to receive_message_chain(:ui, :debug).with('Looking up gems ["lskdjf"]')
           compact_index.specs_for_names(["lskdjf"])
         end
       end
 
       context "with debug off" do
         before do
-          allow(Bundler).to receive_message_chain(:ui, :debug?).and_return(false)
+          allow(Lic).to receive_message_chain(:ui, :debug?).and_return(false)
         end
 
         it "should log at info level" do
-          expect(Bundler).to receive_message_chain(:ui, :info).with(".", false)
+          expect(Lic).to receive_message_chain(:ui, :info).with(".", false)
           compact_index.specs_for_names(["lskdjf"])
         end
       end

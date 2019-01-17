@@ -1,4 +1,4 @@
-# Bundler Code of Conduct
+# Lic Code of Conduct
 
 ## When Something Happens
 
@@ -6,7 +6,7 @@ If you see a Code of Conduct violation, follow these steps:
 
 1.  Let the person know that what they did is not appropriate and ask them to stop and/or edit their message(s).
 2.  That person should immediately stop the behavior and correct the issue.
-3.  If this doesn't happen, or if you're uncomfortable speaking up, [contact admins](#contacting-admins).
+3.  If this doesn't happen, or if you're uncomfortable speaking up, contact the administrator.
 4.  As soon as available, an admin will join, identify themselves, and take [further action (see below)](#further-enforcement), starting with a warning, then temporary deactivation, then long-term deactivation.
 
 When reporting, please include any relevant details, links, screenshots, context, or other information that may be used to better understand and resolve the situation.
@@ -15,7 +15,7 @@ When reporting, please include any relevant details, links, screenshots, context
 
 ## Our Pledge
 
-In the interest of fostering an open and welcoming environment, we as members of the Bundler community pledge to making participation in our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, technical preferences, nationality, personal appearance, race, religion, or sexual identity and orientation.
+In the interest of fostering an open and welcoming environment, we as members of the Lic community pledge to making participation in our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, technical preferences, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 ## Our Standards
 
@@ -47,7 +47,7 @@ Examples of unacceptable behavior by participants include:
 
 ## Scope
 
-This Code of Conduct applies both within community spaces and in other spaces involving the community. This includes the GitHub repository, the Bundler Slack instance, the Bundler Twitter community, private email communications in the context of the community, and any events where members of the community are participating, as well as adjacent communities and venues affecting the community's members.
+This Code of Conduct applies both within community spaces and in other spaces involving the community. This includes the GitHub repository, the Lic Slack instance, the Lic Twitter community, private email communications in the context of the community, and any events where members of the community are participating, as well as adjacent communities and venues affecting the community's members.
 
 Depending on the violation, the admins may decide that violations of this code of conduct that have happened outside of the scope of the community may deem an individual unwelcome, and take appropriate action to maintain the comfort and safety of its members.
 
@@ -59,9 +59,9 @@ Once the admins get involved, they will follow a documented series of steps and 
 
 ### Contacting Admins
 
-You may get in touch with the Bundler admin team through any of the following methods:
+You may get in touch with the Lic admin team through any of the following methods:
 
-- Email [the Bundler maintainers](http://bundler.io/contributors.html) as a group at [team@bundler.io](mailto:team@bundler.io).
+- Email [the Lic maintainers](http://lic.io/contributors.html) as a group at [team@lic.io](mailto:team@lic.io).
 - Directly message any maintainer in private (through Slack, Twitter, email, or other available option) if that is more comfortable
 
 ### Further Enforcement
@@ -111,7 +111,7 @@ Sometimes, though, you need to get admins involved. Admins will do their best to
 
 > Patt: "Leave me alone I haven't said anything bad wtf is wrong with you."
 
-> MxAdmin1: _removes patt_ _DMs patt_ "I mean it. Please refer to the CoC over at bundler.io/conduct.html if you have questions, but you can consider this an actual warning. I'd appreciate it if you reworded your messages in #general, since they made folks there uncomfortable. Let's try and be kind, yeah?"
+> MxAdmin1: _removes patt_ _DMs patt_ "I mean it. Please refer to the CoC over at lic.io/conduct.html if you have questions, but you can consider this an actual warning. I'd appreciate it if you reworded your messages in #general, since they made folks there uncomfortable. Let's try and be kind, yeah?"
 
 > Patt: _Replies to DM_ "@mxadmin1 Okay sorry. I'm just frustrated and I'm kinda burnt out and I guess I got carried away. I'll DM Alex a note apologizing and edit my messages. Sorry for the trouble."
 
@@ -133,4 +133,4 @@ Sometimes, though, you need to get admins involved. Admins will do their best to
 
 This Code of Conduct is adapted from the [package.community Code of Conduct], adapted from the [WeAllJS Code of Conduct](https://wealljs.org/code-of-conduct), itself adapted from [Contributor Covenant](http://contributor-covenant.org) version 1.4, available at [http://contributor-covenant.org/version/1/4](http://contributor-covenant.org/version/1/4), as well as the LGBTQ in Technology Slack [Code of Conduct](http://lgbtq.technology/coc.html).
 
-Additional thanks to [Contributor Covenant](http://contributor-covenant.org) for the [default code of conduct](https://github.com/bundler/bundler/blob/master/lib/bundler/templates/newgem/CODE_OF_CONDUCT.md.tt) included in generated gems.
+Additional thanks to [Contributor Covenant](http://contributor-covenant.org) for the [default code of conduct](https://github.com/lic/lic/blob/master/lib/lic/templates/newgem/CODE_OF_CONDUCT.md.tt) included in generated gems.

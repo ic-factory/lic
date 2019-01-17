@@ -1,24 +1,24 @@
-bundle-add(1) -- Add gem to the Gemfile and run bundle install
+lic-add(1) -- Add gem to the Gemfile and run lic install
 ================================================================
 
 ## SYNOPSIS
 
-`bundle add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE] [--skip-install] [--strict] [--optimistic]
+`lic add` <GEM_NAME> [--group=GROUP] [--version=VERSION] [--source=SOURCE] [--skip-install] [--strict] [--optimistic]
 
 ## DESCRIPTION
-Adds the named gem to the Gemfile and run `bundle install`. `bundle install` can be avoided by using the flag `--skip-install`.
+Adds the named gem to the Gemfile and run `lic install`. `lic install` can be avoided by using the flag `--skip-install`.
 
 Example:
 
-bundle add rails
+lic add rails
 
-bundle add rails --version "< 3.0, > 1.1"
+lic add rails --version "< 3.0, > 1.1"
 
-bundle add rails --version "~> 5.0.0" --source "https://gems.example.com" --group "development"
+lic add rails --version "~> 5.0.0" --source "https://gems.example.com" --group "development"
 
-bundle add rails --skip-install
+lic add rails --skip-install
 
-bundle add rails --group "development, test"
+lic add rails --group "development, test"
 
 ## OPTIONS
 * `--version`, `-v`:

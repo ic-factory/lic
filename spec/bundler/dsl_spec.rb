@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Dsl do
+RSpec.describe Lic::Dsl do
   before do
     @rubygems = double("rubygems")
-    allow(Bundler::Source::Rubygems).to receive(:new) { @rubygems }
+    allow(Lic::Source::Rubygems).to receive(:new) { @rubygems }
   end
 
   describe "#git_source" do
@@ -18,23 +18,23 @@ RSpec.describe Bundler::Dsl do
     it "raises exception on invalid hostname" do
       expect do
         subject.git_source(:group) {|repo_name| "git@git.example.com:#{repo_name}.git" }
-      end.to raise_error(Bundler::InvalidOption)
+      end.to raise_error(Lic::InvalidOption)
     end
 
     it "expects block passed" do
-      expect { subject.git_source(:example) }.to raise_error(Bundler::InvalidOption)
+      expect { subject.git_source(:example) }.to raise_error(Lic::InvalidOption)
     end
 
     context "github_https feature flag" do
       it "is true when github.https is true" do
-        bundle "config github.https true"
-        expect(Bundler.feature_flag.github_https?).to eq "true"
+        lic "config github.https true"
+        expect(Lic.feature_flag.github_https?).to eq "true"
       end
     end
 
-    context "default hosts (git, gist)", :bundler => "< 2" do
+    context "default hosts (git, gist)", :lic => "< 2" do
       context "when github.https config is true" do
-        before { bundle "config github.https true" }
+        before { lic "config github.https true" }
         it "converts :github to :git using https" do
           subject.gem("sparks", :github => "indirect/sparks")
           github_uri = "https://github.com/indirect/sparks.git"
@@ -79,7 +79,7 @@ RSpec.describe Bundler::Dsl do
       end
     end
 
-    context "default git sources", :bundler => "2" do
+    context "default git sources", :lic => "2" do
       it "has none" do
         expect(subject.instance_variable_get(:@git_sources)).to eq({})
       end
@@ -88,28 +88,28 @@ RSpec.describe Bundler::Dsl do
 
   describe "#method_missing" do
     it "raises an error for unknown DSL methods" do
-      expect(Bundler).to receive(:read_file).with(bundled_app("Gemfile").to_s).
+      expect(Lic).to receive(:read_file).with(licd_app("Gemfile").to_s).
         and_return("unknown")
 
-      error_msg = "There was an error parsing `Gemfile`: Undefined local variable or method `unknown' for Gemfile. Bundler cannot continue."
+      error_msg = "There was an error parsing `Gemfile`: Undefined local variable or method `unknown' for Gemfile. Lic cannot continue."
       expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, Regexp.new(error_msg))
+        to raise_error(Lic::GemfileError, Regexp.new(error_msg))
     end
   end
 
   describe "#eval_gemfile" do
     it "handles syntax errors with a useful message" do
-      expect(Bundler).to receive(:read_file).with(bundled_app("Gemfile").to_s).and_return("}")
+      expect(Lic).to receive(:read_file).with(licd_app("Gemfile").to_s).and_return("}")
       expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '\}'). Bundler cannot continue./)
+        to raise_error(Lic::GemfileError, /There was an error parsing `Gemfile`: (syntax error, unexpected tSTRING_DEND|(compile error - )?syntax error, unexpected '\}'). Lic cannot continue./)
     end
 
     it "distinguishes syntax errors from evaluation errors" do
-      expect(Bundler).to receive(:read_file).with(bundled_app("Gemfile").to_s).and_return(
+      expect(Lic).to receive(:read_file).with(licd_app("Gemfile").to_s).and_return(
         "ruby '2.1.5', :engine => 'ruby', :engine_version => '1.2.4'"
       )
       expect { subject.eval_gemfile("Gemfile") }.
-        to raise_error(Bundler::GemfileError, /There was an error evaluating `Gemfile`: ruby_version must match the :engine_version for MRI/)
+        to raise_error(Lic::GemfileError, /There was an error evaluating `Gemfile`: ruby_version must match the :engine_version for MRI/)
     end
   end
 
@@ -123,57 +123,57 @@ RSpec.describe Bundler::Dsl do
 
     it "rejects invalid platforms" do
       expect { subject.gem("foo", :platform => :bogus) }.
-        to raise_error(Bundler::GemfileError, /is not a valid platform/)
+        to raise_error(Lic::GemfileError, /is not a valid platform/)
     end
 
     it "rejects empty gem name" do
       expect { subject.gem("") }.
-        to raise_error(Bundler::GemfileError, /an empty gem name is not valid/)
+        to raise_error(Lic::GemfileError, /an empty gem name is not valid/)
     end
 
     it "rejects with a leading space in the name" do
       expect { subject.gem(" foo") }.
-        to raise_error(Bundler::GemfileError, /' foo' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /' foo' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects with a trailing space in the name" do
       expect { subject.gem("foo ") }.
-        to raise_error(Bundler::GemfileError, /'foo ' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /'foo ' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects with a space in the gem name" do
       expect { subject.gem("fo o") }.
-        to raise_error(Bundler::GemfileError, /'fo o' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /'fo o' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects with a tab in the gem name" do
       expect { subject.gem("fo\to") }.
-        to raise_error(Bundler::GemfileError, /'fo\to' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /'fo\to' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects with a newline in the gem name" do
       expect { subject.gem("fo\no") }.
-        to raise_error(Bundler::GemfileError, /'fo\no' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /'fo\no' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects with a carriage return in the gem name" do
       expect { subject.gem("fo\ro") }.
-        to raise_error(Bundler::GemfileError, /'fo\ro' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /'fo\ro' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects with a form feed in the gem name" do
       expect { subject.gem("fo\fo") }.
-        to raise_error(Bundler::GemfileError, /'fo\fo' is not a valid gem name because it contains whitespace/)
+        to raise_error(Lic::GemfileError, /'fo\fo' is not a valid gem name because it contains whitespace/)
     end
 
     it "rejects symbols as gem name" do
       expect { subject.gem(:foo) }.
-        to raise_error(Bundler::GemfileError, /You need to specify gem names as Strings. Use 'gem "foo"' instead/)
+        to raise_error(Lic::GemfileError, /You need to specify gem names as Strings. Use 'gem "foo"' instead/)
     end
 
     it "rejects branch option on non-git gems" do
       expect { subject.gem("foo", :branch => "test") }.
-        to raise_error(Bundler::GemfileError, /The `branch` option for `gem 'foo'` is not allowed. Only gems with a git source can specify a branch/)
+        to raise_error(Lic::GemfileError, /The `branch` option for `gem 'foo'` is not allowed. Only gems with a git source can specify a branch/)
     end
 
     it "allows specifying a branch on git gems" do
@@ -184,7 +184,7 @@ RSpec.describe Bundler::Dsl do
 
     it "allows specifying a branch on git gems with a git_source" do
       subject.git_source(:test_source) {|n| "https://github.com/#{n}" }
-      subject.gem("foo", :branch => "test", :test_source => "bundler/bundler")
+      subject.gem("foo", :branch => "test", :test_source => "lic/lic")
       dep = subject.dependencies.last
       expect(dep.name).to eq "foo"
     end
@@ -200,8 +200,8 @@ RSpec.describe Bundler::Dsl do
 
     before do
       allow(Dir).to receive(:[]).and_return(["spec_path"])
-      allow(Bundler).to receive(:load_gemspec).with("spec_path").and_return(spec)
-      allow(Bundler).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
+      allow(Lic).to receive(:load_gemspec).with("spec_path").and_return(spec)
+      allow(Lic).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
     end
 
     context "with a ruby platform" do
@@ -209,7 +209,7 @@ RSpec.describe Bundler::Dsl do
 
       it "keeps track of the ruby platforms in the dependency" do
         subject.gemspec
-        expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::RUBY])
+        expect(subject.dependencies.last.platforms).to eq(Lic::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::RUBY])
       end
     end
 
@@ -219,12 +219,12 @@ RSpec.describe Bundler::Dsl do
       it "keeps track of the jruby platforms in the dependency" do
         allow(Gem::Platform).to receive(:local).and_return(java)
         subject.gemspec
-        expect(subject.dependencies.last.platforms).to eq(Bundler::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::JAVA])
+        expect(subject.dependencies.last.platforms).to eq(Lic::Dependency::REVERSE_PLATFORM_MAP[Gem::Platform::JAVA])
       end
     end
   end
 
-  context "can bundle groups of gems with" do
+  context "can lic groups of gems with" do
     # git "https://github.com/rails/rails.git" do
     #   gem "railties"
     #   gem "action_pack"
@@ -245,7 +245,7 @@ RSpec.describe Bundler::Dsl do
     #   gem 'spree_api'
     #   gem 'spree_backend'
     # end
-    describe "#github", :bundler => "< 2" do
+    describe "#github", :lic => "< 2" do
       it "from github" do
         spree_gems = %w[spree_core spree_api spree_backend]
         subject.github "spree" do
@@ -258,31 +258,31 @@ RSpec.describe Bundler::Dsl do
       end
     end
 
-    describe "#github", :bundler => "2" do
+    describe "#github", :lic => "2" do
       it "from github" do
         expect do
           spree_gems = %w[spree_core spree_api spree_backend]
           subject.github "spree" do
             spree_gems.each {|spree_gem| subject.send :gem, spree_gem }
           end
-        end.to raise_error(Bundler::DeprecatedError, /github method has been removed/)
+        end.to raise_error(Lic::DeprecatedError, /github method has been removed/)
       end
     end
   end
 
   describe "syntax errors" do
-    it "will raise a Bundler::GemfileError" do
+    it "will raise a Lic::GemfileError" do
       gemfile "gem 'foo', :path => /unquoted/string/syntax/error"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`:( compile error -)? unknown regexp options - trg. Bundler cannot continue./)
+      expect { Lic::Dsl.evaluate(licd_app("Gemfile"), nil, true) }.
+        to raise_error(Lic::GemfileError, /There was an error parsing `Gemfile`:( compile error -)? unknown regexp options - trg. Lic cannot continue./)
     end
   end
 
-  describe "Runtime errors", :unless => Bundler.current_ruby.on_18? do
-    it "will raise a Bundler::GemfileError" do
+  describe "Runtime errors", :unless => Lic.current_ruby.on_18? do
+    it "will raise a Lic::GemfileError" do
       gemfile "s = 'foo'.freeze; s.strip!"
-      expect { Bundler::Dsl.evaluate(bundled_app("Gemfile"), nil, true) }.
-        to raise_error(Bundler::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Bundler cannot continue./i)
+      expect { Lic::Dsl.evaluate(licd_app("Gemfile"), nil, true) }.
+        to raise_error(Lic::GemfileError, /There was an error parsing `Gemfile`: can't modify frozen String. Lic cannot continue./i)
     end
   end
 
@@ -290,8 +290,8 @@ RSpec.describe Bundler::Dsl do
     context "if there was a rubygem source already defined" do
       it "restores it after it's done" do
         other_source = double("other-source")
-        allow(Bundler::Source::Rubygems).to receive(:new).and_return(other_source)
-        allow(Bundler).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
+        allow(Lic::Source::Rubygems).to receive(:new).and_return(other_source)
+        allow(Lic).to receive(:default_gemfile).and_return(Pathname.new("./Gemfile"))
 
         subject.source("https://other-source.org") do
           subject.gem("dobry-pies", :path => "foo")

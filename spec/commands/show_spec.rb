@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle show" do
+RSpec.describe "lic show" do
   context "with a standard Gemfile" do
     before :each do
       install_gemfile <<-G
@@ -12,91 +12,91 @@ RSpec.describe "bundle show" do
     it "creates a Gemfile.lock if one did not exist" do
       FileUtils.rm("Gemfile.lock")
 
-      bundle "show"
+      lic "show"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(licd_app("Gemfile.lock")).to exist
     end
 
     it "creates a Gemfile.lock when invoked with a gem name" do
       FileUtils.rm("Gemfile.lock")
 
-      bundle "show rails"
+      lic "show rails"
 
-      expect(bundled_app("Gemfile.lock")).to exist
+      expect(licd_app("Gemfile.lock")).to exist
     end
 
-    it "prints path if gem exists in bundle", :bundler => "< 2" do
-      bundle "show rails"
-      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+    it "prints path if gem exists in lic", :lic => "< 2" do
+      lic "show rails"
+      expect(out).to eq(default_lic_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints path if gem exists in bundle", :bundler => "2" do
-      bundle "show rails"
+    it "prints path if gem exists in lic", :lic => "2" do
+      lic "show rails"
       expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info rails` instead of `bundle show rails`\n" +
-        default_bundle_path("gems", "rails-2.3.2").to_s
+        "[DEPRECATED FOR 2.0] use `lic info rails` instead of `lic show rails`\n" +
+        default_lic_path("gems", "rails-2.3.2").to_s
       )
     end
 
-    it "prints path if gem exists in bundle (with --paths option)", :bundler => "< 2" do
-      bundle "show rails --paths"
-      expect(out).to eq(default_bundle_path("gems", "rails-2.3.2").to_s)
+    it "prints path if gem exists in lic (with --paths option)", :lic => "< 2" do
+      lic "show rails --paths"
+      expect(out).to eq(default_lic_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints path if gem exists in bundle (with --paths option)", :bundler => "2" do
-      bundle "show rails --paths"
+    it "prints path if gem exists in lic (with --paths option)", :lic => "2" do
+      lic "show rails --paths"
       expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info rails --path` instead of `bundle show rails --paths`\n" +
-        default_bundle_path("gems", "rails-2.3.2").to_s
+        "[DEPRECATED FOR 2.0] use `lic info rails --path` instead of `lic show rails --paths`\n" +
+        default_lic_path("gems", "rails-2.3.2").to_s
       )
     end
 
     it "warns if path no longer exists on disk" do
-      FileUtils.rm_rf(default_bundle_path("gems", "rails-2.3.2"))
+      FileUtils.rm_rf(default_lic_path("gems", "rails-2.3.2"))
 
-      bundle "show rails"
+      lic "show rails"
 
       expect(out).to match(/has been deleted/i).
-        and include(default_bundle_path("gems", "rails-2.3.2").to_s)
+        and include(default_lic_path("gems", "rails-2.3.2").to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "< 2" do
-      bundle "show bundler"
+    it "prints the path to the running lic", :lic => "< 2" do
+      lic "show lic"
       expect(out).to eq(root.to_s)
     end
 
-    it "prints the path to the running bundler", :bundler => "2" do
-      bundle "show bundler"
+    it "prints the path to the running lic", :lic => "2" do
+      lic "show lic"
       expect(out).to eq(
-        "[DEPRECATED FOR 2.0] use `bundle info bundler` instead of `bundle show bundler`\n" +
+        "[DEPRECATED FOR 2.0] use `lic info lic` instead of `lic show lic`\n" +
         root.to_s
       )
     end
 
-    it "complains if gem not in bundle" do
-      bundle "show missing"
+    it "complains if gem not in lic" do
+      lic "show missing"
       expect(out).to match(/could not find gem 'missing'/i)
     end
 
-    it "prints path of all gems in bundle sorted by name", :bundler => "< 2" do
-      bundle "show --paths"
+    it "prints path of all gems in lic sorted by name", :lic => "< 2" do
+      lic "show --paths"
 
-      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
+      expect(out).to include(default_lic_path("gems", "rake-10.0.2").to_s)
+      expect(out).to include(default_lic_path("gems", "rails-2.3.2").to_s)
 
       # Gem names are the last component of their path.
       gem_list = out.split.map {|p| p.split("/").last }
       expect(gem_list).to eq(gem_list.sort)
     end
 
-    it "prints path of all gems in bundle sorted by name", :bundler => "2" do
-      bundle "show --paths"
+    it "prints path of all gems in lic sorted by name", :lic => "2" do
+      lic "show --paths"
 
-      expect(out).to include(default_bundle_path("gems", "rake-10.0.2").to_s)
-      expect(out).to include(default_bundle_path("gems", "rails-2.3.2").to_s)
+      expect(out).to include(default_lic_path("gems", "rake-10.0.2").to_s)
+      expect(out).to include(default_lic_path("gems", "rails-2.3.2").to_s)
 
       out_lines = out.split("\n")
-      expect(out_lines[0]).to eq("[DEPRECATED FOR 2.0] use `bundle list` instead of `bundle show --paths`")
+      expect(out_lines[0]).to eq("[DEPRECATED FOR 2.0] use `lic list` instead of `lic show --paths`")
 
       # Gem names are the last component of their path.
       gem_list = out_lines[1..-1].map {|p| p.split("/").last }
@@ -104,7 +104,7 @@ RSpec.describe "bundle show" do
     end
 
     it "prints summary of gems" do
-      bundle "show --verbose"
+      lic "show --verbose"
 
       expect(out).to include("* actionmailer (2.3.2)")
       expect(out).to include("\tSummary:  This is just a fake gem for testing")
@@ -122,9 +122,9 @@ RSpec.describe "bundle show" do
       install_gemfile <<-G
         gem "foo", :git => "#{lib_path("foo-1.0")}"
       G
-      expect(the_bundle).to include_gems "foo 1.0"
+      expect(the_lic).to include_gems "foo 1.0"
 
-      bundle :show
+      lic :show
       expect(out).to include("foo (1.0 #{@git.ref_for("master", 6)}")
     end
 
@@ -137,9 +137,9 @@ RSpec.describe "bundle show" do
       install_gemfile <<-G
         gem "foo", :git => "#{lib_path("foo-1.0")}", :branch => "omg"
       G
-      expect(the_bundle).to include_gems "foo 1.0.omg"
+      expect(the_lic).to include_gems "foo 1.0.omg"
 
-      bundle :show
+      lic :show
       expect(out).to include("foo (1.0 #{@git.ref_for("omg", 6)}")
     end
 
@@ -149,7 +149,7 @@ RSpec.describe "bundle show" do
         gem "foo", :git => "#{lib_path("foo-1.0")}", :ref => "#{sha}"
       G
 
-      bundle :show
+      lic :show
       expect(out).to include("foo (1.0 #{sha[0..6]})")
     end
 
@@ -158,9 +158,9 @@ RSpec.describe "bundle show" do
       install_gemfile <<-G
         gem "foo", "1.0.0-beta.1", :git => "#{lib_path("foo")}"
       G
-      expect(the_bundle).to include_gems "foo 1.0.0.pre.beta.1"
+      expect(the_lic).to include_gems "foo 1.0.0.pre.beta.1"
 
-      bundle! :show
+      lic! :show
       expect(out).to include("foo (1.0.0.pre.beta.1")
     end
   end
@@ -174,19 +174,19 @@ RSpec.describe "bundle show" do
     end
 
     it "does not output git errors" do
-      bundle :show
+      lic :show
       expect(err).to lack_errors
     end
   end
 
-  it "performs an automatic bundle install" do
+  it "performs an automatic lic install" do
     gemfile <<-G
       source "file://#{gem_repo1}"
       gem "foo"
     G
 
-    bundle "config auto_install 1"
-    bundle :show
+    lic "config auto_install 1"
+    lic :show
     expect(out).to include("Installing foo 1.0")
   end
 
@@ -199,13 +199,13 @@ RSpec.describe "bundle show" do
 
       invalid_regexp = "[]"
 
-      bundle "show #{invalid_regexp}"
+      lic "show #{invalid_regexp}"
       expect(out).to include("Could not find gem '#{invalid_regexp}'.")
     end
   end
 
   context "--outdated option" do
-    # Regression test for https://github.com/bundler/bundler/issues/5375
+    # Regression test for https://github.com/lic/lic/issues/5375
     before do
       build_repo2
     end
@@ -216,7 +216,7 @@ RSpec.describe "bundle show" do
         gem "rails"
       G
 
-      expect(the_bundle).to include_gem("rails 2.3.2")
+      expect(the_lic).to include_gem("rails 2.3.2")
 
       update_repo2 do
         build_gem "rails", "3.0.0" do |s|
@@ -224,10 +224,10 @@ RSpec.describe "bundle show" do
         end
       end
 
-      bundle! "show --outdated"
+      lic! "show --outdated"
 
-      bundle! "install"
-      expect(the_bundle).to include_gem("rails 2.3.2")
+      lic! "install"
+      expect(the_lic).to include_gem("rails 2.3.2")
     end
   end
 end

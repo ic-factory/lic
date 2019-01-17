@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "bundler/ruby_dsl"
+require "lic/ruby_dsl"
 
-RSpec.describe Bundler::RubyDsl do
+RSpec.describe Lic::RubyDsl do
   class MockDSL
-    include Bundler::RubyDsl
+    include Lic::RubyDsl
 
     attr_reader :ruby_version
   end

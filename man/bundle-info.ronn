@@ -1,9 +1,9 @@
-bundle-info(1) -- Show information for the given gem in your bundle
+lic-info(1) -- Show information for the given gem in your lic
 =========================================================================
 
 ## SYNOPSIS
 
-`bundle info` [GEM]
+`lic info` [GEM]
               [--path]
 
 ## DESCRIPTION

@@ -1,16 +1,16 @@
-bundle(1) -- Ruby Dependency Management
+lic(1) -- Ruby Dependency Management
 =======================================
 
 ## SYNOPSIS
 
-`bundle` COMMAND [--no-color] [--verbose] [ARGS]
+`lic` COMMAND [--no-color] [--verbose] [ARGS]
 
 ## DESCRIPTION
 
-Bundler manages an `application's dependencies` through its entire life
+Lic manages an `application's dependencies` through its entire life
 across many machines systematically and repeatably.
 
-See [the bundler website](http://bundler.io) for information on getting
+See [the lic website](http://lic.io) for information on getting
 started, and Gemfile(5) for more information on the `Gemfile` format.
 
 ## OPTIONS
@@ -24,88 +24,88 @@ started, and Gemfile(5) for more information on the `Gemfile` format.
 * `--verbose`, `-V`:
   Print out additional logging information
 
-## BUNDLE COMMANDS
+## LIC COMMANDS
 
-We divide `bundle` subcommands into primary commands and utilities:
+We divide `lic` subcommands into primary commands and utilities:
 
 ## PRIMARY COMMANDS
 
-* [`bundle install(1)`](bundle-install.1.html):
+* [`lic install(1)`](lic-install.1.html):
   Install the gems specified by the `Gemfile` or `Gemfile.lock`
 
-* [`bundle update(1)`](bundle-update.1.html):
+* [`lic update(1)`](lic-update.1.html):
   Update dependencies to their latest versions
 
-* [`bundle package(1)`](bundle-package.1.html):
+* [`lic package(1)`](lic-package.1.html):
   Package the .gem files required by your application into the
   `vendor/cache` directory
 
-* [`bundle exec(1)`](bundle-exec.1.html):
-  Execute a script in the current bundle
+* [`lic exec(1)`](lic-exec.1.html):
+  Execute a script in the current lic
 
-* [`bundle config(1)`](bundle-config.1.html):
-  Specify and read configuration options for Bundler
+* [`lic config(1)`](lic-config.1.html):
+  Specify and read configuration options for Lic
 
-* `bundle help(1)`:
+* `lic help(1)`:
   Display detailed help for each subcommand
 
 ## UTILITIES
 
-* [`bundle add(1)`](bundle-add.1.html):
-  Add the named gem to the Gemfile and run `bundle install`
+* [`lic add(1)`](lic-add.1.html):
+  Add the named gem to the Gemfile and run `lic install`
 
-* [`bundle binstubs(1)`](bundle-binstubs.1.html):
+* [`lic binstubs(1)`](lic-binstubs.1.html):
   Generate binstubs for executables in a gem
 
-* [`bundle check(1)`](bundle-check.1.html):
+* [`lic check(1)`](lic-check.1.html):
   Determine whether the requirements for your application are installed
-  and available to Bundler
+  and available to Lic
 
-* [`bundle show(1)`](bundle-show.1.html):
-  Show the source location of a particular gem in the bundle
+* [`lic show(1)`](lic-show.1.html):
+  Show the source location of a particular gem in the lic
 
-* [`bundle outdated(1)`](bundle-outdated.1.html):
-  Show all of the outdated gems in the current bundle
+* [`lic outdated(1)`](lic-outdated.1.html):
+  Show all of the outdated gems in the current lic
 
-* `bundle console(1)`:
-  Start an IRB session in the current bundle
+* `lic console(1)`:
+  Start an IRB session in the current lic
 
-* [`bundle open(1)`](bundle-open.1.html):
+* [`lic open(1)`](lic-open.1.html):
   Open an installed gem in the editor
 
-* [`bundle lock(1)`](bundle-lock.1.hmtl):
+* [`lic lock(1)`](lic-lock.1.hmtl):
   Generate a lockfile for your dependencies
 
-* [`bundle viz(1)`](bundle-viz.1.html):
+* [`lic viz(1)`](lic-viz.1.html):
   Generate a visual representation of your dependencies
 
-* [`bundle init(1)`](bundle-init.1.html):
+* [`lic init(1)`](lic-init.1.html):
   Generate a simple `Gemfile`, placed in the current directory
 
-* [`bundle gem(1)`](bundle-gem.1.html):
-  Create a simple gem, suitable for development with Bundler
+* [`lic gem(1)`](lic-gem.1.html):
+  Create a simple gem, suitable for development with Lic
 
-* [`bundle platform(1)`](bundle-platform.1.html):
+* [`lic platform(1)`](lic-platform.1.html):
   Display platform compatibility information
 
-* [`bundle clean(1)`](bundle-clean.1.html):
-  Clean up unused gems in your Bundler directory
+* [`lic clean(1)`](lic-clean.1.html):
+  Clean up unused gems in your Lic directory
 
-* [`bundle doctor(1)`](bundle-doctor.1.html):
+* [`lic doctor(1)`](lic-doctor.1.html):
   Display warnings about common problems
 
-* [`bundle remove(1)`](bundle-remove.1.html):
+* [`lic remove(1)`](lic-remove.1.html):
   Removes gems from the Gemfile
 
 ## PLUGINS
 
 When running a command that isn't listed in PRIMARY COMMANDS or UTILITIES,
-Bundler will try to find an executable on your path named `bundler-<command>`
+Lic will try to find an executable on your path named `lic-<command>`
 and execute it, passing down any extra arguments to it.
 
 ## OBSOLETE
 
 These commands are obsolete and should no longer be used:
 
-* `bundle cache(1)`
-* `bundle show(1)`
+* `lic cache(1)`
+* `lic show(1)`

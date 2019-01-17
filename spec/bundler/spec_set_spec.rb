@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::SpecSet do
+RSpec.describe Lic::SpecSet do
   let(:specs) do
     [
       build_spec("a", "1.0"),

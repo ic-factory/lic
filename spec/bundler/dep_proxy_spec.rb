@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::DepProxy do
-  let(:dep) { Bundler::Dependency.new("rake", ">= 0") }
+RSpec.describe Lic::DepProxy do
+  let(:dep) { Lic::Dependency.new("rake", ">= 0") }
   subject { described_class.new(dep, Gem::Platform::RUBY) }
   let(:same) { subject }
   let(:other) { subject.dup }

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bundler/lockfile_parser"
+require "lic/lockfile_parser"
 
-RSpec.describe Bundler::LockfileParser do
+RSpec.describe Lic::LockfileParser do
   let(:lockfile_contents) { strip_whitespace(<<-L) }
     GIT
       remote: https://github.com/alloy/peiji-san.git
@@ -25,7 +25,7 @@ RSpec.describe Bundler::LockfileParser do
     RUBY VERSION
        ruby 2.1.3p242
 
-    BUNDLED WITH
+    LICD WITH
        1.12.0.rc.2
   L
 
@@ -33,7 +33,7 @@ RSpec.describe Bundler::LockfileParser do
     it "returns the attributes" do
       attributes = described_class.sections_in_lockfile(lockfile_contents)
       expect(attributes).to contain_exactly(
-        "BUNDLED WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION"
+        "LICD WITH", "DEPENDENCIES", "GEM", "GIT", "PLATFORMS", "RUBY VERSION"
       )
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe Bundler::LockfileParser do
 
       it "returns the same as > 1.0" do
         expect(subject).to contain_exactly(
-          described_class::BUNDLED, described_class::RUBY, described_class::PLUGIN
+          described_class::LICD, described_class::RUBY, described_class::PLUGIN
         )
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe Bundler::LockfileParser do
     end
 
     context "with a current version" do
-      let(:base_version) { Gem::Version.create(Bundler::VERSION) }
+      let(:base_version) { Gem::Version.create(Lic::VERSION) }
 
       it "returns an empty array" do
         expect(subject).to eq([])
@@ -93,27 +93,27 @@ RSpec.describe Bundler::LockfileParser do
   end
 
   describe "#initialize" do
-    before { allow(Bundler::SharedHelpers).to receive(:find_gemfile).and_return(bundled_app("gems.rb")) }
+    before { allow(Lic::SharedHelpers).to receive(:find_gemfile).and_return(licd_app("gems.rb")) }
     subject { described_class.new(lockfile_contents) }
 
     let(:sources) do
-      [Bundler::Source::Git.new("uri" => "https://github.com/alloy/peiji-san.git", "revision" => "eca485d8dc95f12aaec1a434b49d295c7e91844b"),
-       Bundler::Source::Rubygems.new("remotes" => ["https://rubygems.org"])]
+      [Lic::Source::Git.new("uri" => "https://github.com/alloy/peiji-san.git", "revision" => "eca485d8dc95f12aaec1a434b49d295c7e91844b"),
+       Lic::Source::Rubygems.new("remotes" => ["https://rubygems.org"])]
     end
     let(:dependencies) do
       {
-        "peiji-san" => Bundler::Dependency.new("peiji-san", ">= 0"),
-        "rake" => Bundler::Dependency.new("rake", ">= 0"),
+        "peiji-san" => Lic::Dependency.new("peiji-san", ">= 0"),
+        "rake" => Lic::Dependency.new("rake", ">= 0"),
       }
     end
     let(:specs) do
       [
-        Bundler::LazySpecification.new("peiji-san", v("1.2.0"), rb),
-        Bundler::LazySpecification.new("rake", v("10.3.2"), rb),
+        Lic::LazySpecification.new("peiji-san", v("1.2.0"), rb),
+        Lic::LazySpecification.new("rake", v("10.3.2"), rb),
       ]
     end
     let(:platforms) { [rb] }
-    let(:bundler_version) { Gem::Version.new("1.12.0.rc.2") }
+    let(:lic_version) { Gem::Version.new("1.12.0.rc.2") }
     let(:ruby_version) { "ruby 2.1.3p242" }
 
     shared_examples_for "parsing" do
@@ -123,7 +123,7 @@ RSpec.describe Bundler::LockfileParser do
         expect(subject.specs).to eq specs
         expect(Hash[subject.specs.map {|s| [s, s.dependencies] }]).to eq Hash[subject.specs.map {|s| [s, s.dependencies] }]
         expect(subject.platforms).to eq platforms
-        expect(subject.bundler_version).to eq bundler_version
+        expect(subject.lic_version).to eq lic_version
         expect(subject.ruby_version).to eq ruby_version
       end
     end

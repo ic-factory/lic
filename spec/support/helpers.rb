@@ -7,7 +7,7 @@ module Spec
     def reset!
       Dir.glob("#{tmp}/{gems/*,*}", File::FNM_DOTMATCH).each do |dir|
         next if %w[base remote1 gems rubygems . ..].include?(File.basename(dir))
-        if ENV["BUNDLER_SUDO_TESTS"]
+        if ENV["LIC_SUDO_TESTS"]
           `sudo rm -rf "#{dir}"`
         else
           FileUtils.rm_rf(dir)
@@ -15,9 +15,9 @@ module Spec
       end
       FileUtils.mkdir_p(home)
       FileUtils.mkdir_p(tmpdir)
-      Bundler.reset!
-      Bundler.ui = nil
-      Bundler.ui # force it to initialize
+      Lic.reset!
+      Lic.ui = nil
+      Lic.ui # force it to initialize
     end
 
     def self.bang(method)
@@ -32,7 +32,7 @@ module Spec
       end
     end
 
-    def the_bundle(*args)
+    def the_lic(*args)
       TheBundle.new(*args)
     end
 
@@ -52,16 +52,16 @@ module Spec
       last_command.exitstatus
     end
 
-    def bundle_update_requires_all?
-      Bundler::VERSION.start_with?("1.") ? nil : true
+    def lic_update_requires_all?
+      Lic::VERSION.start_with?("1.") ? nil : true
     end
 
     def in_app_root(&blk)
-      Dir.chdir(bundled_app, &blk)
+      Dir.chdir(licd_app, &blk)
     end
 
     def in_app_root2(&blk)
-      Dir.chdir(bundled_app2, &blk)
+      Dir.chdir(licd_app2, &blk)
     end
 
     def in_app_root_custom(root, &blk)
@@ -71,7 +71,7 @@ module Spec
     def run(cmd, *args)
       opts = args.last.is_a?(Hash) ? args.pop : {}
       groups = args.map(&:inspect).join(", ")
-      setup = "require 'rubygems' ; require 'bundler' ; Bundler.setup(#{groups})\n"
+      setup = "require 'rubygems' ; require 'lic' ; Lic.setup(#{groups})\n"
       ruby(setup + cmd, opts)
     end
     bang :run
@@ -97,18 +97,18 @@ module Spec
       spec_dir.to_s
     end
 
-    def bundle(cmd, options = {})
+    def lic(cmd, options = {})
       with_sudo = options.delete(:sudo)
       sudo = with_sudo == :preserve_env ? "sudo -E" : "sudo" if with_sudo
 
-      bundle_bin = options.delete("bundle_bin") || bindir.join("bundle")
+      lic_bin = options.delete("lic_bin") || bindir.join("lic")
 
-      if system_bundler = options.delete(:system_bundler)
-        bundle_bin = system_bundle_bin_path
+      if system_lic = options.delete(:system_lic)
+        lic_bin = system_lic_bin_path
       end
 
       env = options.delete(:env) || {}
-      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_bundler
+      env["PATH"].gsub!("#{Path.root}/exe", "") if env["PATH"] && system_lic
 
       requires = options.delete(:requires) || []
       requires << "support/hax"
@@ -127,7 +127,7 @@ module Spec
       requires_str = requires.map {|r| "-r#{r}" }.join(" ")
 
       load_path = []
-      load_path << lib unless system_bundler
+      load_path << lib unless system_lic
       load_path << spec
       load_path_str = "-I#{load_path.join(File::PATH_SEPARATOR)}"
 
@@ -146,13 +146,13 @@ module Spec
         end
       end.join
 
-      cmd = "#{env} #{sudo} #{Gem.ruby} #{load_path_str} #{requires_str} #{bundle_bin} #{cmd}#{args}"
+      cmd = "#{env} #{sudo} #{Gem.ruby} #{load_path_str} #{requires_str} #{lic_bin} #{cmd}#{args}"
       sys_exec(cmd) {|i, o, thr| yield i, o, thr if block_given? }
     end
-    bang :bundle
+    bang :lic
 
     def forgotten_command_line_options(options)
-      remembered = Bundler::VERSION.split(".", 2).first == "1"
+      remembered = Lic::VERSION.split(".", 2).first == "1"
       options = options.map do |k, v|
         k = Array(k)[remembered ? 0 : -1]
         v = '""' if v && v.to_s.empty?
@@ -161,22 +161,22 @@ module Spec
       return Hash[options] if remembered
       options.each do |k, v|
         if v.nil?
-          bundle! "config --delete #{k}"
+          lic! "config --delete #{k}"
         else
-          bundle! "config --local #{k} #{v}"
+          lic! "config --local #{k} #{v}"
         end
       end
       {}
     end
 
-    def bundler(cmd, options = {})
-      options["bundle_bin"] = bindir.join("bundler")
-      bundle(cmd, options)
+    def lic(cmd, options = {})
+      options["lic_bin"] = bindir.join("lic")
+      lic(cmd, options)
     end
 
-    def bundle_ruby(options = {})
-      options["bundle_bin"] = bindir.join("bundle_ruby")
-      bundle("", options)
+    def lic_ruby(options = {})
+      options["lic_bin"] = bindir.join("lic_ruby")
+      lic("", options)
     end
 
     def ruby(ruby, options = {})
@@ -201,7 +201,7 @@ module Spec
       lib = File.expand_path("../../../lib", __FILE__)
       old = ENV["RUBYOPT"]
       ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -I#{lib}"
-      cmd = bundled_app("bin/#{cmd}") unless cmd.to_s.include?("/")
+      cmd = licd_app("bin/#{cmd}") unless cmd.to_s.include?("/")
       sys_exec(cmd.to_s)
     ensure
       ENV["RUBYOPT"] = old
@@ -212,7 +212,7 @@ module Spec
         args = args.gsub(/(?=")/, "\\")
         args = %("#{args}")
       end
-      gem = ENV["BUNDLE_GEM"] || "#{Gem.ruby} -rrubygems -S gem --backtrace"
+      gem = ENV["LIC_GEM"] || "#{Gem.ruby} -rrubygems -S gem --backtrace"
       sys_exec("#{gem} #{command} #{args}")
     end
     bang :gem_command
@@ -239,7 +239,7 @@ module Spec
     end
     bang :sys_exec
 
-    def config(config = nil, path = bundled_app(".bundle/config"))
+    def config(config = nil, path = licd_app(".lic/config"))
       return YAML.load_file(path) unless config
       FileUtils.mkdir_p(File.dirname(path))
       File.open(path, "w") do |f|
@@ -249,11 +249,11 @@ module Spec
     end
 
     def global_config(config = nil)
-      config(config, home(".bundle/config"))
+      config(config, home(".lic/config"))
     end
 
     def create_file(*args)
-      path = bundled_app(args.shift)
+      path = licd_app(args.shift)
       path = args.shift if args.first.is_a?(Pathname)
       str  = args.shift || ""
       path.dirname.mkpath
@@ -297,7 +297,7 @@ module Spec
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
       opts[:retry] ||= 0
-      bundle :install, opts
+      lic :install, opts
     end
     bang :install_gemfile
 
@@ -305,19 +305,19 @@ module Spec
       gemfile(*args)
       opts = args.last.is_a?(Hash) ? args.last : {}
       opts[:retry] ||= 0
-      bundle :lock, opts
+      lic :lock, opts
     end
 
     def install_gems(*gems)
       options = gems.last.is_a?(Hash) ? gems.pop : {}
       gem_repo = options.fetch(:gem_repo) { gem_repo1 }
       gems.each do |g|
-        path = if g == :bundler
+        path = if g == :lic
           Dir.chdir(root) { gem_command! :build, gemspec.to_s }
-          bundler_path = if ruby_core?
-            root + "lib/bundler-#{Bundler::VERSION}.gem"
+          lic_path = if ruby_core?
+            root + "lib/lic-#{Lic::VERSION}.gem"
           else
-            root + "bundler-#{Bundler::VERSION}.gem"
+            root + "lic-#{Lic::VERSION}.gem"
           end
         elsif g.to_s =~ %r{\A/.*\.gem\z}
           g
@@ -329,7 +329,7 @@ module Spec
 
         gem_command! :install, "--no-document --ignore-dependencies '#{path}'"
 
-        bundler_path && bundler_path.rmtree
+        lic_path && lic_path.rmtree
       end
     end
 
@@ -339,7 +339,7 @@ module Spec
       backup = ENV.to_hash
       ENV["GEM_HOME"] = path.to_s
       ENV["GEM_PATH"] = path.to_s
-      ENV["BUNDLER_ORIG_GEM_PATH"] = nil
+      ENV["LIC_ORIG_GEM_PATH"] = nil
       yield
     ensure
       ENV.replace(backup)
@@ -348,7 +348,7 @@ module Spec
     def with_path_as(path)
       backup = ENV.to_hash
       ENV["PATH"] = path.to_s
-      ENV["BUNDLER_ORIG_PATH"] = nil
+      ENV["LIC_ORIG_PATH"] = nil
       yield
     ensure
       ENV.replace(backup)
@@ -380,13 +380,13 @@ module Spec
     def system_gems(*gems)
       opts = gems.last.is_a?(Hash) ? gems.last : {}
       path = opts.fetch(:path, system_gem_path)
-      if path == :bundle_path
+      if path == :lic_path
         path = ruby!(<<-RUBY)
-          require "bundler"
+          require "lic"
           begin
-            puts Bundler.bundle_path
-          rescue Bundler::GemfileNotFound
-            ENV["BUNDLE_GEMFILE"] = "Gemfile"
+            puts Lic.lic_path
+          rescue Lic::GemfileNotFound
+            ENV["LIC_GEMFILE"] = "Gemfile"
             retry
           end
 
@@ -404,7 +404,7 @@ module Spec
       env_backup = ENV.to_hash
       ENV["GEM_HOME"] = path.to_s
       ENV["GEM_PATH"] = path.to_s
-      ENV["BUNDLER_ORIG_GEM_PATH"] = nil
+      ENV["LIC_ORIG_GEM_PATH"] = nil
 
       install_gems(*gems)
       return unless block_given?
@@ -445,76 +445,76 @@ module Spec
     def cache_gems(*gems)
       gems = gems.flatten
 
-      FileUtils.rm_rf("#{bundled_app}/vendor/cache")
-      FileUtils.mkdir_p("#{bundled_app}/vendor/cache")
+      FileUtils.rm_rf("#{licd_app}/vendor/cache")
+      FileUtils.mkdir_p("#{licd_app}/vendor/cache")
 
       gems.each do |g|
         path = "#{gem_repo1}/gems/#{g}.gem"
         raise "OMG `#{path}` does not exist!" unless File.exist?(path)
-        FileUtils.cp(path, "#{bundled_app}/vendor/cache")
+        FileUtils.cp(path, "#{licd_app}/vendor/cache")
       end
     end
 
     def simulate_new_machine
       system_gems []
       FileUtils.rm_rf system_gem_path
-      FileUtils.rm_rf bundled_app(".bundle")
+      FileUtils.rm_rf licd_app(".lic")
     end
 
     def simulate_platform(platform)
-      old = ENV["BUNDLER_SPEC_PLATFORM"]
-      ENV["BUNDLER_SPEC_PLATFORM"] = platform.to_s
+      old = ENV["LIC_SPEC_PLATFORM"]
+      ENV["LIC_SPEC_PLATFORM"] = platform.to_s
       yield if block_given?
     ensure
-      ENV["BUNDLER_SPEC_PLATFORM"] = old if block_given?
+      ENV["LIC_SPEC_PLATFORM"] = old if block_given?
     end
 
     def simulate_ruby_version(version)
       return if version == RUBY_VERSION
-      old = ENV["BUNDLER_SPEC_RUBY_VERSION"]
-      ENV["BUNDLER_SPEC_RUBY_VERSION"] = version
+      old = ENV["LIC_SPEC_RUBY_VERSION"]
+      ENV["LIC_SPEC_RUBY_VERSION"] = version
       yield if block_given?
     ensure
-      ENV["BUNDLER_SPEC_RUBY_VERSION"] = old if block_given?
+      ENV["LIC_SPEC_RUBY_VERSION"] = old if block_given?
     end
 
     def simulate_ruby_engine(engine, version = "1.6.0")
       return if engine == local_ruby_engine
 
-      old = ENV["BUNDLER_SPEC_RUBY_ENGINE"]
-      ENV["BUNDLER_SPEC_RUBY_ENGINE"] = engine
-      old_version = ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"]
-      ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"] = version
+      old = ENV["LIC_SPEC_RUBY_ENGINE"]
+      ENV["LIC_SPEC_RUBY_ENGINE"] = engine
+      old_version = ENV["LIC_SPEC_RUBY_ENGINE_VERSION"]
+      ENV["LIC_SPEC_RUBY_ENGINE_VERSION"] = version
       yield if block_given?
     ensure
-      ENV["BUNDLER_SPEC_RUBY_ENGINE"] = old if block_given?
-      ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"] = old_version if block_given?
+      ENV["LIC_SPEC_RUBY_ENGINE"] = old if block_given?
+      ENV["LIC_SPEC_RUBY_ENGINE_VERSION"] = old_version if block_given?
     end
 
-    def simulate_bundler_version(version)
-      old = ENV["BUNDLER_SPEC_VERSION"]
-      ENV["BUNDLER_SPEC_VERSION"] = version.to_s
+    def simulate_lic_version(version)
+      old = ENV["LIC_SPEC_VERSION"]
+      ENV["LIC_SPEC_VERSION"] = version.to_s
       yield if block_given?
     ensure
-      ENV["BUNDLER_SPEC_VERSION"] = old if block_given?
+      ENV["LIC_SPEC_VERSION"] = old if block_given?
     end
 
     def simulate_rubygems_version(version)
-      old = ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"]
-      ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"] = version.to_s
+      old = ENV["LIC_SPEC_RUBYGEMS_VERSION"]
+      ENV["LIC_SPEC_RUBYGEMS_VERSION"] = version.to_s
       yield if block_given?
     ensure
-      ENV["BUNDLER_SPEC_RUBYGEMS_VERSION"] = old if block_given?
+      ENV["LIC_SPEC_RUBYGEMS_VERSION"] = old if block_given?
     end
 
     def simulate_windows(platform = mswin)
-      old = ENV["BUNDLER_SPEC_WINDOWS"]
-      ENV["BUNDLER_SPEC_WINDOWS"] = "true"
+      old = ENV["LIC_SPEC_WINDOWS"]
+      ENV["LIC_SPEC_WINDOWS"] = "true"
       simulate_platform platform do
         yield
       end
     ensure
-      ENV["BUNDLER_SPEC_WINDOWS"] = old
+      ENV["LIC_SPEC_WINDOWS"] = old
     end
 
     def revision_for(path)
@@ -586,9 +586,9 @@ module Spec
       port
     end
 
-    def bundler_fileutils
+    def lic_fileutils
       if RUBY_VERSION >= "2.4"
-        ::Bundler::FileUtils
+        ::Lic::FileUtils
       else
         ::FileUtils
       end

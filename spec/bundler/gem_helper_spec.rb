@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
 require "rake"
-require "bundler/gem_helper"
+require "lic/gem_helper"
 
-RSpec.describe Bundler::GemHelper do
+RSpec.describe Lic::GemHelper do
   let(:app_name) { "lorem__ipsum" }
-  let(:app_path) { bundled_app app_name }
+  let(:app_path) { licd_app app_name }
   let(:app_gemspec_path) { app_path.join("#{app_name}.gemspec") }
 
   before(:each) do
-    global_config "BUNDLE_GEM__MIT" => "false", "BUNDLE_GEM__TEST" => "false", "BUNDLE_GEM__COC" => "false"
-    bundle "gem #{app_name}"
+    global_config "LIC_GEM__MIT" => "false", "LIC_GEM__TEST" => "false", "LIC_GEM__COC" => "false"
+    lic "gem #{app_name}"
   end
 
   context "determining gemspec" do
-    subject { Bundler::GemHelper.new(app_path) }
+    subject { Lic::GemHelper.new(app_path) }
 
     context "fails" do
       it "when there is no gemspec" do
@@ -40,8 +40,8 @@ RSpec.describe Bundler::GemHelper do
     end
 
     it "handles namespaces and converts them to CamelCase" do
-      bundle "gem #{app_name}-foo_bar"
-      underscore_path = bundled_app "#{app_name}-foo_bar"
+      lic "gem #{app_name}-foo_bar"
+      underscore_path = licd_app "#{app_name}-foo_bar"
 
       lib = underscore_path.join("lib/#{app_name}/foo_bar.rb").read
       expect(lib).to include("module LoremIpsum")
@@ -51,7 +51,7 @@ RSpec.describe Bundler::GemHelper do
 
   context "gem management" do
     def mock_confirm_message(message)
-      expect(Bundler.ui).to receive(:confirm).with(message)
+      expect(Lic.ui).to receive(:confirm).with(message)
     end
 
     def mock_build_message(name, version)
@@ -59,7 +59,7 @@ RSpec.describe Bundler::GemHelper do
       mock_confirm_message message
     end
 
-    subject! { Bundler::GemHelper.new(app_path) }
+    subject! { Lic::GemHelper.new(app_path) }
     let(:app_version) { "0.1.0" }
     let(:app_gem_dir) { app_path.join("pkg") }
     let(:app_gem_path) { app_gem_dir.join("#{app_name}-#{app_version}.gem") }
@@ -73,7 +73,7 @@ RSpec.describe Bundler::GemHelper do
     end
 
     it "uses a shell UI for output" do
-      expect(Bundler.ui).to be_a(Bundler::UI::Shell)
+      expect(Lic.ui).to be_a(Lic::UI::Shell)
     end
 
     describe "#install" do
@@ -186,8 +186,8 @@ RSpec.describe Bundler::GemHelper do
         end
 
         # silence messages
-        allow(Bundler.ui).to receive(:confirm)
-        allow(Bundler.ui).to receive(:error)
+        allow(Lic.ui).to receive(:confirm)
+        allow(Lic.ui).to receive(:error)
       end
 
       context "fails" do
@@ -264,11 +264,11 @@ RSpec.describe Bundler::GemHelper do
         end
 
         # silence messages
-        allow(Bundler.ui).to receive(:confirm)
-        allow(Bundler.ui).to receive(:error)
+        allow(Lic.ui).to receive(:confirm)
+        allow(Lic.ui).to receive(:error)
 
         credentials = double("credentials", "file?" => true)
-        allow(Bundler.user_home).to receive(:join).
+        allow(Lic.user_home).to receive(:join).
           with(".gem/credentials").and_return(credentials)
       end
 

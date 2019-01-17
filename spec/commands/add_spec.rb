@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle add" do
+RSpec.describe "lic add" do
   before :each do
     build_repo2 do
       build_gem "foo", "1.1"
@@ -19,139 +19,139 @@ RSpec.describe "bundle add" do
 
   context "when no gems are specified" do
     it "shows error" do
-      bundle "add"
+      lic "add"
 
-      expect(last_command.bundler_err).to include("Please specify gems to add")
+      expect(last_command.lic_err).to include("Please specify gems to add")
     end
   end
 
   describe "without version specified" do
     it "version requirement becomes ~> major.minor.patch when resolved version is < 1.0" do
-      bundle "add 'bar'"
-      expect(bundled_app("Gemfile").read).to match(/gem "bar", "~> 0.12.3"/)
-      expect(the_bundle).to include_gems "bar 0.12.3"
+      lic "add 'bar'"
+      expect(licd_app("Gemfile").read).to match(/gem "bar", "~> 0.12.3"/)
+      expect(the_lic).to include_gems "bar 0.12.3"
     end
 
     it "version requirement becomes ~> major.minor when resolved version is > 1.0" do
-      bundle "add 'baz'"
-      expect(bundled_app("Gemfile").read).to match(/gem "baz", "~> 1.2"/)
-      expect(the_bundle).to include_gems "baz 1.2.3"
+      lic "add 'baz'"
+      expect(licd_app("Gemfile").read).to match(/gem "baz", "~> 1.2"/)
+      expect(the_lic).to include_gems "baz 1.2.3"
     end
 
     it "version requirement becomes ~> major.minor.patch.pre when resolved version is < 1.0" do
-      bundle "add 'cat'"
-      expect(bundled_app("Gemfile").read).to match(/gem "cat", "~> 0.12.3.pre"/)
-      expect(the_bundle).to include_gems "cat 0.12.3.pre"
+      lic "add 'cat'"
+      expect(licd_app("Gemfile").read).to match(/gem "cat", "~> 0.12.3.pre"/)
+      expect(the_lic).to include_gems "cat 0.12.3.pre"
     end
 
     it "version requirement becomes ~> major.minor.pre when resolved version is > 1.0.pre" do
-      bundle "add 'dog'"
-      expect(bundled_app("Gemfile").read).to match(/gem "dog", "~> 1.1.pre"/)
-      expect(the_bundle).to include_gems "dog 1.1.3.pre"
+      lic "add 'dog'"
+      expect(licd_app("Gemfile").read).to match(/gem "dog", "~> 1.1.pre"/)
+      expect(the_lic).to include_gems "dog 1.1.3.pre"
     end
   end
 
   describe "with --version" do
     it "adds dependency of specified version and runs install" do
-      bundle "add 'foo' --version='~> 1.0'"
-      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 1.0"/)
-      expect(the_bundle).to include_gems "foo 1.1"
+      lic "add 'foo' --version='~> 1.0'"
+      expect(licd_app("Gemfile").read).to match(/gem "foo", "~> 1.0"/)
+      expect(the_lic).to include_gems "foo 1.1"
     end
 
     it "adds multiple version constraints when specified" do
       requirements = ["< 3.0", "> 1.0"]
-      bundle "add 'foo' --version='#{requirements.join(", ")}'"
-      expect(bundled_app("Gemfile").read).to match(/gem "foo", #{Gem::Requirement.new(requirements).as_list.map(&:dump).join(', ')}/)
-      expect(the_bundle).to include_gems "foo 2.0"
+      lic "add 'foo' --version='#{requirements.join(", ")}'"
+      expect(licd_app("Gemfile").read).to match(/gem "foo", #{Gem::Requirement.new(requirements).as_list.map(&:dump).join(', ')}/)
+      expect(the_lic).to include_gems "foo 2.0"
     end
   end
 
   describe "with --group" do
     it "adds dependency for the specified group" do
-      bundle "add 'foo' --group='development'"
-      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :group => :development/)
-      expect(the_bundle).to include_gems "foo 2.0"
+      lic "add 'foo' --group='development'"
+      expect(licd_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :group => :development/)
+      expect(the_lic).to include_gems "foo 2.0"
     end
 
     it "adds dependency to more than one group" do
-      bundle "add 'foo' --group='development, test'"
-      expect(bundled_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :groups => \[:development, :test\]/)
-      expect(the_bundle).to include_gems "foo 2.0"
+      lic "add 'foo' --group='development, test'"
+      expect(licd_app("Gemfile").read).to match(/gem "foo", "~> 2.0", :groups => \[:development, :test\]/)
+      expect(the_lic).to include_gems "foo 2.0"
     end
   end
 
   describe "with --source" do
     it "adds dependency with specified source" do
-      bundle "add 'foo' --source='file://#{gem_repo2}'"
+      lic "add 'foo' --source='file://#{gem_repo2}'"
 
-      expect(bundled_app("Gemfile").read).to match(%r{gem "foo", "~> 2.0", :source => "file:\/\/#{gem_repo2}"})
-      expect(the_bundle).to include_gems "foo 2.0"
+      expect(licd_app("Gemfile").read).to match(%r{gem "foo", "~> 2.0", :source => "file:\/\/#{gem_repo2}"})
+      expect(the_lic).to include_gems "foo 2.0"
     end
   end
 
   describe "with --skip-install" do
     it "adds gem to Gemfile but is not installed" do
-      bundle "add foo --skip-install --version=2.0"
+      lic "add foo --skip-install --version=2.0"
 
-      expect(bundled_app("Gemfile").read).to match(/gem "foo", "= 2.0"/)
-      expect(the_bundle).to_not include_gems "foo 2.0"
+      expect(licd_app("Gemfile").read).to match(/gem "foo", "= 2.0"/)
+      expect(the_lic).to_not include_gems "foo 2.0"
     end
   end
 
   it "using combination of short form options works like long form" do
-    bundle "add 'foo' -s='file://#{gem_repo2}' -g='development' -v='~>1.0'"
-    expect(bundled_app("Gemfile").read).to include %(gem "foo", "~> 1.0", :group => :development, :source => "file://#{gem_repo2}")
-    expect(the_bundle).to include_gems "foo 1.1"
+    lic "add 'foo' -s='file://#{gem_repo2}' -g='development' -v='~>1.0'"
+    expect(licd_app("Gemfile").read).to include %(gem "foo", "~> 1.0", :group => :development, :source => "file://#{gem_repo2}")
+    expect(the_lic).to include_gems "foo 1.1"
   end
 
   it "shows error message when version is not formatted correctly" do
-    bundle "add 'foo' -v='~>1 . 0'"
+    lic "add 'foo' -v='~>1 . 0'"
     expect(out).to match("Invalid gem requirement pattern '~>1 . 0'")
   end
 
   it "shows error message when gem cannot be found" do
-    bundle "add 'werk_it'"
+    lic "add 'werk_it'"
     expect(out).to match("Could not find gem 'werk_it' in")
 
-    bundle "add 'werk_it' -s='file://#{gem_repo2}'"
+    lic "add 'werk_it' -s='file://#{gem_repo2}'"
     expect(out).to match("Could not find gem 'werk_it' in rubygems repository")
   end
 
   it "shows error message when source cannot be reached" do
-    bundle "add 'baz' --source='http://badhostasdf'"
+    lic "add 'baz' --source='http://badhostasdf'"
     expect(out).to include("Could not reach host badhostasdf. Check your network connection and try again.")
 
-    bundle "add 'baz' --source='file://does/not/exist'"
+    lic "add 'baz' --source='file://does/not/exist'"
     expect(out).to include("Could not fetch specs from file://does/not/exist/")
   end
 
   describe "with --optimistic" do
     it "adds optimistic version" do
-      bundle! "add 'foo' --optimistic"
-      expect(bundled_app("Gemfile").read).to include %(gem "foo", ">= 2.0")
-      expect(the_bundle).to include_gems "foo 2.0"
+      lic! "add 'foo' --optimistic"
+      expect(licd_app("Gemfile").read).to include %(gem "foo", ">= 2.0")
+      expect(the_lic).to include_gems "foo 2.0"
     end
   end
 
   describe "with --strict option" do
     it "adds strict version" do
-      bundle! "add 'foo' --strict"
-      expect(bundled_app("Gemfile").read).to include %(gem "foo", "= 2.0")
-      expect(the_bundle).to include_gems "foo 2.0"
+      lic! "add 'foo' --strict"
+      expect(licd_app("Gemfile").read).to include %(gem "foo", "= 2.0")
+      expect(the_lic).to include_gems "foo 2.0"
     end
   end
 
   describe "with no option" do
     it "adds pessimistic version" do
-      bundle! "add 'foo'"
-      expect(bundled_app("Gemfile").read).to include %(gem "foo", "~> 2.0")
-      expect(the_bundle).to include_gems "foo 2.0"
+      lic! "add 'foo'"
+      expect(licd_app("Gemfile").read).to include %(gem "foo", "~> 2.0")
+      expect(the_lic).to include_gems "foo 2.0"
     end
   end
 
   describe "with --optimistic and --strict" do
     it "throws error" do
-      bundle "add 'foo' --strict --optimistic"
+      lic "add 'foo' --strict --optimistic"
 
       expect(out).to include("You can not specify `--strict` and `--optimistic` at the same time")
     end
@@ -159,14 +159,14 @@ RSpec.describe "bundle add" do
 
   context "multiple gems" do
     it "adds multiple gems to gemfile" do
-      bundle! "add bar baz"
+      lic! "add bar baz"
 
-      expect(bundled_app("Gemfile").read).to match(/gem "bar", "~> 0.12.3"/)
-      expect(bundled_app("Gemfile").read).to match(/gem "baz", "~> 1.2"/)
+      expect(licd_app("Gemfile").read).to match(/gem "bar", "~> 0.12.3"/)
+      expect(licd_app("Gemfile").read).to match(/gem "baz", "~> 1.2"/)
     end
 
     it "throws error if any of the specified gems are present in the gemfile with different version" do
-      bundle "add weakling bar"
+      lic "add weakling bar"
 
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
       expect(out).to include("You specified: weakling (~> 0.0.1) and weakling (>= 0).")
@@ -180,10 +180,10 @@ RSpec.describe "bundle add" do
         gem "rack", "1.0"
       G
 
-      bundle "add 'rack' --version=1.1"
+      lic "add 'rack' --version=1.1"
 
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
-      expect(out).to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
+      expect(out).to include("If you want to update the gem version, run `lic update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
 
     it "shows error when added without version requirements" do
@@ -192,11 +192,11 @@ RSpec.describe "bundle add" do
         gem "rack", "1.0"
       G
 
-      bundle "add 'rack'"
+      lic "add 'rack'"
 
       expect(out).to include("Gem already added.")
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
-      expect(out).not_to include("If you want to update the gem version, run `bundle update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
+      expect(out).not_to include("If you want to update the gem version, run `lic update rack`. You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
   end
 
@@ -207,10 +207,10 @@ RSpec.describe "bundle add" do
         gem "rack"
       G
 
-      bundle "add 'rack' --version=1.1"
+      lic "add 'rack' --version=1.1"
 
       expect(out).to include("You cannot specify the same gem twice with different version requirements")
-      expect(out).to include("If you want to update the gem version, run `bundle update rack`.")
+      expect(out).to include("If you want to update the gem version, run `lic update rack`.")
       expect(out).not_to include("You may also need to change the version requirement specified in the Gemfile if it's too restrictive")
     end
   end

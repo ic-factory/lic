@@ -8,7 +8,7 @@ RSpec.describe "fetching dependencies with a mirrored source", :realworld => tru
 
   before do
     setup_server
-    bundle "config --local mirror.#{mirror} #{original}"
+    lic "config --local mirror.#{mirror} #{original}"
   end
 
   after do
@@ -17,17 +17,17 @@ RSpec.describe "fetching dependencies with a mirrored source", :realworld => tru
     @t.join
   end
 
-  it "sets the 'X-Gemfile-Source' header and bundles successfully" do
+  it "sets the 'X-Gemfile-Source' header and lics successfully" do
     gemfile <<-G
       source "#{mirror}"
       gem 'weakling'
     G
 
-    bundle :install, :artifice => nil
+    lic :install, :artifice => nil
 
     expect(out).to include("Installing weakling")
     expect(out).to include("Bundle complete")
-    expect(the_bundle).to include_gems "weakling 0.0.3"
+    expect(the_lic).to include_gems "weakling 0.0.3"
   end
 
   private

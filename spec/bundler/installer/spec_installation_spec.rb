@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bundler/installer/parallel_installer"
+require "lic/installer/parallel_installer"
 
-RSpec.describe Bundler::ParallelInstaller::SpecInstallation do
+RSpec.describe Lic::ParallelInstaller::SpecInstallation do
   let!(:dep) do
     a_spec = Object.new
     def a_spec.name

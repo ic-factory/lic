@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "bundler/settings"
+require "lic/settings"
 
-RSpec.describe Bundler::Settings do
-  subject(:settings) { described_class.new(bundled_app) }
+RSpec.describe Lic::Settings do
+  subject(:settings) { described_class.new(licd_app) }
 
   describe "#set_local" do
     context "when the local config file is not found" do
@@ -11,7 +11,7 @@ RSpec.describe Bundler::Settings do
 
       it "raises a GemfileNotFound error with explanation" do
         expect { subject.set_local("foo", "bar") }.
-          to raise_error(Bundler::GemfileNotFound, "Could not locate Gemfile")
+          to raise_error(Lic::GemfileNotFound, "Could not locate Gemfile")
       end
     end
   end
@@ -27,8 +27,8 @@ RSpec.describe Bundler::Settings do
         "gem.mit" => "false",
         "gem.test" => "minitest",
         "thingy" => <<-EOS.tr("\n", " "),
---asdf --fdsa --ty=oh man i hope this doesnt break bundler because
-that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
+--asdf --fdsa --ty=oh man i hope this doesnt break lic because
+that would suck --ehhh=oh geez it looks like i might have broken lic somehow
 --very-important-option=DontDeleteRoo
 --very-important-option=DontDeleteRoo
 --very-important-option=DontDeleteRoo
@@ -45,18 +45,18 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
 
     it "can load the config" do
-      loaded = settings.send(:load_config, bundled_app("config"))
+      loaded = settings.send(:load_config, licd_app("config"))
       expected = Hash[hash.map do |k, v|
         [settings.send(:key_for, k), v.to_s]
       end]
       expect(loaded).to eq(expected)
     end
 
-    context "when BUNDLE_IGNORE_CONFIG is set" do
-      before { ENV["BUNDLE_IGNORE_CONFIG"] = "TRUE" }
+    context "when LIC_IGNORE_CONFIG is set" do
+      before { ENV["LIC_IGNORE_CONFIG"] = "TRUE" }
 
       it "ignores the config" do
-        loaded = settings.send(:load_config, bundled_app("config"))
+        loaded = settings.send(:load_config, licd_app("config"))
         expect(loaded).to eq({})
       end
     end
@@ -66,8 +66,8 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     context "when $HOME is not accessible" do
       context "when $TMPDIR is not writable" do
         it "does not raise" do
-          expect(Bundler.rubygems).to receive(:user_home).twice.and_return(nil)
-          expect(FileUtils).to receive(:mkpath).twice.with(File.join(Dir.tmpdir, "bundler", "home")).and_raise(Errno::EROFS, "Read-only file system @ dir_s_mkdir - /tmp/bundler")
+          expect(Lic.rubygems).to receive(:user_home).twice.and_return(nil)
+          expect(FileUtils).to receive(:mkpath).twice.with(File.join(Dir.tmpdir, "lic", "home")).and_raise(Errno::EROFS, "Read-only file system @ dir_s_mkdir - /tmp/lic")
 
           expect(subject.send(:global_config_file)).to be_nil
         end
@@ -120,40 +120,40 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
 
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
-        expect(bundler_fileutils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
+        expect(lic_fileutils).to receive(:mkdir_p).with(settings.send(:local_config_file).dirname).
           and_raise(Errno::EACCES)
         expect { settings.set_local :frozen, "1" }.
-          to raise_error(Bundler::PermissionError, /config/)
+          to raise_error(Lic::PermissionError, /config/)
       end
     end
   end
 
   describe "#temporary" do
     it "reset after used" do
-      Bundler.settings.set_command_option :no_install, true
+      Lic.settings.set_command_option :no_install, true
 
-      Bundler.settings.temporary(:no_install => false) do
-        expect(Bundler.settings[:no_install]).to eq false
+      Lic.settings.temporary(:no_install => false) do
+        expect(Lic.settings[:no_install]).to eq false
       end
 
-      expect(Bundler.settings[:no_install]).to eq true
+      expect(Lic.settings[:no_install]).to eq true
 
-      Bundler.settings.set_command_option :no_install, nil
+      Lic.settings.set_command_option :no_install, nil
     end
 
     it "returns the return value of the block" do
-      ret = Bundler.settings.temporary({}) { :ret }
+      ret = Lic.settings.temporary({}) { :ret }
       expect(ret).to eq :ret
     end
 
     context "when called without a block" do
       it "leaves the setting changed" do
-        Bundler.settings.temporary(:foo => :random)
-        expect(Bundler.settings[:foo]).to eq "random"
+        Lic.settings.temporary(:foo => :random)
+        expect(Lic.settings[:foo]).to eq "random"
       end
 
       it "returns nil" do
-        expect(Bundler.settings.temporary(:foo => :bar)).to be_nil
+        expect(Lic.settings.temporary(:foo => :bar)).to be_nil
       end
     end
   end
@@ -161,10 +161,10 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
   describe "#set_global" do
     context "when it's not possible to write to the file" do
       it "raises an PermissionError with explanation" do
-        expect(bundler_fileutils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
+        expect(lic_fileutils).to receive(:mkdir_p).with(settings.send(:global_config_file).dirname).
           and_raise(Errno::EACCES)
         expect { settings.set_global(:frozen, "1") }.
-          to raise_error(Bundler::PermissionError, %r{\.bundle/config})
+          to raise_error(Lic::PermissionError, %r{\.lic/config})
       end
     end
   end
@@ -174,7 +174,7 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
       bool_key = described_class::BOOL_KEYS.first
       settings.set_local(bool_key, "false")
       expect(subject.pretty_values_for(bool_key)).to eq [
-        "Set for your local app (#{bundled_app("config")}): false",
+        "Set for your local app (#{licd_app("config")}): false",
       ]
     end
   end
@@ -307,21 +307,21 @@ that would suck --ehhh=oh geez it looks like i might have broken bundler somehow
     end
   end
 
-  describe "BUNDLE_ keys format" do
-    let(:settings) { described_class.new(bundled_app(".bundle")) }
+  describe "LIC_ keys format" do
+    let(:settings) { described_class.new(licd_app(".lic")) }
 
     it "converts older keys without double dashes" do
-      config("BUNDLE_MY__PERSONAL.RACK" => "~/Work/git/rack")
+      config("LIC_MY__PERSONAL.RACK" => "~/Work/git/rack")
       expect(settings["my.personal.rack"]).to eq("~/Work/git/rack")
     end
 
     it "converts older keys without trailing slashes and double dashes" do
-      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS.ORG" => "http://rubygems-mirror.org")
+      config("LIC_MIRROR__HTTPS://RUBYGEMS.ORG" => "http://rubygems-mirror.org")
       expect(settings["mirror.https://rubygems.org/"]).to eq("http://rubygems-mirror.org")
     end
 
     it "reads newer keys format properly" do
-      config("BUNDLE_MIRROR__HTTPS://RUBYGEMS__ORG/" => "http://rubygems-mirror.org")
+      config("LIC_MIRROR__HTTPS://RUBYGEMS__ORG/" => "http://rubygems-mirror.org")
       expect(settings["mirror.https://rubygems.org/"]).to eq("http://rubygems-mirror.org")
     end
   end

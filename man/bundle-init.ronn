@@ -1,9 +1,9 @@
-bundle-init(1) -- Generates a Gemfile into the current working directory
+lic-init(1) -- Generates a Gemfile into the current working directory
 ========================================================================
 
 ## SYNOPSIS
 
-`bundle init` [--gemspec=FILE]
+`lic init` [--gemspec=FILE]
 
 ## DESCRIPTION
 
@@ -26,4 +26,4 @@ results in all string literals in the file being implicitly frozen.
 
 ## SEE ALSO
 
-[Gemfile(5)](http://bundler.io/man/gemfile.5.html)
+[Gemfile(5)](http://lic.io/man/gemfile.5.html)

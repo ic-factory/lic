@@ -5,8 +5,8 @@ load File.expand_path("../with_rubygems", __FILE__) if ENV["RGV"]
 
 require "rubygems"
 
-bundler_spec = Gem::Specification.load(File.expand_path("../../bundler.gemspec", __FILE__))
-bundler_spec.dependencies.each do |dep|
+lic_spec = Gem::Specification.load(File.expand_path("../../lic.gemspec", __FILE__))
+lic_spec.dependencies.each do |dep|
   begin
     gem dep.name, dep.requirement
   rescue Gem::LoadError => e

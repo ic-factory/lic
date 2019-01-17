@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path("../../path.rb", __FILE__)
-require Spec::Path.root.join("lib/bundler/deprecate")
+require Spec::Path.root.join("lib/lic/deprecate")
 include Spec::Path
 
 $LOAD_PATH.unshift(*Dir[Spec::Path.base_system_gems.join("gems/{artifice,rack,tilt,sinatra}-*/lib")].map(&:to_s))
@@ -12,7 +12,7 @@ ALL_REQUESTS = [] # rubocop:disable Style/MutableConstant
 ALL_REQUESTS_MUTEX = Mutex.new
 
 at_exit do
-  if expected = ENV["BUNDLER_SPEC_ALL_REQUESTS"]
+  if expected = ENV["LIC_SPEC_ALL_REQUESTS"]
     expected = expected.split("\n").sort
     actual = ALL_REQUESTS.sort
 
@@ -27,7 +27,7 @@ class Endpoint < Sinatra::Base
     @all_requests ||= []
   end
 
-  GEM_REPO = Pathname.new(ENV["BUNDLER_SPEC_GEM_REPO"] || Spec::Path.gem_repo1)
+  GEM_REPO = Pathname.new(ENV["LIC_SPEC_GEM_REPO"] || Spec::Path.gem_repo1)
   set :raise_errors, true
   set :show_exceptions, false
 
@@ -44,8 +44,8 @@ class Endpoint < Sinatra::Base
       return [] if gem_names.nil? || gem_names.empty?
 
       require "rubygems"
-      require "bundler"
-      Bundler::Deprecate.skip_during do
+      require "lic"
+      Lic::Deprecate.skip_during do
         all_specs = %w[specs.4.8 prerelease_specs.4.8].map do |filename|
           Marshal.load(File.open(gem_repo.join(filename)).read)
         end.inject(:+)
@@ -68,7 +68,7 @@ class Endpoint < Sinatra::Base
     def load_spec(name, version, platform, gem_repo)
       full_name = "#{name}-#{version}"
       full_name += "-#{platform}" if platform != "ruby"
-      Marshal.load(Bundler.rubygems.inflate(File.open(gem_repo.join("quick/Marshal.4.8/#{full_name}.gemspec.rz")).read))
+      Marshal.load(Lic.rubygems.inflate(File.open(gem_repo.join("quick/Marshal.4.8/#{full_name}.gemspec.rz")).read))
     end
   end
 

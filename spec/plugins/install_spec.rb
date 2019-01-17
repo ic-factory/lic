@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundler plugin install" do
+RSpec.describe "lic plugin install" do
   before do
     build_repo2 do
       build_plugin "foo"
@@ -9,21 +9,21 @@ RSpec.describe "bundler plugin install" do
   end
 
   it "shows proper message when gem in not found in the source" do
-    bundle "plugin install no-foo --source file://#{gem_repo1}"
+    lic "plugin install no-foo --source file://#{gem_repo1}"
 
     expect(out).to include("Could not find")
     plugin_should_not_be_installed("no-foo")
   end
 
   it "installs from rubygems source" do
-    bundle "plugin install foo --source file://#{gem_repo2}"
+    lic "plugin install foo --source file://#{gem_repo2}"
 
     expect(out).to include("Installed plugin foo")
     plugin_should_be_installed("foo")
   end
 
   it "installs multiple plugins" do
-    bundle "plugin install foo kung-foo --source file://#{gem_repo2}"
+    lic "plugin install foo kung-foo --source file://#{gem_repo2}"
 
     expect(out).to include("Installed plugin foo")
     expect(out).to include("Installed plugin kung-foo")
@@ -37,7 +37,7 @@ RSpec.describe "bundler plugin install" do
       build_plugin "kung-foo", "1.1"
     end
 
-    bundle "plugin install foo kung-foo --version '1.0' --source file://#{gem_repo2}"
+    lic "plugin install foo kung-foo --version '1.0' --source file://#{gem_repo2}"
 
     expect(out).to include("Installing foo 1.0")
     expect(out).to include("Installing kung-foo 1.0")
@@ -49,7 +49,7 @@ RSpec.describe "bundler plugin install" do
       build_plugin "testing" do |s|
         s.write "plugins.rb", <<-RUBY
           require "fubar"
-          class Test < Bundler::Plugin::API
+          class Test < Lic::Plugin::API
             command "check2"
 
             def exec(command, args)
@@ -61,9 +61,9 @@ RSpec.describe "bundler plugin install" do
         s.write("src/fubar.rb")
       end
     end
-    bundle "plugin install testing --source file://#{gem_repo2}"
+    lic "plugin install testing --source file://#{gem_repo2}"
 
-    bundle "check2", "no-color" => false
+    lic "check2", "no-color" => false
     expect(out).to eq("mate")
   end
 
@@ -74,7 +74,7 @@ RSpec.describe "bundler plugin install" do
         build_plugin "kung-foo", "1.1"
       end
 
-      bundle "plugin install foo kung-foo --version '1.0' --source file://#{gem_repo2}"
+      lic "plugin install foo kung-foo --version '1.0' --source file://#{gem_repo2}"
 
       expect(out).to include("Installing foo 1.0")
       expect(out).to include("Installing kung-foo 1.0")
@@ -84,7 +84,7 @@ RSpec.describe "bundler plugin install" do
         build_gem "charlie"
       end
 
-      bundle "plugin install charlie --source file://#{gem_repo2}"
+      lic "plugin install charlie --source file://#{gem_repo2}"
 
       expect(out).to include("plugins.rb was not found")
 
@@ -103,7 +103,7 @@ RSpec.describe "bundler plugin install" do
         end
       end
 
-      bundle "plugin install chaplin --source file://#{gem_repo2}"
+      lic "plugin install chaplin --source file://#{gem_repo2}"
 
       expect(global_plugin_gem("chaplin-1.0")).not_to be_directory
 
@@ -117,7 +117,7 @@ RSpec.describe "bundler plugin install" do
         s.write "plugins.rb"
       end
 
-      bundle "plugin install foo --git file://#{lib_path("foo-1.0")}"
+      lic "plugin install foo --git file://#{lib_path("foo-1.0")}"
 
       expect(out).to include("Installed plugin foo")
       plugin_should_be_installed("foo")
@@ -128,14 +128,14 @@ RSpec.describe "bundler plugin install" do
         s.write "plugins.rb"
       end
 
-      bundle "plugin install foo --local_git #{lib_path("foo-1.0")}"
+      lic "plugin install foo --local_git #{lib_path("foo-1.0")}"
 
       expect(out).to include("Installed plugin foo")
       plugin_should_be_installed("foo")
     end
 
     it "raises an error when both git and local git sources are specified" do
-      bundle "plugin install foo --local_git /phony/path/project --git git@gitphony.com:/repo/project"
+      lic "plugin install foo --local_git /phony/path/project --git git@gitphony.com:/repo/project"
 
       expect(exitstatus).not_to eq(0) if exitstatus
       expect(out).to eq("Remote and local plugin git sources can't be both specified")
@@ -150,13 +150,13 @@ RSpec.describe "bundler plugin install" do
         gem 'rack', "1.0.0"
       G
 
-      bundle "install"
+      lic "install"
 
       expect(out).to include("Installed plugin foo")
 
       expect(out).to include("Bundle complete!")
 
-      expect(the_bundle).to include_gems("rack 1.0.0")
+      expect(the_lic).to include_gems("rack 1.0.0")
       plugin_should_be_installed("foo")
     end
 
@@ -170,7 +170,7 @@ RSpec.describe "bundler plugin install" do
         plugin 'foo', "1.0"
       G
 
-      bundle "install"
+      lic "install"
 
       expect(out).to include("Installing foo 1.0")
 
@@ -209,7 +209,7 @@ RSpec.describe "bundler plugin install" do
 
         expect(out).to include("Bundle complete!")
 
-        expect(the_bundle).to include_gems("rack 1.0.0")
+        expect(the_lic).to include_gems("rack 1.0.0")
         plugin_should_be_installed("foo")
       end
     end
@@ -218,7 +218,7 @@ RSpec.describe "bundler plugin install" do
   context "inline gemfiles" do
     it "installs the listed plugins" do
       code = <<-RUBY
-        require "bundler/inline"
+        require "lic/inline"
 
         gemfile do
           source 'file://#{gem_repo2}'
@@ -234,7 +234,7 @@ RSpec.describe "bundler plugin install" do
   describe "local plugin" do
     it "is installed when inside an app" do
       gemfile ""
-      bundle "plugin install foo --source file://#{gem_repo2}"
+      lic "plugin install foo --source file://#{gem_repo2}"
 
       plugin_should_be_installed("foo")
       expect(local_plugin_gem("foo-1.0")).to be_directory
@@ -245,7 +245,7 @@ RSpec.describe "bundler plugin install" do
         update_repo2 do
           build_plugin "fubar" do |s|
             s.write "plugins.rb", <<-RUBY
-              class Fubar < Bundler::Plugin::API
+              class Fubar < Lic::Plugin::API
                 command "shout"
 
                 def exec(command, args)
@@ -258,12 +258,12 @@ RSpec.describe "bundler plugin install" do
 
         # inside the app
         gemfile "source 'file://#{gem_repo2}'\nplugin 'fubar'"
-        bundle "install"
+        lic "install"
 
         update_repo2 do
           build_plugin "fubar", "1.1" do |s|
             s.write "plugins.rb", <<-RUBY
-              class Fubar < Bundler::Plugin::API
+              class Fubar < Lic::Plugin::API
                 command "shout"
 
                 def exec(command, args)
@@ -276,20 +276,20 @@ RSpec.describe "bundler plugin install" do
 
         # outside the app
         Dir.chdir tmp
-        bundle "plugin install fubar --source file://#{gem_repo2}"
+        lic "plugin install fubar --source file://#{gem_repo2}"
       end
 
       it "inside the app takes precedence over global plugin" do
-        Dir.chdir bundled_app
+        Dir.chdir licd_app
 
-        bundle "shout"
+        lic "shout"
         expect(out).to eq("local_one")
       end
 
       it "outside the app global plugin is used" do
         Dir.chdir tmp
 
-        bundle "shout"
+        lic "shout"
         expect(out).to eq("global_one")
       end
     end

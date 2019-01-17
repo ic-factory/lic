@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Fetcher::Downloader do
+RSpec.describe Lic::Fetcher::Downloader do
   let(:connection)     { double(:connection) }
   let(:redirect_limit) { 5 }
   let(:uri)            { URI("http://www.uri-to-fetch.com/api/v2/endpoint") }
@@ -21,8 +21,8 @@ RSpec.describe Bundler::Fetcher::Downloader do
     context "when the # requests counter is greater than the redirect limit" do
       let(:counter) { redirect_limit + 1 }
 
-      it "should raise a Bundler::HTTPError specifying too many redirects" do
-        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::HTTPError, "Too many redirects")
+      it "should raise a Lic::HTTPError specifying too many redirects" do
+        expect { subject.fetch(uri, options, counter) }.to raise_error(Lic::HTTPError, "Too many redirects")
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
       let(:http_response) { Net::HTTPSuccess.new("1.1", 200, "Success") }
 
       it "should log the HTTP response code and message to debug" do
-        expect(Bundler).to receive_message_chain(:ui, :debug).with("HTTP 200 Success #{uri}")
+        expect(Lic).to receive_message_chain(:ui, :debug).with("HTTP 200 Success #{uri}")
         subject.fetch(uri, options, counter)
       end
     end
@@ -70,16 +70,16 @@ RSpec.describe Bundler::Fetcher::Downloader do
     context "when the request response is a Net::HTTPRequestEntityTooLarge" do
       let(:http_response) { Net::HTTPRequestEntityTooLarge.new("1.1", 413, "Too Big") }
 
-      it "should raise a Bundler::Fetcher::FallbackError with the response body" do
-        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::Fetcher::FallbackError, "Body with info")
+      it "should raise a Lic::Fetcher::FallbackError with the response body" do
+        expect { subject.fetch(uri, options, counter) }.to raise_error(Lic::Fetcher::FallbackError, "Body with info")
       end
     end
 
     context "when the request response is a Net::HTTPUnauthorized" do
       let(:http_response) { Net::HTTPUnauthorized.new("1.1", 401, "Unauthorized") }
 
-      it "should raise a Bundler::Fetcher::AuthenticationRequiredError with the uri host" do
-        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
+      it "should raise a Lic::Fetcher::AuthenticationRequiredError with the uri host" do
+        expect { subject.fetch(uri, options, counter) }.to raise_error(Lic::Fetcher::AuthenticationRequiredError,
           /Authentication is required for www.uri-to-fetch.com/)
       end
     end
@@ -87,17 +87,17 @@ RSpec.describe Bundler::Fetcher::Downloader do
     context "when the request response is a Net::HTTPNotFound" do
       let(:http_response) { Net::HTTPNotFound.new("1.1", 404, "Not Found") }
 
-      it "should raise a Bundler::Fetcher::FallbackError with Net::HTTPNotFound" do
+      it "should raise a Lic::Fetcher::FallbackError with Net::HTTPNotFound" do
         expect { subject.fetch(uri, options, counter) }.
-          to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound: http://www.uri-to-fetch.com/api/v2/endpoint")
+          to raise_error(Lic::Fetcher::FallbackError, "Net::HTTPNotFound: http://www.uri-to-fetch.com/api/v2/endpoint")
       end
 
       context "when the there are credentials provided in the request" do
         let(:uri) { URI("http://username:password@www.uri-to-fetch.com/api/v2/endpoint") }
 
-        it "should raise a Bundler::Fetcher::FallbackError that doesn't contain the password" do
+        it "should raise a Lic::Fetcher::FallbackError that doesn't contain the password" do
           expect { subject.fetch(uri, options, counter) }.
-            to raise_error(Bundler::Fetcher::FallbackError, "Net::HTTPNotFound: http://username@www.uri-to-fetch.com/api/v2/endpoint")
+            to raise_error(Lic::Fetcher::FallbackError, "Net::HTTPNotFound: http://username@www.uri-to-fetch.com/api/v2/endpoint")
         end
       end
     end
@@ -105,8 +105,8 @@ RSpec.describe Bundler::Fetcher::Downloader do
     context "when the request response is some other type" do
       let(:http_response) { Net::HTTPBadGateway.new("1.1", 500, "Fatal Error") }
 
-      it "should raise a Bundler::HTTPError with the response class and body" do
-        expect { subject.fetch(uri, options, counter) }.to raise_error(Bundler::HTTPError, "Net::HTTPBadGateway: Body with info")
+      it "should raise a Lic::HTTPError with the response class and body" do
+        expect { subject.fetch(uri, options, counter) }.to raise_error(Lic::HTTPError, "Net::HTTPBadGateway: Body with info")
       end
     end
   end
@@ -121,7 +121,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
     end
 
     it "should log the HTTP GET request to debug" do
-      expect(Bundler).to receive_message_chain(:ui, :debug).with("HTTP GET http://www.uri-to-fetch.com/api/v2/endpoint")
+      expect(Lic).to receive_message_chain(:ui, :debug).with("HTTP GET http://www.uri-to-fetch.com/api/v2/endpoint")
       subject.request(uri, options)
     end
 
@@ -188,7 +188,7 @@ RSpec.describe Bundler::Fetcher::Downloader do
       before { allow(connection).to receive(:request).with(uri, net_http_get) { raise OpenSSL::SSL::SSLError.new } }
 
       it "should raise a LoadError about openssl" do
-        expect { subject.request(uri, options) }.to raise_error(Bundler::Fetcher::CertificateFailureError,
+        expect { subject.request(uri, options) }.to raise_error(Lic::Fetcher::CertificateFailureError,
           %r{Could not verify the SSL certificate for http://www.uri-to-fetch.com/api/v2/endpoint})
       end
     end
@@ -198,21 +198,21 @@ RSpec.describe Bundler::Fetcher::Downloader do
       let(:error)   { RuntimeError.new(message) }
 
       before do
-        stub_const("Bundler::Fetcher::HTTP_ERRORS", [RuntimeError])
+        stub_const("Lic::Fetcher::HTTP_ERRORS", [RuntimeError])
         allow(connection).to receive(:request).with(uri, net_http_get) { raise error }
       end
 
       it "should trace log the error" do
-        allow(Bundler).to receive_message_chain(:ui, :debug)
-        expect(Bundler).to receive_message_chain(:ui, :trace).with(error)
-        expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError)
+        allow(Lic).to receive_message_chain(:ui, :debug)
+        expect(Lic).to receive_message_chain(:ui, :trace).with(error)
+        expect { subject.request(uri, options) }.to raise_error(Lic::HTTPError)
       end
 
       context "when error message is about the host being down" do
         let(:message) { "host down: http://www.uri-to-fetch.com" }
 
-        it "should raise a Bundler::Fetcher::NetworkDownError" do
-          expect { subject.request(uri, options) }.to raise_error(Bundler::Fetcher::NetworkDownError,
+        it "should raise a Lic::Fetcher::NetworkDownError" do
+          expect { subject.request(uri, options) }.to raise_error(Lic::Fetcher::NetworkDownError,
             /Could not reach host www.uri-to-fetch.com/)
         end
       end
@@ -220,8 +220,8 @@ RSpec.describe Bundler::Fetcher::Downloader do
       context "when error message is about getaddrinfo issues" do
         let(:message) { "getaddrinfo: nodename nor servname provided for http://www.uri-to-fetch.com" }
 
-        it "should raise a Bundler::Fetcher::NetworkDownError" do
-          expect { subject.request(uri, options) }.to raise_error(Bundler::Fetcher::NetworkDownError,
+        it "should raise a Lic::Fetcher::NetworkDownError" do
+          expect { subject.request(uri, options) }.to raise_error(Lic::Fetcher::NetworkDownError,
             /Could not reach host www.uri-to-fetch.com/)
         end
       end
@@ -229,8 +229,8 @@ RSpec.describe Bundler::Fetcher::Downloader do
       context "when error message is about neither host down or getaddrinfo" do
         let(:message) { "other error about network" }
 
-        it "should raise a Bundler::HTTPError" do
-          expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
+        it "should raise a Lic::HTTPError" do
+          expect { subject.request(uri, options) }.to raise_error(Lic::HTTPError,
             "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint (other error about network)")
         end
 
@@ -240,8 +240,8 @@ RSpec.describe Bundler::Fetcher::Downloader do
             allow(net_http_get).to receive(:basic_auth).with("username", "password")
           end
 
-          it "should raise a Bundler::HTTPError that doesn't contain the password" do
-            expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
+          it "should raise a Lic::HTTPError that doesn't contain the password" do
+            expect { subject.request(uri, options) }.to raise_error(Lic::HTTPError,
               "Network error while fetching http://username@www.uri-to-fetch.com/api/v2/endpoint (other error about network)")
           end
         end
@@ -250,8 +250,8 @@ RSpec.describe Bundler::Fetcher::Downloader do
       context "when error message is about no route to host" do
         let(:message) { "Failed to open TCP connection to www.uri-to-fetch.com:443 " }
 
-        it "should raise a Bundler::Fetcher::HTTPError" do
-          expect { subject.request(uri, options) }.to raise_error(Bundler::HTTPError,
+        it "should raise a Lic::Fetcher::HTTPError" do
+          expect { subject.request(uri, options) }.to raise_error(Lic::HTTPError,
             "Network error while fetching http://www.uri-to-fetch.com/api/v2/endpoint (#{message})")
         end
       end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bundler/installer/parallel_installer"
+require "lic/installer/parallel_installer"
 
-RSpec.describe Bundler::ParallelInstaller do
+RSpec.describe Lic::ParallelInstaller do
   let(:installer) { instance_double("Installer") }
   let(:all_specs) { [] }
   let(:size) { 1 }
@@ -19,9 +19,9 @@ RSpec.describe Bundler::ParallelInstaller do
     end
 
     it "prints a warning" do
-      expect(Bundler.ui).to receive(:warn).with(<<-W.strip)
-Your lockfile was created by an old Bundler that left some things out.
-You can fix this by adding the missing gems to your Gemfile, running bundle install, and then removing the gems from your Gemfile.
+      expect(Lic.ui).to receive(:warn).with(<<-W.strip)
+Your lockfile was created by an old Lic that left some things out.
+You can fix this by adding the missing gems to your Gemfile, running lic install, and then removing the gems from your Gemfile.
 The missing gems are:
 * a depended upon by alpha
       W
@@ -32,10 +32,10 @@ The missing gems are:
       let(:size) { 500 }
 
       it "prints a warning and sets size to 1" do
-        expect(Bundler.ui).to receive(:warn).with(<<-W.strip)
-Your lockfile was created by an old Bundler that left some things out.
+        expect(Lic.ui).to receive(:warn).with(<<-W.strip)
+Your lockfile was created by an old Lic that left some things out.
 Because of the missing DEPENDENCIES, we can only install gems one at a time, instead of installing 500 at a time.
-You can fix this by adding the missing gems to your Gemfile, running bundle install, and then removing the gems from your Gemfile.
+You can fix this by adding the missing gems to your Gemfile, running lic install, and then removing the gems from your Gemfile.
 The missing gems are:
 * a depended upon by alpha
         W

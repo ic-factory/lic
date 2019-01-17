@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require "net/http"
-require "bundler/compact_index_client"
-require "bundler/compact_index_client/updater"
+require "lic/compact_index_client"
+require "lic/compact_index_client/updater"
 
-RSpec.describe Bundler::CompactIndexClient::Updater do
+RSpec.describe Lic::CompactIndexClient::Updater do
   let(:fetcher) { double(:fetcher) }
   let(:local_path) { Pathname("/tmp/localpath") }
   let(:remote_path) { double(:remote_path) }
@@ -12,7 +12,7 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
   subject(:updater) { described_class.new(fetcher) }
 
   context "when the ETag header is missing" do
-    # Regression test for https://github.com/bundler/bundler/issues/5463
+    # Regression test for https://github.com/lic/lic/issues/5463
 
     let(:response) { double(:response, :body => "") }
 
@@ -24,7 +24,7 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
 
       expect do
         updater.update(local_path, remote_path)
-      end.to raise_error(Bundler::CompactIndexClient::Updater::MisMatchedChecksumError)
+      end.to raise_error(Lic::CompactIndexClient::Updater::MisMatchedChecksumError)
     end
   end
 
@@ -37,11 +37,11 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
 
       expect do
         updater.update(local_path, remote_path)
-      end.to raise_error(Bundler::HTTPError)
+      end.to raise_error(Lic::HTTPError)
     end
   end
 
-  context "when bundler doesn't have permissions on Dir.tmpdir" do
+  context "when lic doesn't have permissions on Dir.tmpdir" do
     let(:response) { double(:response, :body => "") }
 
     it "Errno::EACCES is raised" do
@@ -49,7 +49,7 @@ RSpec.describe Bundler::CompactIndexClient::Updater do
 
       expect do
         updater.update(local_path, remote_path)
-      end.to raise_error(Bundler::PermissionError)
+      end.to raise_error(Lic::PermissionError)
     end
   end
 end

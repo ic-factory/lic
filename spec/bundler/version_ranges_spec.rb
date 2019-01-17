@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bundler/version_ranges"
+require "lic/version_ranges"
 
-RSpec.describe Bundler::VersionRanges do
+RSpec.describe Lic::VersionRanges do
   describe ".empty?" do
     shared_examples_for "empty?" do |exp, *req|
       it "returns #{exp} for #{req}" do

@@ -2,7 +2,7 @@
 
 module Spec
   module Platforms
-    include Bundler::GemHelpers
+    include Lic::GemHelpers
 
     def rb
       Gem::Platform::RUBY
@@ -45,7 +45,7 @@ module Spec
     end
 
     def specific_local_platform
-      Bundler.local_platform
+      Lic.local_platform
     end
 
     def not_local
@@ -65,11 +65,11 @@ module Spec
     end
 
     def local_ruby_engine
-      ENV["BUNDLER_SPEC_RUBY_ENGINE"] || (defined?(RUBY_ENGINE) ? RUBY_ENGINE : "ruby")
+      ENV["LIC_SPEC_RUBY_ENGINE"] || (defined?(RUBY_ENGINE) ? RUBY_ENGINE : "ruby")
     end
 
     def local_engine_version
-      return ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"] if ENV["BUNDLER_SPEC_RUBY_ENGINE_VERSION"]
+      return ENV["LIC_SPEC_RUBY_ENGINE_VERSION"] if ENV["LIC_SPEC_RUBY_ENGINE_VERSION"]
 
       case local_ruby_engine
       when "ruby"
@@ -106,7 +106,7 @@ module Spec
     end
 
     def local_platforms
-      if Bundler::VERSION.split(".").first.to_i > 1
+      if Lic::VERSION.split(".").first.to_i > 1
         [local, specific_local_platform]
       else
         [local]

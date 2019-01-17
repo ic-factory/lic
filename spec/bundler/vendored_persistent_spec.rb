@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "bundler/vendored_persistent"
+require "lic/vendored_persistent"
 
-RSpec.describe Bundler::PersistentHTTP do
+RSpec.describe Lic::PersistentHTTP do
   describe "#warn_old_tls_version_rubygems_connection" do
     let(:uri) { "https://index.rubygems.org" }
     let(:connection) { instance_double(subject.http_class) }
@@ -23,14 +23,14 @@ RSpec.describe Bundler::PersistentHTTP do
 
     shared_examples_for "does not warn" do
       it "does not warn" do
-        allow(Bundler.ui).to receive(:warn).never
+        allow(Lic.ui).to receive(:warn).never
         subject.warn_old_tls_version_rubygems_connection(URI(uri), connection)
       end
     end
 
     shared_examples_for "does warn" do |*expected|
       it "warns" do
-        expect(Bundler.ui).to receive(:warn).with(*expected)
+        expect(Lic.ui).to receive(:warn).with(*expected)
         subject.warn_old_tls_version_rubygems_connection(URI(uri), connection)
       end
     end

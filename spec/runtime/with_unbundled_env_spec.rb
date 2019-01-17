@@ -1,41 +1,41 @@
 # frozen_string_literal: true
 
-RSpec.describe "Bundler.with_env helpers" do
-  def bundle_exec_ruby!(code, *args)
-    build_bundler_context
+RSpec.describe "Lic.with_env helpers" do
+  def lic_exec_ruby!(code, *args)
+    build_lic_context
     opts = args.last.is_a?(Hash) ? args.pop : {}
     env = opts[:env] ||= {}
     env[:RUBYOPT] ||= "-r#{spec_dir.join("support/hax")}"
     args.push opts
-    bundle! "exec '#{Gem.ruby}' -e #{code}", *args
+    lic! "exec '#{Gem.ruby}' -e #{code}", *args
   end
 
-  def build_bundler_context
-    bundle "config path vendor/bundle"
+  def build_lic_context
+    lic "config path vendor/lic"
     gemfile ""
-    bundle "install"
+    lic "install"
   end
 
-  describe "Bundler.original_env" do
-    it "should return the PATH present before bundle was activated" do
-      code = "print Bundler.original_env['PATH']"
+  describe "Lic.original_env" do
+    it "should return the PATH present before lic was activated" do
+      code = "print Lic.original_env['PATH']"
       path = `getconf PATH`.strip + "#{File::PATH_SEPARATOR}/foo"
       with_path_as(path) do
-        bundle_exec_ruby!(code.dump)
+        lic_exec_ruby!(code.dump)
         expect(last_command.stdboth).to eq(path)
       end
     end
 
-    it "should return the GEM_PATH present before bundle was activated" do
-      code = "print Bundler.original_env['GEM_PATH']"
+    it "should return the GEM_PATH present before lic was activated" do
+      code = "print Lic.original_env['GEM_PATH']"
       gem_path = ENV["GEM_PATH"] + ":/foo"
       with_gem_path_as(gem_path) do
-        bundle_exec_ruby!(code.dump)
+        lic_exec_ruby!(code.dump)
         expect(last_command.stdboth).to eq(gem_path)
       end
     end
 
-    it "works with nested bundle exec invocations", :ruby_repo do
+    it "works with nested lic exec invocations", :ruby_repo do
       create_file("exe.rb", <<-'RB')
         count = ARGV.first.to_i
         exit if count < 0
@@ -47,8 +47,8 @@ RSpec.describe "Bundler.with_env helpers" do
       RB
       path = `getconf PATH`.strip + File::PATH_SEPARATOR + File.dirname(Gem.ruby)
       with_path_as(path) do
-        build_bundler_context
-        bundle! "exec '#{Gem.ruby}' #{bundled_app("exe.rb")} 2", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
+        build_lic_context
+        lic! "exec '#{Gem.ruby}' #{licd_app("exe.rb")} 2", :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" }
       end
       expect(err).to eq <<-EOS.strip
 2 false
@@ -57,84 +57,84 @@ RSpec.describe "Bundler.with_env helpers" do
       EOS
     end
 
-    it "removes variables that bundler added", :ruby_repo do
+    it "removes variables that lic added", :ruby_repo do
       original = ruby!('puts ENV.to_a.map {|e| e.join("=") }.sort.join("\n")', :env => { :RUBYOPT => "-r#{spec_dir.join("support/hax")}" })
-      code = 'puts Bundler.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
-      bundle_exec_ruby! code.dump
+      code = 'puts Lic.original_env.to_a.map {|e| e.join("=") }.sort.join("\n")'
+      lic_exec_ruby! code.dump
       expect(out).to eq original
     end
   end
 
   shared_examples_for "an unbundling helper" do
-    it "should delete BUNDLE_PATH" do
-      code = "print #{modified_env}.has_key?('BUNDLE_PATH')"
-      ENV["BUNDLE_PATH"] = "./foo"
-      bundle_exec_ruby! code.dump
+    it "should delete LIC_PATH" do
+      code = "print #{modified_env}.has_key?('LIC_PATH')"
+      ENV["LIC_PATH"] = "./foo"
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).to include "false"
     end
 
-    it "should remove '-rbundler/setup' from RUBYOPT" do
+    it "should remove '-rlic/setup' from RUBYOPT" do
       code = "print #{modified_env}['RUBYOPT']"
-      ENV["RUBYOPT"] = "-W2 -rbundler/setup"
-      bundle_exec_ruby! code.dump
-      expect(last_command.stdboth).not_to include("-rbundler/setup")
+      ENV["RUBYOPT"] = "-W2 -rlic/setup"
+      lic_exec_ruby! code.dump
+      expect(last_command.stdboth).not_to include("-rlic/setup")
     end
 
     it "should clean up RUBYLIB", :ruby_repo do
       code = "print #{modified_env}['RUBYLIB']"
       ENV["RUBYLIB"] = root.join("lib").to_s + File::PATH_SEPARATOR + "/foo"
-      bundle_exec_ruby! code.dump
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).to include("/foo")
     end
 
     it "should restore the original MANPATH" do
       code = "print #{modified_env}['MANPATH']"
       ENV["MANPATH"] = "/foo"
-      ENV["BUNDLER_ORIG_MANPATH"] = "/foo-original"
-      bundle_exec_ruby! code.dump
+      ENV["LIC_ORIG_MANPATH"] = "/foo-original"
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).to include("/foo-original")
     end
   end
 
-  describe "Bundler.unbundled_env" do
-    let(:modified_env) { "Bundler.unbundled_env" }
+  describe "Lic.unlicd_env" do
+    let(:modified_env) { "Lic.unlicd_env" }
 
     it_behaves_like "an unbundling helper"
   end
 
-  describe "Bundler.clean_env" do
-    let(:modified_env) { "Bundler.clean_env" }
+  describe "Lic.clean_env" do
+    let(:modified_env) { "Lic.clean_env" }
 
     it_behaves_like "an unbundling helper"
 
-    it "prints a deprecation", :bundler => 2 do
-      code = "Bundler.clean_env"
-      bundle_exec_ruby! code.dump
+    it "prints a deprecation", :lic => 2 do
+      code = "Lic.clean_env"
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).to include(
-        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
-        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+        "[DEPRECATED FOR 2.0] `Lic.clean_env` has been deprecated in favor of `Lic.unlicd_env`. " \
+        "If you instead want the environment before lic was originally loaded, use `Lic.original_env`"
       )
     end
 
-    it "does not print a deprecation", :bundler => "< 2" do
-      code = "Bundler.clean_env"
-      bundle_exec_ruby! code.dump
+    it "does not print a deprecation", :lic => "< 2" do
+      code = "Lic.clean_env"
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include(
-        "[DEPRECATED FOR 2.0] `Bundler.clean_env` has been deprecated in favor of `Bundler.unbundled_env`. " \
-        "If you instead want the environment before bundler was originally loaded, use `Bundler.original_env`"
+        "[DEPRECATED FOR 2.0] `Lic.clean_env` has been deprecated in favor of `Lic.unlicd_env`. " \
+        "If you instead want the environment before lic was originally loaded, use `Lic.original_env`"
       )
     end
   end
 
-  describe "Bundler.with_original_env" do
+  describe "Lic.with_original_env" do
     it "should set ENV to original_env in the block" do
-      expected = Bundler.original_env
-      actual = Bundler.with_original_env { ENV.to_hash }
+      expected = Lic.original_env
+      actual = Lic.with_original_env { ENV.to_hash }
       expect(actual).to eq(expected)
     end
 
     it "should restore the environment after execution" do
-      Bundler.with_original_env do
+      Lic.with_original_env do
         ENV["FOO"] = "hello"
       end
 
@@ -142,49 +142,49 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.with_clean_env" do
-    it "should set ENV to unbundled_env in the block" do
-      expected = Bundler.unbundled_env
-      actual = Bundler.with_clean_env { ENV.to_hash }
+  describe "Lic.with_clean_env" do
+    it "should set ENV to unlicd_env in the block" do
+      expected = Lic.unlicd_env
+      actual = Lic.with_clean_env { ENV.to_hash }
       expect(actual).to eq(expected)
     end
 
     it "should restore the environment after execution" do
-      Bundler.with_clean_env do
+      Lic.with_clean_env do
         ENV["FOO"] = "hello"
       end
 
       expect(ENV).not_to have_key("FOO")
     end
 
-    it "prints a deprecation", :bundler => 2 do
-      code = "Bundler.with_clean_env {}"
-      bundle_exec_ruby! code.dump
+    it "prints a deprecation", :lic => 2 do
+      code = "Lic.with_clean_env {}"
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).to include(
-        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
-        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+        "[DEPRECATED FOR 2.0] `Lic.with_clean_env` has been deprecated in favor of `Lic.with_unlicd_env`. " \
+        "If you instead want the environment before lic was originally loaded, use `Lic.with_original_env`"
       )
     end
 
-    it "does not print a deprecation", :bundler => "< 2" do
-      code = "Bundler.with_clean_env {}"
-      bundle_exec_ruby! code.dump
+    it "does not print a deprecation", :lic => "< 2" do
+      code = "Lic.with_clean_env {}"
+      lic_exec_ruby! code.dump
       expect(last_command.stdboth).not_to include(
-        "[DEPRECATED FOR 2.0] `Bundler.with_clean_env` has been deprecated in favor of `Bundler.with_unbundled_env`. " \
-        "If you instead want the environment before bundler was originally loaded, use `Bundler.with_original_env`"
+        "[DEPRECATED FOR 2.0] `Lic.with_clean_env` has been deprecated in favor of `Lic.with_unlicd_env`. " \
+        "If you instead want the environment before lic was originally loaded, use `Lic.with_original_env`"
       )
     end
   end
 
-  describe "Bundler.with_unbundled_env" do
-    it "should set ENV to unbundled_env in the block" do
-      expected = Bundler.unbundled_env
-      actual = Bundler.with_unbundled_env { ENV.to_hash }
+  describe "Lic.with_unlicd_env" do
+    it "should set ENV to unlicd_env in the block" do
+      expected = Lic.unlicd_env
+      actual = Lic.with_unlicd_env { ENV.to_hash }
       expect(actual).to eq(expected)
     end
 
     it "should restore the environment after execution" do
-      Bundler.with_unbundled_env do
+      Lic.with_unlicd_env do
         ENV["FOO"] = "hello"
       end
 
@@ -192,17 +192,17 @@ RSpec.describe "Bundler.with_env helpers" do
     end
   end
 
-  describe "Bundler.clean_system", :ruby => ">= 1.9", :bundler => "< 2" do
+  describe "Lic.clean_system", :ruby => ">= 1.9", :lic => "< 2" do
     it "runs system inside with_clean_env" do
-      Bundler.clean_system(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
+      Lic.clean_system(%(echo 'if [ "$LIC_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
       expect($?.exitstatus).to eq(42)
     end
   end
 
-  describe "Bundler.clean_exec", :ruby => ">= 1.9", :bundler => "< 2" do
+  describe "Lic.clean_exec", :ruby => ">= 1.9", :lic => "< 2" do
     it "runs exec inside with_clean_env" do
       pid = Kernel.fork do
-        Bundler.clean_exec(%(echo 'if [ "$BUNDLE_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
+        Lic.clean_exec(%(echo 'if [ "$LIC_PATH" = "" ]; then exit 42; else exit 1; fi' | /bin/sh))
       end
       Process.wait(pid)
       expect($?.exitstatus).to eq(42)

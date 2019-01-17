@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::SharedHelpers do
+RSpec.describe Lic::SharedHelpers do
   let(:ext_lock_double) { double(:ext_lock) }
 
   before do
-    allow(Bundler.rubygems).to receive(:ext_lock).and_return(ext_lock_double)
+    allow(Lic.rubygems).to receive(:ext_lock).and_return(ext_lock_double)
     allow(ext_lock_double).to receive(:synchronize) {|&block| block.call }
   end
 
-  subject { Bundler::SharedHelpers }
+  subject { Lic::SharedHelpers }
 
   describe "#default_gemfile" do
-    before { ENV["BUNDLE_GEMFILE"] = "/path/Gemfile" }
+    before { ENV["LIC_GEMFILE"] = "/path/Gemfile" }
 
     context "Gemfile is present" do
       let(:expected_gemfile_path) { Pathname.new("/path/Gemfile") }
@@ -22,17 +22,17 @@ RSpec.describe Bundler::SharedHelpers do
     end
 
     context "Gemfile is not present" do
-      before { ENV["BUNDLE_GEMFILE"] = nil }
+      before { ENV["LIC_GEMFILE"] = nil }
 
       it "raises a GemfileNotFound error" do
         expect { subject.default_gemfile }.to raise_error(
-          Bundler::GemfileNotFound, "Could not locate Gemfile"
+          Lic::GemfileNotFound, "Could not locate Gemfile"
         )
       end
     end
 
     context "Gemfile is not an absolute path" do
-      before { ENV["BUNDLE_GEMFILE"] = "Gemfile" }
+      before { ENV["LIC_GEMFILE"] = "Gemfile" }
 
       let(:expected_gemfile_path) { Pathname.new("Gemfile").expand_path }
 
@@ -66,79 +66,79 @@ RSpec.describe Bundler::SharedHelpers do
     end
   end
 
-  describe "#default_bundle_dir" do
-    context ".bundle does not exist" do
+  describe "#default_lic_dir" do
+    context ".lic does not exist" do
       it "returns nil" do
-        expect(subject.default_bundle_dir).to be_nil
+        expect(subject.default_lic_dir).to be_nil
       end
     end
 
-    context ".bundle is global .bundle" do
-      let(:global_rubygems_dir) { Pathname.new("#{bundled_app}") }
+    context ".lic is global .lic" do
+      let(:global_rubygems_dir) { Pathname.new("#{licd_app}") }
 
       before do
-        Dir.mkdir ".bundle"
-        allow(Bundler.rubygems).to receive(:user_home).and_return(global_rubygems_dir)
+        Dir.mkdir ".lic"
+        allow(Lic.rubygems).to receive(:user_home).and_return(global_rubygems_dir)
       end
 
       it "returns nil" do
-        expect(subject.default_bundle_dir).to be_nil
+        expect(subject.default_lic_dir).to be_nil
       end
     end
 
-    context ".bundle is not global .bundle" do
+    context ".lic is not global .lic" do
       let(:global_rubygems_dir)      { Pathname.new("/path/rubygems") }
-      let(:expected_bundle_dir_path) { Pathname.new("#{bundled_app}/.bundle") }
+      let(:expected_lic_dir_path) { Pathname.new("#{licd_app}/.lic") }
 
       before do
-        Dir.mkdir ".bundle"
-        allow(Bundler.rubygems).to receive(:user_home).and_return(global_rubygems_dir)
+        Dir.mkdir ".lic"
+        allow(Lic.rubygems).to receive(:user_home).and_return(global_rubygems_dir)
       end
 
-      it "returns the .bundle path" do
-        expect(subject.default_bundle_dir).to eq(expected_bundle_dir_path)
+      it "returns the .lic path" do
+        expect(subject.default_lic_dir).to eq(expected_lic_dir_path)
       end
     end
   end
 
-  describe "#in_bundle?" do
+  describe "#in_lic?" do
     it "calls the find_gemfile method" do
       expect(subject).to receive(:find_gemfile)
-      subject.in_bundle?
+      subject.in_lic?
     end
 
     shared_examples_for "correctly determines whether to return a Gemfile path" do
       context "currently in directory with a Gemfile" do
         before { File.new("Gemfile", "w") }
 
-        it "returns path of the bundle Gemfile" do
-          expect(subject.in_bundle?).to eq("#{bundled_app}/Gemfile")
+        it "returns path of the lic Gemfile" do
+          expect(subject.in_lic?).to eq("#{licd_app}/Gemfile")
         end
       end
 
       context "currently in directory without a Gemfile" do
         it "returns nil" do
-          expect(subject.in_bundle?).to be_nil
+          expect(subject.in_lic?).to be_nil
         end
       end
     end
 
-    context "ENV['BUNDLE_GEMFILE'] set" do
-      before { ENV["BUNDLE_GEMFILE"] = "/path/Gemfile" }
+    context "ENV['LIC_GEMFILE'] set" do
+      before { ENV["LIC_GEMFILE"] = "/path/Gemfile" }
 
-      it "returns ENV['BUNDLE_GEMFILE']" do
-        expect(subject.in_bundle?).to eq("/path/Gemfile")
+      it "returns ENV['LIC_GEMFILE']" do
+        expect(subject.in_lic?).to eq("/path/Gemfile")
       end
     end
 
-    context "ENV['BUNDLE_GEMFILE'] not set" do
-      before { ENV["BUNDLE_GEMFILE"] = nil }
+    context "ENV['LIC_GEMFILE'] not set" do
+      before { ENV["LIC_GEMFILE"] = nil }
 
       it_behaves_like "correctly determines whether to return a Gemfile path"
     end
 
-    context "ENV['BUNDLE_GEMFILE'] is blank" do
-      before { ENV["BUNDLE_GEMFILE"] = "" }
+    context "ENV['LIC_GEMFILE'] is blank" do
+      before { ENV["LIC_GEMFILE"] = "" }
 
       it_behaves_like "correctly determines whether to return a Gemfile path"
     end
@@ -157,7 +157,7 @@ RSpec.describe Bundler::SharedHelpers do
 
   describe "#pwd" do
     it "returns the current absolute path" do
-      expect(subject.pwd).to eq(bundled_app)
+      expect(subject.pwd).to eq(licd_app)
     end
   end
 
@@ -218,25 +218,25 @@ RSpec.describe Bundler::SharedHelpers do
     end
   end
 
-  describe "#set_bundle_environment" do
+  describe "#set_lic_environment" do
     before do
-      ENV["BUNDLE_GEMFILE"] = "Gemfile"
+      ENV["LIC_GEMFILE"] = "Gemfile"
     end
 
     shared_examples_for "ENV['PATH'] gets set correctly" do
-      before { Dir.mkdir ".bundle" }
+      before { Dir.mkdir ".lic" }
 
-      it "ensures bundle bin path is in ENV['PATH']" do
-        subject.set_bundle_environment
+      it "ensures lic bin path is in ENV['PATH']" do
+        subject.set_lic_environment
         paths = ENV["PATH"].split(File::PATH_SEPARATOR)
-        expect(paths).to include("#{Bundler.bundle_path}/bin")
+        expect(paths).to include("#{Lic.lic_path}/bin")
       end
     end
 
     shared_examples_for "ENV['RUBYOPT'] gets set correctly" do
-      it "ensures -rbundler/setup is at the beginning of ENV['RUBYOPT']" do
-        subject.set_bundle_environment
-        expect(ENV["RUBYOPT"].split(" ")).to start_with("-rbundler/setup")
+      it "ensures -rlic/setup is at the beginning of ENV['RUBYOPT']" do
+        subject.set_lic_environment
+        expect(ENV["RUBYOPT"].split(" ")).to start_with("-rlic/setup")
       end
     end
 
@@ -244,11 +244,11 @@ RSpec.describe Bundler::SharedHelpers do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
       before do
-        allow(Bundler::SharedHelpers).to receive(:bundler_ruby_lib).and_return(ruby_lib_path)
+        allow(Lic::SharedHelpers).to receive(:lic_ruby_lib).and_return(ruby_lib_path)
       end
 
-      it "ensures bundler's ruby version lib path is in ENV['RUBYLIB']" do
-        subject.set_bundle_environment
+      it "ensures lic's ruby version lib path is in ENV['RUBYLIB']" do
+        subject.set_lic_environment
         paths = (ENV["RUBYLIB"]).split(File::PATH_SEPARATOR)
         expect(paths).to include(ruby_lib_path)
       end
@@ -258,52 +258,52 @@ RSpec.describe Bundler::SharedHelpers do
       expect(subject).to receive(:set_path)
       expect(subject).to receive(:set_rubyopt)
       expect(subject).to receive(:set_rubylib)
-      subject.set_bundle_environment
+      subject.set_lic_environment
     end
 
-    it "exits if bundle path contains the unix-like path separator" do
+    it "exits if lic path contains the unix-like path separator" do
       if Gem.respond_to?(:path_separator)
         allow(Gem).to receive(:path_separator).and_return(":")
       else
         stub_const("File::PATH_SEPARATOR", ":".freeze)
       end
-      allow(Bundler).to receive(:bundle_path) { Pathname.new("so:me/dir/bin") }
-      expect { subject.send(:validate_bundle_path) }.to raise_error(
-        Bundler::PathError,
-        "Your bundle path contains text matching \":\", which is the " \
-        "path separator for your system. Bundler cannot " \
+      allow(Lic).to receive(:lic_path) { Pathname.new("so:me/dir/bin") }
+      expect { subject.send(:validate_lic_path) }.to raise_error(
+        Lic::PathError,
+        "Your lic path contains text matching \":\", which is the " \
+        "path separator for your system. Lic cannot " \
         "function correctly when the Bundle path contains the " \
         "system's PATH separator. Please change your " \
-        "bundle path to not match \":\".\nYour current bundle " \
-        "path is '#{Bundler.bundle_path}'."
+        "lic path to not match \":\".\nYour current lic " \
+        "path is '#{Lic.lic_path}'."
       )
     end
 
     context "with a jruby path_separator regex", :ruby => "1.9" do
       # In versions of jruby that supported ruby 1.8, the path separator was the standard File::PATH_SEPARATOR
       let(:regex) { Regexp.new("(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):") }
-      it "does not exit if bundle path is the standard uri path" do
-        allow(Bundler.rubygems).to receive(:path_separator).and_return(regex)
-        allow(Bundler).to receive(:bundle_path) { Pathname.new("uri:classloader:/WEB-INF/gems") }
-        expect { subject.send(:validate_bundle_path) }.not_to raise_error
+      it "does not exit if lic path is the standard uri path" do
+        allow(Lic.rubygems).to receive(:path_separator).and_return(regex)
+        allow(Lic).to receive(:lic_path) { Pathname.new("uri:classloader:/WEB-INF/gems") }
+        expect { subject.send(:validate_lic_path) }.not_to raise_error
       end
 
-      it "exits if bundle path contains another directory" do
-        allow(Bundler.rubygems).to receive(:path_separator).and_return(regex)
-        allow(Bundler).to receive(:bundle_path) {
+      it "exits if lic path contains another directory" do
+        allow(Lic.rubygems).to receive(:path_separator).and_return(regex)
+        allow(Lic).to receive(:lic_path) {
           Pathname.new("uri:classloader:/WEB-INF/gems:other/dir")
         }
 
-        expect { subject.send(:validate_bundle_path) }.to raise_error(
-          Bundler::PathError,
-          "Your bundle path contains text matching " \
+        expect { subject.send(:validate_lic_path) }.to raise_error(
+          Lic::PathError,
+          "Your lic path contains text matching " \
           "/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/, which is the " \
-          "path separator for your system. Bundler cannot " \
+          "path separator for your system. Lic cannot " \
           "function correctly when the Bundle path contains the " \
           "system's PATH separator. Please change your " \
-          "bundle path to not match " \
+          "lic path to not match " \
           "/(?<!jar:file|jar|file|classpath|uri:classloader|uri|http|https):/." \
-          "\nYour current bundle path is '#{Bundler.bundle_path}'."
+          "\nYour current lic path is '#{Lic.lic_path}'."
         )
       end
     end
@@ -326,19 +326,19 @@ RSpec.describe Bundler::SharedHelpers do
       it_behaves_like "ENV['PATH'] gets set correctly"
     end
 
-    context "ENV['PATH'] already contains the bundle bin path" do
-      let(:bundle_path) { "#{Bundler.bundle_path}/bin" }
+    context "ENV['PATH'] already contains the lic bin path" do
+      let(:lic_path) { "#{Lic.lic_path}/bin" }
 
       before do
-        ENV["PATH"] = bundle_path
+        ENV["PATH"] = lic_path
       end
 
       it_behaves_like "ENV['PATH'] gets set correctly"
 
-      it "ENV['PATH'] should only contain one instance of bundle bin path" do
-        subject.set_bundle_environment
+      it "ENV['PATH'] should only contain one instance of lic bin path" do
+        subject.set_lic_environment
         paths = (ENV["PATH"]).split(File::PATH_SEPARATOR)
-        expect(paths.count(bundle_path)).to eq(1)
+        expect(paths.count(lic_path)).to eq(1)
       end
     end
 
@@ -348,14 +348,14 @@ RSpec.describe Bundler::SharedHelpers do
       it_behaves_like "ENV['RUBYOPT'] gets set correctly"
     end
 
-    context "ENV['RUBYOPT'] exists without -rbundler/setup" do
+    context "ENV['RUBYOPT'] exists without -rlic/setup" do
       before { ENV["RUBYOPT"] = "-I/some_app_path/lib" }
 
       it_behaves_like "ENV['RUBYOPT'] gets set correctly"
     end
 
-    context "ENV['RUBYOPT'] exists and contains -rbundler/setup" do
-      before { ENV["RUBYOPT"] = "-rbundler/setup" }
+    context "ENV['RUBYOPT'] exists and contains -rlic/setup" do
+      before { ENV["RUBYOPT"] = "-rlic/setup" }
 
       it_behaves_like "ENV['RUBYOPT'] gets set correctly"
     end
@@ -378,18 +378,18 @@ RSpec.describe Bundler::SharedHelpers do
       it_behaves_like "ENV['RUBYLIB'] gets set correctly"
     end
 
-    context "bundle executable in ENV['BUNDLE_BIN_PATH'] does not exist" do
-      before { ENV["BUNDLE_BIN_PATH"] = "/does/not/exist" }
-      before { Bundler.rubygems.replace_bin_path [], [] }
+    context "lic executable in ENV['LIC_BIN_PATH'] does not exist" do
+      before { ENV["LIC_BIN_PATH"] = "/does/not/exist" }
+      before { Lic.rubygems.replace_bin_path [], [] }
 
-      it "sets BUNDLE_BIN_PATH to the bundle executable file" do
-        subject.set_bundle_environment
-        bundle_exe = ruby_core? ? "../../../../exe/bundle" : "../../../exe/bundle"
-        expect(ENV["BUNDLE_BIN_PATH"]).to eq(File.expand_path(bundle_exe, __FILE__))
+      it "sets LIC_BIN_PATH to the lic executable file" do
+        subject.set_lic_environment
+        lic_exe = ruby_core? ? "../../../../exe/lic" : "../../../exe/lic"
+        expect(ENV["LIC_BIN_PATH"]).to eq(File.expand_path(lic_exe, __FILE__))
       end
     end
 
-    context "ENV['RUBYLIB'] already contains the bundler's ruby version lib path" do
+    context "ENV['RUBYLIB'] already contains the lic's ruby version lib path" do
       let(:ruby_lib_path) { "stubbed_ruby_lib_dir" }
 
       before do
@@ -398,8 +398,8 @@ RSpec.describe Bundler::SharedHelpers do
 
       it_behaves_like "ENV['RUBYLIB'] gets set correctly"
 
-      it "ENV['RUBYLIB'] should only contain one instance of bundler's ruby version lib path" do
-        subject.set_bundle_environment
+      it "ENV['RUBYLIB'] should only contain one instance of lic's ruby version lib path" do
+        subject.set_lic_environment
         paths = (ENV["RUBYLIB"]).split(File::PATH_SEPARATOR)
         expect(paths.count(ruby_lib_path)).to eq(1)
       end
@@ -421,7 +421,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "raises a PermissionError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::PermissionError
+          Lic::PermissionError
         )
       end
     end
@@ -431,7 +431,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "raises a TemporaryResourceError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::TemporaryResourceError
+          Lic::TemporaryResourceError
         )
       end
     end
@@ -441,7 +441,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "raises a VirtualProtocolError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::VirtualProtocolError
+          Lic::VirtualProtocolError
         )
       end
     end
@@ -451,7 +451,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "raises a OperationNotSupportedError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::OperationNotSupportedError
+          Lic::OperationNotSupportedError
         )
       end
     end
@@ -461,7 +461,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "raises a NoSpaceOnDeviceError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::NoSpaceOnDeviceError
+          Lic::NoSpaceOnDeviceError
         )
       end
     end
@@ -472,7 +472,7 @@ RSpec.describe Bundler::SharedHelpers do
 
       it "raises a GenericSystemCallError" do
         expect { subject.filesystem_access("/path", &file_op_block) }.to raise_error(
-          Bundler::GenericSystemCallError, /error accessing.+underlying.+Shields down/m
+          Lic::GenericSystemCallError, /error accessing.+underlying.+Shields down/m
         )
       end
     end

@@ -1,10 +1,10 @@
-# Docs: Contributing and developing Bundler
+# Docs: Contributing and developing Lic
 
-_If you're looking for documentation on how to use Bundler: visit [bundler.io](http://bundler.io/), or run `bundle help` from the command line. You may also be interested in [troubleshooting common issues](TROUBLESHOOTING.md) found when using Bundler._
+_If you're looking for documentation on how to use Lic: visit [lic.io](http://lic.io/), or run `lic help` from the command line. You may also be interested in [troubleshooting common issues](TROUBLESHOOTING.md) found when using Lic._
 
-Bundler welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](http://bundler.io/conduct.html), so that everyone can be included. Maintainers are expected to work together with the community in accordance with [our project policies](POLICIES.md).
+Lic welcomes contributions from *everyone*. While contributing, please follow the project [code of conduct](http://lic.io/conduct.html), so that everyone can be included. Maintainers are expected to work together with the community in accordance with [our project policies](POLICIES.md).
 
-If you'd like to help make Bundler better, you totally rock! Thanks for helping us make Bundler better.
+If you'd like to help make Lic better, you totally rock! Thanks for helping us make Lic better.
 
 ## Contributing
 
@@ -21,7 +21,7 @@ If you'd like to help make Bundler better, you totally rock! Thanks for helping 
 * [Development setup](development/SETUP.md)
 * [Submitting pull requests](development/PULL_REQUESTS.md)
 * [Adding new features](development/NEW_FEATURES.md)
-* [Releasing Bundler](development/RELEASING.md)
+* [Releasing Lic](development/RELEASING.md)
 
 ## Documentation
 

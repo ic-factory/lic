@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle lock" do
+RSpec.describe "lic lock" do
   def strip_lockfile(lockfile)
     strip_whitespace(lockfile).sub(/\n\Z/, "")
   end
 
   def read_lockfile(file = "Gemfile.lock")
-    strip_lockfile bundled_app(file).read
+    strip_lockfile licd_app(file).read
   end
 
   let(:repo) { gem_repo1 }
@@ -50,13 +50,13 @@ RSpec.describe "bundle lock" do
         rails
         with_license
 
-      BUNDLED WITH
-         #{Bundler::VERSION}
+      LICD WITH
+         #{Lic::VERSION}
     L
   end
 
   it "prints a lockfile when there is no existing lockfile with --print" do
-    bundle "lock --print"
+    lic "lock --print"
 
     expect(out).to eq(@lockfile)
   end
@@ -64,13 +64,13 @@ RSpec.describe "bundle lock" do
   it "prints a lockfile when there is an existing lockfile with --print" do
     lockfile @lockfile
 
-    bundle "lock --print"
+    lic "lock --print"
 
     expect(out).to eq(@lockfile)
   end
 
   it "writes a lockfile when there is no existing lockfile" do
-    bundle "lock"
+    lic "lock"
 
     expect(read_lockfile).to eq(@lockfile)
   end
@@ -78,13 +78,13 @@ RSpec.describe "bundle lock" do
   it "writes a lockfile when there is an outdated lockfile using --update" do
     lockfile @lockfile.gsub("2.3.2", "2.3.1")
 
-    bundle! "lock --update"
+    lic! "lock --update"
 
     expect(read_lockfile).to eq(@lockfile)
   end
 
   it "does not fetch remote specs when using the --local option" do
-    bundle "lock --update --local"
+    lic "lock --update --local"
 
     expect(out).to match(/sources listed in your Gemfile|installed locally/)
   end
@@ -106,10 +106,10 @@ RSpec.describe "bundle lock" do
       DEPENDENCIES
         foo
 
-      BUNDLED WITH
-         #{Bundler::VERSION}
+      LICD WITH
+         #{Lic::VERSION}
     L
-    bundle "lock --gemfile CustomGemfile"
+    lic "lock --gemfile CustomGemfile"
 
     expect(out).to match(/Writing lockfile to.+CustomGemfile\.lock/)
     expect(read_lockfile("CustomGemfile.lock")).to eq(lockfile)
@@ -117,7 +117,7 @@ RSpec.describe "bundle lock" do
   end
 
   it "writes to a custom location using --lockfile" do
-    bundle "lock --lockfile=lock"
+    lic "lock --lockfile=lock"
 
     expect(out).to match(/Writing lockfile to.+lock/)
     expect(read_lockfile("lock")).to eq(@lockfile)
@@ -125,8 +125,8 @@ RSpec.describe "bundle lock" do
   end
 
   it "writes to custom location using --lockfile when a default lockfile is present" do
-    bundle "install"
-    bundle "lock --lockfile=lock"
+    lic "install"
+    lic "lock --lockfile=lock"
 
     expect(out).to match(/Writing lockfile to.+lock/)
     expect(read_lockfile("lock")).to eq(@lockfile)
@@ -135,7 +135,7 @@ RSpec.describe "bundle lock" do
   it "update specific gems using --update" do
     lockfile @lockfile.gsub("2.3.2", "2.3.1").gsub("10.0.2", "10.0.1")
 
-    bundle "lock --update rails rake"
+    lic "lock --update rails rake"
 
     expect(read_lockfile).to eq(@lockfile)
   end
@@ -143,7 +143,7 @@ RSpec.describe "bundle lock" do
   it "errors when updating a missing specific gems using --update" do
     lockfile @lockfile
 
-    bundle "lock --update blahblah"
+    lic "lock --update blahblah"
     expect(out).to eq("Could not find gem 'blahblah'.")
 
     expect(read_lockfile).to eq(@lockfile)
@@ -156,10 +156,10 @@ RSpec.describe "bundle lock" do
       gem "thin"
       gem "rack_middleware", :group => "test"
     G
-    bundle! "config set without test"
-    bundle! "config set path .bundle"
-    bundle! "lock"
-    expect(bundled_app(".bundle")).not_to exist
+    lic! "config set without test"
+    lic! "config set path .lic"
+    lic! "lock"
+    expect(licd_app(".lic")).not_to exist
   end
 
   # see update_spec for more coverage on same options. logic is shared so it's not necessary
@@ -198,54 +198,54 @@ RSpec.describe "bundle lock" do
     end
 
     it "single gem updates dependent gem to minor" do
-      bundle "lock --update foo --patch"
+      lic "lock --update foo --patch"
 
-      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(%w[foo-1.4.5 bar-2.1.1 qux-1.0.0].sort)
+      expect(the_lic.locked_gems.specs.map(&:full_name)).to eq(%w[foo-1.4.5 bar-2.1.1 qux-1.0.0].sort)
     end
 
     it "minor preferred with strict" do
-      bundle "lock --update --minor --strict"
+      lic "lock --update --minor --strict"
 
-      expect(the_bundle.locked_gems.specs.map(&:full_name)).to eq(%w[foo-1.5.0 bar-2.1.1 qux-1.1.0].sort)
+      expect(the_lic.locked_gems.specs.map(&:full_name)).to eq(%w[foo-1.5.0 bar-2.1.1 qux-1.1.0].sort)
     end
   end
 
   it "supports adding new platforms" do
-    bundle! "lock --add-platform java x86-mingw32"
+    lic! "lock --add-platform java x86-mingw32"
 
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Lic::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
   end
 
   it "supports adding the `ruby` platform" do
-    bundle! "lock --add-platform ruby"
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lic! "lock --add-platform ruby"
+    lockfile = Lic::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift("ruby").uniq)
   end
 
   it "warns when adding an unknown platform" do
-    bundle "lock --add-platform foobarbaz"
+    lic "lock --add-platform foobarbaz"
     expect(out).to include("The platform `foobarbaz` is unknown to RubyGems and adding it will likely lead to resolution errors")
   end
 
   it "allows removing platforms" do
-    bundle! "lock --add-platform java x86-mingw32"
+    lic! "lock --add-platform java x86-mingw32"
 
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Lic::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(java, mingw).uniq)
 
-    bundle! "lock --remove-platform java"
+    lic! "lock --remove-platform java"
 
-    lockfile = Bundler::LockfileParser.new(read_lockfile)
+    lockfile = Lic::LockfileParser.new(read_lockfile)
     expect(lockfile.platforms).to match_array(local_platforms.unshift(mingw).uniq)
   end
 
   it "errors when removing all platforms" do
-    bundle "lock --remove-platform #{local_platforms.join(" ")}"
-    expect(last_command.bundler_err).to include("Removing all platforms from the bundle is not allowed")
+    lic "lock --remove-platform #{local_platforms.join(" ")}"
+    expect(last_command.lic_err).to include("Removing all platforms from the lic is not allowed")
   end
 
-  # from https://github.com/bundler/bundler/issues/4896
+  # from https://github.com/lic/lic/issues/4896
   it "properly adds platforms when platform requirements come from different dependencies" do
     build_repo4 do
       build_gem "ffi", "1.9.14"
@@ -282,9 +282,9 @@ RSpec.describe "bundle lock" do
       gem "gssapi"
     G
 
-    simulate_platform(mingw) { bundle! :lock }
+    simulate_platform(mingw) { lic! :lock }
 
-    expect(the_bundle.lockfile).to read_as(normalize_uri_file(strip_whitespace(<<-G)))
+    expect(the_lic.lockfile).to read_as(normalize_uri_file(strip_whitespace(<<-G)))
       GEM
         remote: file://localhost#{gem_repo4}/
         specs:
@@ -303,13 +303,13 @@ RSpec.describe "bundle lock" do
         gssapi
         mixlib-shellout
 
-      BUNDLED WITH
-         #{Bundler::VERSION}
+      LICD WITH
+         #{Lic::VERSION}
     G
 
-    simulate_platform(rb) { bundle! :lock }
+    simulate_platform(rb) { lic! :lock }
 
-    expect(the_bundle.lockfile).to read_as(normalize_uri_file(strip_whitespace(<<-G)))
+    expect(the_lic.lockfile).to read_as(normalize_uri_file(strip_whitespace(<<-G)))
       GEM
         remote: file://localhost#{gem_repo4}/
         specs:
@@ -331,8 +331,8 @@ RSpec.describe "bundle lock" do
         gssapi
         mixlib-shellout
 
-      BUNDLED WITH
-         #{Bundler::VERSION}
+      LICD WITH
+         #{Lic::VERSION}
     G
   end
 
@@ -347,14 +347,14 @@ RSpec.describe "bundle lock" do
     end
 
     it "does not implicitly update" do
-      bundle! "lock"
+      lic! "lock"
 
       expect(read_lockfile).to eq(@lockfile)
     end
 
     it "accounts for changes in the gemfile" do
       gemfile gemfile.gsub('"foo"', '"foo", "2.0"')
-      bundle! "lock"
+      lic! "lock"
 
       expect(read_lockfile).to eq(@lockfile.sub("foo (1.0)", "foo (2.0)").sub(/foo$/, "foo (= 2.0)"))
     end

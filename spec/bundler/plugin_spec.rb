@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Plugin do
-  Plugin = Bundler::Plugin
+RSpec.describe Lic::Plugin do
+  Plugin = Lic::Plugin
 
   let(:installer) { double(:installer) }
   let(:index) { double(:index) }
@@ -36,7 +36,7 @@ RSpec.describe Bundler::Plugin do
     context "when no plugins are installed" do
       before { allow(index).to receive(:installed_plugins) { [] } }
       it "outputs no plugins installed" do
-        expect(Bundler.ui).to receive(:info).with("No plugins installed")
+        expect(Lic.ui).to receive(:info).with("No plugins installed")
         subject.list
       end
     end
@@ -49,7 +49,7 @@ RSpec.describe Bundler::Plugin do
       end
       it "list plugins followed by commands" do
         expected_output = "plug1\n-----\n  c11\n  c12\n\nplug2\n-----\n  c21\n  c22\n\n"
-        expect(Bundler.ui).to receive(:info).with(expected_output)
+        expect(Lic.ui).to receive(:info).with(expected_output)
         subject.list
       end
     end
@@ -105,7 +105,7 @@ RSpec.describe Bundler::Plugin do
   describe "evaluate gemfile for plugins" do
     let(:definition) { double("definition") }
     let(:builder) { double("builder") }
-    let(:gemfile) { bundled_app("Gemfile") }
+    let(:gemfile) { licd_app("Gemfile") }
 
     before do
       allow(Plugin::DSL).to receive(:new) { builder }
@@ -131,7 +131,7 @@ RSpec.describe Bundler::Plugin do
 
       before do
         allow(index).to receive(:installed?) { nil }
-        allow(definition).to receive(:dependencies) { [Bundler::Dependency.new("new-plugin", ">=0"), Bundler::Dependency.new("another-plugin", ">=0")] }
+        allow(definition).to receive(:dependencies) { [Lic::Dependency.new("new-plugin", ">=0"), Lic::Dependency.new("another-plugin", ">=0")] }
         allow(installer).to receive(:install_definition) { plugin_specs }
       end
 
@@ -238,15 +238,15 @@ RSpec.describe Bundler::Plugin do
         gemfile ""
       end
 
-      it "returns plugin dir in app .bundle path" do
-        expect(subject.root).to eq(bundled_app.join(".bundle/plugin"))
+      it "returns plugin dir in app .lic path" do
+        expect(subject.root).to eq(licd_app.join(".lic/plugin"))
       end
     end
 
     context "outside app dir" do
-      it "returns plugin dir in global bundle path" do
+      it "returns plugin dir in global lic path" do
         Dir.chdir tmp
-        expect(subject.root).to eq(home.join(".bundle/plugin"))
+        expect(subject.root).to eq(home.join(".lic/plugin"))
       end
     end
   end
@@ -268,20 +268,20 @@ RSpec.describe Bundler::Plugin do
         s.write "plugins.rb", code
       end
 
-      Bundler::Plugin::Events.send(:reset)
-      Bundler::Plugin::Events.send(:define, :EVENT_1, "event-1")
-      Bundler::Plugin::Events.send(:define, :EVENT_2, "event-2")
+      Lic::Plugin::Events.send(:reset)
+      Lic::Plugin::Events.send(:define, :EVENT_1, "event-1")
+      Lic::Plugin::Events.send(:define, :EVENT_2, "event-2")
 
-      allow(index).to receive(:hook_plugins).with(Bundler::Plugin::Events::EVENT_1).
+      allow(index).to receive(:hook_plugins).with(Lic::Plugin::Events::EVENT_1).
         and_return(["foo-plugin"])
-      allow(index).to receive(:hook_plugins).with(Bundler::Plugin::Events::EVENT_2).
+      allow(index).to receive(:hook_plugins).with(Lic::Plugin::Events::EVENT_2).
         and_return(["foo-plugin"])
       allow(index).to receive(:plugin_path).with("foo-plugin").and_return(path)
       allow(index).to receive(:load_paths).with("foo-plugin").and_return([])
     end
 
     let(:code) { <<-RUBY }
-      Bundler::Plugin::API.hook("event-1") { puts "hook for event 1" }
+      Lic::Plugin::API.hook("event-1") { puts "hook for event 1" }
     RUBY
 
     it "raises an ArgumentError on an unregistered event" do
@@ -292,7 +292,7 @@ RSpec.describe Bundler::Plugin do
 
     it "executes the hook" do
       out = capture(:stdout) do
-        Plugin.hook(Bundler::Plugin::Events::EVENT_1)
+        Plugin.hook(Lic::Plugin::Events::EVENT_1)
       end.strip
 
       expect(out).to eq("hook for event 1")
@@ -300,15 +300,15 @@ RSpec.describe Bundler::Plugin do
 
     context "single plugin declaring more than one hook" do
       let(:code) { <<-RUBY }
-        Bundler::Plugin::API.hook(Bundler::Plugin::Events::EVENT_1) {}
-        Bundler::Plugin::API.hook(Bundler::Plugin::Events::EVENT_2) {}
+        Lic::Plugin::API.hook(Lic::Plugin::Events::EVENT_1) {}
+        Lic::Plugin::API.hook(Lic::Plugin::Events::EVENT_2) {}
         puts "loaded"
       RUBY
 
       it "evals plugins.rb once" do
         out = capture(:stdout) do
-          Plugin.hook(Bundler::Plugin::Events::EVENT_1)
-          Plugin.hook(Bundler::Plugin::Events::EVENT_2)
+          Plugin.hook(Lic::Plugin::Events::EVENT_1)
+          Plugin.hook(Lic::Plugin::Events::EVENT_2)
         end.strip
 
         expect(out).to eq("loaded")
@@ -317,12 +317,12 @@ RSpec.describe Bundler::Plugin do
 
     context "a block is passed" do
       let(:code) { <<-RUBY }
-        Bundler::Plugin::API.hook(Bundler::Plugin::Events::EVENT_1) { |&blk| blk.call }
+        Lic::Plugin::API.hook(Lic::Plugin::Events::EVENT_1) { |&blk| blk.call }
       RUBY
 
       it "is passed to the hook" do
         out = capture(:stdout) do
-          Plugin.hook(Bundler::Plugin::Events::EVENT_1) { puts "win" }
+          Plugin.hook(Lic::Plugin::Events::EVENT_1) { puts "win" }
         end.strip
 
         expect(out).to eq("win")

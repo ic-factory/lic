@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Fetcher::Index do
+RSpec.describe Lic::Fetcher::Index do
   let(:downloader)  { nil }
   let(:remote)      { nil }
   let(:display_uri) { "http://sample_uri.com" }
@@ -9,7 +9,7 @@ RSpec.describe Bundler::Fetcher::Index do
 
   subject { described_class.new(downloader, remote, display_uri) }
 
-  before { allow(Bundler).to receive(:rubygems).and_return(rubygems) }
+  before { allow(Lic).to receive(:rubygems).and_return(rubygems) }
 
   it "fetches and returns the list of remote specs" do
     expect(rubygems).to receive(:fetch_all_remote_specs) { nil }
@@ -26,8 +26,8 @@ RSpec.describe Bundler::Fetcher::Index do
       context "when certificate verify failed" do
         let(:error_message) { "certificate verify failed" }
 
-        it "should raise a Bundler::Fetcher::CertificateFailureError" do
-          expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::CertificateFailureError,
+        it "should raise a Lic::Fetcher::CertificateFailureError" do
+          expect { subject.specs(gem_names) }.to raise_error(Lic::Fetcher::CertificateFailureError,
             %r{Could not verify the SSL certificate for http://sample_uri.com})
         end
       end
@@ -35,8 +35,8 @@ RSpec.describe Bundler::Fetcher::Index do
       context "when a 401 response occurs" do
         let(:error_message) { "401" }
 
-        it "should raise a Bundler::Fetcher::AuthenticationRequiredError" do
-          expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
+        it "should raise a Lic::Fetcher::AuthenticationRequiredError" do
+          expect { subject.specs(gem_names) }.to raise_error(Lic::Fetcher::AuthenticationRequiredError,
             %r{Authentication is required for http://remote-uri.org})
         end
       end
@@ -51,8 +51,8 @@ RSpec.describe Bundler::Fetcher::Index do
         context "and there was userinfo" do
           let(:userinfo) { double(:userinfo) }
 
-          it "should raise a Bundler::Fetcher::BadAuthenticationError" do
-            expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::BadAuthenticationError,
+          it "should raise a Lic::Fetcher::BadAuthenticationError" do
+            expect { subject.specs(gem_names) }.to raise_error(Lic::Fetcher::BadAuthenticationError,
               %r{Bad username or password for http://remote-uri.org})
           end
         end
@@ -60,8 +60,8 @@ RSpec.describe Bundler::Fetcher::Index do
         context "and there was no userinfo" do
           let(:userinfo) { nil }
 
-          it "should raise a Bundler::Fetcher::AuthenticationRequiredError" do
-            expect { subject.specs(gem_names) }.to raise_error(Bundler::Fetcher::AuthenticationRequiredError,
+          it "should raise a Lic::Fetcher::AuthenticationRequiredError" do
+            expect { subject.specs(gem_names) }.to raise_error(Lic::Fetcher::AuthenticationRequiredError,
               %r{Authentication is required for http://remote-uri.org})
           end
         end
@@ -70,10 +70,10 @@ RSpec.describe Bundler::Fetcher::Index do
       context "any other message is returned" do
         let(:error_message) { "You get an error, you get an error!" }
 
-        before { allow(Bundler).to receive(:ui).and_return(double(:trace => nil)) }
+        before { allow(Lic).to receive(:ui).and_return(double(:trace => nil)) }
 
-        it "should raise a Bundler::HTTPError" do
-          expect { subject.specs(gem_names) }.to raise_error(Bundler::HTTPError, "Could not fetch specs from http://sample_uri.com")
+        it "should raise a Lic::HTTPError" do
+          expect { subject.specs(gem_names) }.to raise_error(Lic::HTTPError, "Could not fetch specs from http://sample_uri.com")
         end
       end
     end

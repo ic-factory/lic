@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-RSpec.describe "require 'bundler/gem_tasks'", :ruby_repo do
+RSpec.describe "require 'lic/gem_tasks'", :ruby_repo do
   before :each do
-    bundled_app("foo.gemspec").open("w") do |f|
+    licd_app("foo.gemspec").open("w") do |f|
       f.write <<-GEMSPEC
         Gem::Specification.new do |s|
           s.name = "foo"
         end
       GEMSPEC
     end
-    bundled_app("Rakefile").open("w") do |f|
+    licd_app("Rakefile").open("w") do |f|
       f.write <<-RAKEFILE
-        $:.unshift("#{bundler_path}")
-        require "bundler/gem_tasks"
+        $:.unshift("#{lic_path}")
+        require "lic/gem_tasks"
       RAKEFILE
     end
   end

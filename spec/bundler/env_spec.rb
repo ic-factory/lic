@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require "bundler/settings"
+require "lic/settings"
 
-RSpec.describe Bundler::Env do
-  let(:git_proxy_stub) { Bundler::Source::Git::GitProxy.new(nil, nil, nil) }
+RSpec.describe Lic::Env do
+  let(:git_proxy_stub) { Lic::Source::Git::GitProxy.new(nil, nil, nil) }
 
   describe "#report" do
     it "prints the environment" do
       out = described_class.report
 
       expect(out).to include("Environment")
-      expect(out).to include(Bundler::VERSION)
+      expect(out).to include(Lic::VERSION)
       expect(out).to include(Gem::VERSION)
       expect(out).to include(described_class.send(:ruby_version))
       expect(out).to include(described_class.send(:git_version))
@@ -30,7 +30,7 @@ RSpec.describe Bundler::Env do
           DEPENDENCIES
             rack
 
-          BUNDLED WITH
+          LICD WITH
              1.10.0
         L
       end
@@ -69,7 +69,7 @@ RSpec.describe Bundler::Env do
       before do
         gemfile("gemspec")
 
-        File.open(bundled_app.join("foo.gemspec"), "wb") do |f|
+        File.open(licd_app.join("foo.gemspec"), "wb") do |f|
           f.write(gemspec)
         end
       end
@@ -124,7 +124,7 @@ RSpec.describe Bundler::Env do
           ### Gemfile.lock
 
           ```
-          <No #{bundled_app("Gemfile.lock")} found>
+          <No #{licd_app("Gemfile.lock")} found>
           ```
         ENV
       end
@@ -134,7 +134,7 @@ RSpec.describe Bundler::Env do
       it "includes OS specific information with the version number" do
         expect(git_proxy_stub).to receive(:git).with("--version").
           and_return("git version 1.2.3 (Apple Git-BS)")
-        expect(Bundler::Source::Git::GitProxy).to receive(:new).and_return(git_proxy_stub)
+        expect(Lic::Source::Git::GitProxy).to receive(:new).and_return(git_proxy_stub)
 
         expect(described_class.report).to include("Git         1.2.3 (Apple Git-BS)")
       end

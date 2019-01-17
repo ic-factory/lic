@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle install with install-time dependencies" do
+RSpec.describe "lic install with install-time dependencies" do
   it "installs gems with implicit rake dependencies", :ruby_repo do
     install_gemfile <<-G
       source "file://#{gem_repo1}"
@@ -22,7 +22,7 @@ RSpec.describe "bundle install with install-time dependencies" do
     build_repo2
 
     path = "#{gem_repo2}/#{Gem::MARSHAL_SPEC_DIR}/actionpack-2.3.2.gemspec.rz"
-    spec = Marshal.load(Bundler.rubygems.inflate(File.read(path)))
+    spec = Marshal.load(Lic.rubygems.inflate(File.read(path)))
     spec.dependencies.each do |d|
       d.instance_variable_set(:@type, :fail)
     end
@@ -35,7 +35,7 @@ RSpec.describe "bundle install with install-time dependencies" do
       gem "actionpack", "2.3.2"
     G
 
-    expect(the_bundle).to include_gems "actionpack 2.3.2", "activesupport 2.3.2"
+    expect(the_lic).to include_gems "actionpack 2.3.2", "activesupport 2.3.2"
   end
 
   describe "with crazy rubygem plugin stuff" do
@@ -45,7 +45,7 @@ RSpec.describe "bundle install with install-time dependencies" do
         gem "net_b"
       G
 
-      expect(the_bundle).to include_gems "net_b 1.0"
+      expect(the_lic).to include_gems "net_b 1.0"
     end
 
     it "installs plugins depended on by other plugins", :ruby_repo do
@@ -54,7 +54,7 @@ RSpec.describe "bundle install with install-time dependencies" do
         gem "net_a"
       G
 
-      expect(the_bundle).to include_gems "net_a 1.0", "net_b 1.0"
+      expect(the_lic).to include_gems "net_a 1.0", "net_b 1.0"
     end
 
     it "installs multiple levels of dependencies", :ruby_repo do
@@ -64,7 +64,7 @@ RSpec.describe "bundle install with install-time dependencies" do
         gem "net_e"
       G
 
-      expect(the_bundle).to include_gems "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
+      expect(the_lic).to include_gems "net_a 1.0", "net_b 1.0", "net_c 1.0", "net_d 1.0", "net_e 1.0"
     end
 
     context "with ENV['DEBUG_RESOLVER'] set" do
@@ -75,7 +75,7 @@ RSpec.describe "bundle install with install-time dependencies" do
           gem "net_e"
         G
 
-        bundle :install, :env => { "DEBUG_RESOLVER" => "1" }
+        lic :install, :env => { "DEBUG_RESOLVER" => "1" }
 
         expect(err).to include("Creating possibility state for net_c")
       end
@@ -89,7 +89,7 @@ RSpec.describe "bundle install with install-time dependencies" do
           gem "net_e"
         G
 
-        bundle :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
+        lic :install, :env => { "DEBUG_RESOLVER_TREE" => "1" }
 
         expect(err).to include(" net_b").
           and include("Starting resolution").
@@ -108,14 +108,14 @@ RSpec.describe "bundle install with install-time dependencies" do
           end
         end
 
-        install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
+        install_gemfile <<-G, :artifice => "compact_index", :env => { "LIC_SPEC_GEM_REPO" => gem_repo2 }
           ruby "#{RUBY_VERSION}"
           source "http://localgemserver.test/"
           gem 'rack'
         G
 
         expect(out).to_not include("rack-9001.0.0 requires ruby version > 9000")
-        expect(the_bundle).to include_gems("rack 1.2")
+        expect(the_lic).to include_gems("rack 1.2")
       end
     end
 
@@ -133,7 +133,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
       shared_examples_for "ruby version conflicts" do
         it "raises an error during resolution" do
-          install_gemfile <<-G, :artifice => "compact_index", :env => { "BUNDLER_SPEC_GEM_REPO" => gem_repo2 }
+          install_gemfile <<-G, :artifice => "compact_index", :env => { "LIC_SPEC_GEM_REPO" => gem_repo2 }
             source "http://localgemserver.test/"
             ruby #{ruby_requirement}
             gem 'require_ruby'
@@ -142,7 +142,7 @@ RSpec.describe "bundle install with install-time dependencies" do
           expect(out).to_not include("Gem::InstallError: require_ruby requires Ruby version > 9000")
 
           nice_error = strip_whitespace(<<-E).strip
-            Bundler found conflicting requirements for the Ruby\0 version:
+            Lic found conflicting requirements for the Ruby\0 version:
               In Gemfile:
                 Ruby\0 (#{error_message_requirement})
 
@@ -151,7 +151,7 @@ RSpec.describe "bundle install with install-time dependencies" do
 
             Ruby\0 (> 9000), which is required by gem 'require_ruby', is not available in the local ruby installation
           E
-          expect(last_command.bundler_err).to end_with(nice_error)
+          expect(last_command.lic_err).to end_with(nice_error)
         end
       end
 

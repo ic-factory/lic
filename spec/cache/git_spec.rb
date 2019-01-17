@@ -2,18 +2,18 @@
 
 RSpec.describe "git base name" do
   it "base_name should strip private repo uris" do
-    source = Bundler::Source::Git.new("uri" => "git@github.com:bundler.git")
-    expect(source.send(:base_name)).to eq("bundler")
+    source = Lic::Source::Git.new("uri" => "git@github.com:lic.git")
+    expect(source.send(:base_name)).to eq("lic")
   end
 
   it "base_name should strip network share paths" do
-    source = Bundler::Source::Git.new("uri" => "//MachineName/ShareFolder")
+    source = Lic::Source::Git.new("uri" => "//MachineName/ShareFolder")
     expect(source.send(:base_name)).to eq("ShareFolder")
   end
 end
 
 %w[cache package].each do |cmd|
-  RSpec.describe "bundle #{cmd} with git" do
+  RSpec.describe "lic #{cmd} with git" do
     it "copies repository to vendor cache and uses it" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
@@ -22,16 +22,16 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.bundlecache")).to be_file
+      lic "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}/.liccache")).to be_file
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      expect(the_bundle).to include_gems "foo 1.0"
+      expect(the_lic).to include_gems "foo 1.0"
     end
 
-    it "copies repository to vendor cache and uses it even when installed with bundle --path" do
+    it "copies repository to vendor cache and uses it even when installed with lic --path" do
       git = build_git "foo"
       ref = git.ref_for("master", 11)
 
@@ -39,14 +39,14 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "install --path vendor/bundle"
-      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic "install --path vendor/lic"
+      lic "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}/.git")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
-      expect(the_bundle).to include_gems "foo 1.0"
+      expect(the_lic).to include_gems "foo 1.0"
     end
 
     it "runs twice without exploding" do
@@ -56,12 +56,12 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
-      bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       expect(last_command.stdout).to include "Updating files in vendor/cache"
       FileUtils.rm_rf lib_path("foo-1.0")
-      expect(the_bundle).to include_gems "foo 1.0"
+      expect(the_lic).to include_gems "foo 1.0"
     end
 
     it "tracks updates" do
@@ -72,7 +72,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
       update_git "foo" do |s|
         s.write "lib/foo.rb", "puts :CACHE"
@@ -81,11 +81,11 @@ end
       ref = git.ref_for("master", 11)
       expect(ref).not_to eq(old_ref)
 
-      bundle! "update", :all => bundle_update_requires_all?
-      bundle! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic! "update", :all => lic_update_requires_all?
+      lic! "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
       run! "require 'foo'"
@@ -100,7 +100,7 @@ end
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle! cmd, forgotten_command_line_options([:all, :cache_all] => true)
+      lic! cmd, forgotten_command_line_options([:all, :cache_all] => true)
 
       update_git "foo" do |s|
         s.write "lib/foo.rb", "puts :CACHE"
@@ -109,10 +109,10 @@ end
       ref = git.ref_for("master", 11)
       expect(ref).not_to eq(old_ref)
 
-      bundle "update foo"
+      lic "update foo"
 
-      expect(bundled_app("vendor/cache/foo-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{ref}")).to exist
+      expect(licd_app("vendor/cache/foo-1.0-#{old_ref}")).not_to exist
 
       FileUtils.rm_rf lib_path("foo-1.0")
       run "require 'foo'"
@@ -127,11 +127,11 @@ end
         gem "foo", :git => '#{lib_path("foo-invalid")}', :branch => :master
       G
 
-      bundle %(config local.foo #{lib_path("foo-1.0")})
-      bundle "install"
-      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic %(config local.foo #{lib_path("foo-1.0")})
+      lic "install"
+      lic "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
-      expect(bundled_app("vendor/cache/foo-invalid-#{ref}")).to exist
+      expect(licd_app("vendor/cache/foo-invalid-#{ref}")).to exist
 
       # Updating the local still uses the local.
       update_git "foo" do |s|
@@ -161,34 +161,34 @@ end
       G
 
       ref = git.ref_for("master", 11)
-      bundle "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
+      lic "#{cmd}", forgotten_command_line_options([:all, :cache_all] => true)
 
-      expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
-      expect(bundled_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
-      expect(the_bundle).to include_gems "has_submodule 1.0"
+      expect(licd_app("vendor/cache/has_submodule-1.0-#{ref}")).to exist
+      expect(licd_app("vendor/cache/has_submodule-1.0-#{ref}/submodule-1.0")).to exist
+      expect(the_lic).to include_gems "has_submodule 1.0"
     end
 
-    it "displays warning message when detecting git repo in Gemfile", :bundler => "< 2" do
+    it "displays warning message when detecting git repo in Gemfile", :lic => "< 2" do
       build_git "foo"
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle "#{cmd}"
+      lic "#{cmd}"
 
       expect(out).to include("Your Gemfile contains path and git dependencies.")
     end
 
-    it "does not display warning message if cache_all is set in bundle config" do
+    it "does not display warning message if cache_all is set in lic config" do
       build_git "foo"
 
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
 
-      bundle cmd, forgotten_command_line_options([:all, :cache_all] => true)
-      bundle cmd
+      lic cmd, forgotten_command_line_options([:all, :cache_all] => true)
+      lic cmd
 
       expect(out).not_to include("Your Gemfile contains path and git dependencies.")
     end
@@ -204,10 +204,10 @@ end
       install_gemfile <<-G
         gem "foo", :git => '#{lib_path("foo-1.0")}'
       G
-      bundle cmd, forgotten_command_line_options([:all, :cache_all] => true)
+      lic cmd, forgotten_command_line_options([:all, :cache_all] => true)
 
       ref = git.ref_for("master", 11)
-      gemspec = bundled_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
+      gemspec = licd_app("vendor/cache/foo-1.0-#{ref}/foo.gemspec").read
       expect(gemspec).to_not match("`echo bob`")
     end
   end

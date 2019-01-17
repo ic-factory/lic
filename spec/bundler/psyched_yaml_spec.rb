@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "bundler/psyched_yaml"
+require "lic/psyched_yaml"
 
-RSpec.describe "Bundler::YamlLibrarySyntaxError" do
+RSpec.describe "Lic::YamlLibrarySyntaxError" do
   it "is raised on YAML parse errors" do
-    expect { YAML.parse "{foo" }.to raise_error(Bundler::YamlLibrarySyntaxError)
+    expect { YAML.parse "{foo" }.to raise_error(Lic::YamlLibrarySyntaxError)
   end
 end

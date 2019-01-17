@@ -6,7 +6,7 @@ Artifice.deactivate
 
 class CompactIndexConcurrentDownload < CompactIndexAPI
   get "/versions" do
-    versions = File.join(Bundler.rubygems.user_home, ".bundle", "cache", "compact_index",
+    versions = File.join(Lic.rubygems.user_home, ".lic", "cache", "compact_index",
       "localgemserver.test.80.dd34752a738ee965a2a4298dc16db6c5", "versions")
 
     # Verify the original (empty) content hasn't been deleted, e.g. on a retry

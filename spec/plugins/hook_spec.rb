@@ -6,14 +6,14 @@ RSpec.describe "hook plugins" do
       build_repo2 do
         build_plugin "before-install-all-plugin" do |s|
           s.write "plugins.rb", <<-RUBY
-            Bundler::Plugin::API.hook Bundler::Plugin::Events::GEM_BEFORE_INSTALL_ALL do |deps|
+            Lic::Plugin::API.hook Lic::Plugin::Events::GEM_BEFORE_INSTALL_ALL do |deps|
               puts "gems to be installed \#{deps.map(&:name).join(", ")}"
             end
           RUBY
         end
       end
 
-      bundle "plugin install before-install-all-plugin --source file://#{gem_repo2}"
+      lic "plugin install before-install-all-plugin --source file://#{gem_repo2}"
     end
 
     it "runs before all rubygems are installed" do
@@ -32,14 +32,14 @@ RSpec.describe "hook plugins" do
       build_repo2 do
         build_plugin "before-install-plugin" do |s|
           s.write "plugins.rb", <<-RUBY
-            Bundler::Plugin::API.hook Bundler::Plugin::Events::GEM_BEFORE_INSTALL do |spec_install|
+            Lic::Plugin::API.hook Lic::Plugin::Events::GEM_BEFORE_INSTALL do |spec_install|
               puts "installing gem \#{spec_install.name}"
             end
           RUBY
         end
       end
 
-      bundle "plugin install before-install-plugin --source file://#{gem_repo2}"
+      lic "plugin install before-install-plugin --source file://#{gem_repo2}"
     end
 
     it "runs before each rubygem is installed" do
@@ -59,14 +59,14 @@ RSpec.describe "hook plugins" do
       build_repo2 do
         build_plugin "after-install-all-plugin" do |s|
           s.write "plugins.rb", <<-RUBY
-            Bundler::Plugin::API.hook Bundler::Plugin::Events::GEM_AFTER_INSTALL_ALL do |deps|
+            Lic::Plugin::API.hook Lic::Plugin::Events::GEM_AFTER_INSTALL_ALL do |deps|
               puts "installed gems \#{deps.map(&:name).join(", ")}"
             end
           RUBY
         end
       end
 
-      bundle "plugin install after-install-all-plugin --source file://#{gem_repo2}"
+      lic "plugin install after-install-all-plugin --source file://#{gem_repo2}"
     end
 
     it "runs after each rubygem is installed" do
@@ -85,14 +85,14 @@ RSpec.describe "hook plugins" do
       build_repo2 do
         build_plugin "after-install-plugin" do |s|
           s.write "plugins.rb", <<-RUBY
-            Bundler::Plugin::API.hook Bundler::Plugin::Events::GEM_AFTER_INSTALL do |spec_install|
+            Lic::Plugin::API.hook Lic::Plugin::Events::GEM_AFTER_INSTALL do |spec_install|
               puts "installed gem \#{spec_install.name} : \#{spec_install.state}"
             end
           RUBY
         end
       end
 
-      bundle "plugin install after-install-plugin --source file://#{gem_repo2}"
+      lic "plugin install after-install-plugin --source file://#{gem_repo2}"
     end
 
     it "runs after each rubygem is installed" do

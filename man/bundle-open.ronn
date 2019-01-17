@@ -1,19 +1,19 @@
-bundle-open(1) -- Opens the source directory for a gem in your bundle
+lic-open(1) -- Opens the source directory for a gem in your lic
 =====================================================================
 
 ## SYNOPSIS
 
-`bundle open` [GEM]
+`lic open` [GEM]
 
 ## DESCRIPTION
 
 Opens the source directory of the provided GEM in your editor.
 
-For this to work the `EDITOR` or `BUNDLER_EDITOR` environment variable has to
+For this to work the `EDITOR` or `LIC_EDITOR` environment variable has to
 be set.
 
 Example:
 
-    bundle open 'rack'
+    lic open 'rack'
 
-Will open the source directory for the 'rack' gem in your bundle.
+Will open the source directory for the 'rack' gem in your lic.

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundler/inline#gemfile" do
+RSpec.describe "lic/inline#gemfile" do
   def script(code, options = {})
-    requires = ["bundler/inline"]
+    requires = ["lic/inline"]
     requires.unshift File.expand_path("../../support/artifice/" + options.delete(:artifice) + ".rb", __FILE__) if options.key?(:artifice)
     requires = requires.map {|r| "require '#{r}'" }.join("\n")
     @out = ruby("#{requires}\n\n" + code, options)
@@ -96,13 +96,13 @@ RSpec.describe "bundler/inline#gemfile" do
 
   it "lets me use my own ui object" do
     script <<-RUBY, :artifice => "endpoint"
-      require 'bundler'
-      class MyBundlerUI < Bundler::UI::Silent
+      require 'lic'
+      class MyLicUI < Lic::UI::Silent
         def confirm(msg, newline = nil)
           puts "CONFIRMED!"
         end
       end
-      gemfile(true, :ui => MyBundlerUI.new) do
+      gemfile(true, :ui => MyLicUI.new) do
         source "https://notaserver.com"
         gem "activesupport", :require => true
       end
@@ -114,7 +114,7 @@ RSpec.describe "bundler/inline#gemfile" do
 
   it "has an option for quiet installation" do
     script <<-RUBY, :artifice => "endpoint"
-      require 'bundler'
+      require 'lic'
 
       gemfile(true, :quiet => true) do
         source "https://notaserver.com"
@@ -140,8 +140,8 @@ RSpec.describe "bundler/inline#gemfile" do
 
   it "does not mutate the option argument" do
     script <<-RUBY
-      require 'bundler'
-      options = { :ui => Bundler::UI::Shell.new }
+      require 'lic'
+      options = { :ui => Lic::UI::Shell.new }
       gemfile(false, options) do
         path "#{lib_path}" do
           gem "two"
@@ -225,7 +225,7 @@ RSpec.describe "bundler/inline#gemfile" do
       DEPENDENCIES
         rake
 
-      BUNDLED WITH
+      LICD WITH
          1.13.6
     G
 
@@ -244,8 +244,8 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(exitstatus).to be_zero if exitstatus
   end
 
-  it "installs inline gems when BUNDLE_GEMFILE is set to an empty string" do
-    ENV["BUNDLE_GEMFILE"] = ""
+  it "installs inline gems when LIC_GEMFILE is set to an empty string" do
+    ENV["LIC_GEMFILE"] = ""
 
     in_app_root do
       script <<-RUBY
@@ -262,8 +262,8 @@ RSpec.describe "bundler/inline#gemfile" do
     expect(exitstatus).to be_zero if exitstatus
   end
 
-  it "installs inline gems when BUNDLE_BIN is set" do
-    ENV["BUNDLE_BIN"] = "/usr/local/bundle/bin"
+  it "installs inline gems when LIC_BIN is set" do
+    ENV["LIC_BIN"] = "/usr/local/lic/bin"
 
     script <<-RUBY
       gemfile do

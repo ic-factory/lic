@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Fetcher::Base do
+RSpec.describe Lic::Fetcher::Base do
   let(:downloader)  { double(:downloader) }
   let(:remote)      { double(:remote) }
   let(:display_uri) { "http://sample_uri.com" }

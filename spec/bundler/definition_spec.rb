@@ -1,40 +1,40 @@
 # frozen_string_literal: true
 
-require "bundler/definition"
+require "lic/definition"
 
-RSpec.describe Bundler::Definition do
+RSpec.describe Lic::Definition do
   describe "#lock" do
     before do
-      allow(Bundler).to receive(:settings) { Bundler::Settings.new(".") }
-      allow(Bundler::SharedHelpers).to receive(:find_gemfile) { Pathname.new("Gemfile") }
-      allow(Bundler).to receive(:ui) { double("UI", :info => "", :debug => "") }
+      allow(Lic).to receive(:settings) { Lic::Settings.new(".") }
+      allow(Lic::SharedHelpers).to receive(:find_gemfile) { Pathname.new("Gemfile") }
+      allow(Lic).to receive(:ui) { double("UI", :info => "", :debug => "") }
     end
     context "when it's not possible to write to the file" do
-      subject { Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
+      subject { Lic::Definition.new(nil, [], Lic::SourceList.new, []) }
 
       it "raises an PermissionError with explanation" do
         allow(File).to receive(:open).and_call_original
         expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EACCES)
         expect { subject.lock("Gemfile.lock") }.
-          to raise_error(Bundler::PermissionError, /Gemfile\.lock/)
+          to raise_error(Lic::PermissionError, /Gemfile\.lock/)
       end
     end
     context "when a temporary resource access issue occurs" do
-      subject { Bundler::Definition.new(nil, [], Bundler::SourceList.new, []) }
+      subject { Lic::Definition.new(nil, [], Lic::SourceList.new, []) }
 
       it "raises a TemporaryResourceError with explanation" do
         allow(File).to receive(:open).and_call_original
         expect(File).to receive(:open).with("Gemfile.lock", "wb").
           and_raise(Errno::EAGAIN)
         expect { subject.lock("Gemfile.lock") }.
-          to raise_error(Bundler::TemporaryResourceError, /temporarily unavailable/)
+          to raise_error(Lic::TemporaryResourceError, /temporarily unavailable/)
       end
     end
   end
 
   describe "detects changes" do
-    it "for a path gem with changes", :bundler => "< 2" do
+    it "for a path gem with changes", :lic => "< 2" do
       build_lib "foo", "1.0", :path => lib_path("foo")
 
       install_gemfile <<-G
@@ -46,7 +46,7 @@ RSpec.describe Bundler::Definition do
         s.add_dependency "rack", "1.0"
       end
 
-      bundle :install, :env => { "DEBUG" => 1 }
+      lic :install, :env => { "DEBUG" => 1 }
 
       expect(out).to match(/re-resolving dependencies/)
       lockfile_should_be <<-G
@@ -67,12 +67,12 @@ RSpec.describe Bundler::Definition do
         DEPENDENCIES
           foo!
 
-        BUNDLED WITH
-           #{Bundler::VERSION}
+        LICD WITH
+           #{Lic::VERSION}
       G
     end
 
-    it "for a path gem with changes", :bundler => "2" do
+    it "for a path gem with changes", :lic => "2" do
       build_lib "foo", "1.0", :path => lib_path("foo")
 
       install_gemfile <<-G
@@ -84,7 +84,7 @@ RSpec.describe Bundler::Definition do
         s.add_dependency "rack", "1.0"
       end
 
-      bundle :install, :env => { "DEBUG" => 1 }
+      lic :install, :env => { "DEBUG" => 1 }
 
       expect(out).to match(/re-resolving dependencies/)
       lockfile_should_be <<-G
@@ -105,12 +105,12 @@ RSpec.describe Bundler::Definition do
         DEPENDENCIES
           foo!
 
-        BUNDLED WITH
-           #{Bundler::VERSION}
+        LICD WITH
+           #{Lic::VERSION}
       G
     end
 
-    it "for a path gem with deps and no changes", :bundler => "< 2" do
+    it "for a path gem with deps and no changes", :lic => "< 2" do
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "rack", "1.0"
         s.add_development_dependency "net-ssh", "1.0"
@@ -121,7 +121,7 @@ RSpec.describe Bundler::Definition do
         gem "foo", :path => "#{lib_path("foo")}"
       G
 
-      bundle :check, :env => { "DEBUG" => 1 }
+      lic :check, :env => { "DEBUG" => 1 }
 
       expect(out).to match(/using resolution from the lockfile/)
       lockfile_should_be <<-G
@@ -142,12 +142,12 @@ RSpec.describe Bundler::Definition do
         DEPENDENCIES
           foo!
 
-        BUNDLED WITH
-           #{Bundler::VERSION}
+        LICD WITH
+           #{Lic::VERSION}
       G
     end
 
-    it "for a path gem with deps and no changes", :bundler => "2" do
+    it "for a path gem with deps and no changes", :lic => "2" do
       build_lib "foo", "1.0", :path => lib_path("foo") do |s|
         s.add_dependency "rack", "1.0"
         s.add_development_dependency "net-ssh", "1.0"
@@ -158,7 +158,7 @@ RSpec.describe Bundler::Definition do
         gem "foo", :path => "#{lib_path("foo")}"
       G
 
-      bundle :check, :env => { "DEBUG" => 1 }
+      lic :check, :env => { "DEBUG" => 1 }
 
       expect(out).to match(/using resolution from the lockfile/)
       lockfile_should_be <<-G
@@ -179,8 +179,8 @@ RSpec.describe Bundler::Definition do
         DEPENDENCIES
           foo!
 
-        BUNDLED WITH
-           #{Bundler::VERSION}
+        LICD WITH
+           #{Lic::VERSION}
       G
     end
 
@@ -190,7 +190,7 @@ RSpec.describe Bundler::Definition do
         gem "foo"
       G
 
-      bundle :check, :env => { "DEBUG" => 1 }
+      lic :check, :env => { "DEBUG" => 1 }
 
       expect(out).to match(/using resolution from the lockfile/)
       lockfile_should_be <<-G
@@ -205,8 +205,8 @@ RSpec.describe Bundler::Definition do
         DEPENDENCIES
           foo
 
-        BUNDLED WITH
-           #{Bundler::VERSION}
+        LICD WITH
+           #{Lic::VERSION}
       G
     end
   end
@@ -222,7 +222,7 @@ RSpec.describe Bundler::Definition do
         end
 
         it "should get a locked specs list when updating all" do
-          definition = Bundler::Definition.new(bundled_app("Gemfile.lock"), [], Bundler::SourceList.new, true)
+          definition = Lic::Definition.new(licd_app("Gemfile.lock"), [], Lic::SourceList.new, true)
           locked_specs = definition.gem_version_promoter.locked_specs
           expect(locked_specs.to_a.map(&:name)).to eq ["foo"]
           expect(definition.instance_variable_get("@locked_specs").empty?).to eq true
@@ -231,14 +231,14 @@ RSpec.describe Bundler::Definition do
 
       context "without gemfile or lockfile" do
         it "should not attempt to parse empty lockfile contents" do
-          definition = Bundler::Definition.new(nil, [], mock_source_list, true)
+          definition = Lic::Definition.new(nil, [], mock_source_list, true)
           expect(definition.gem_version_promoter.locked_specs.to_a).to eq []
         end
       end
 
       context "eager unlock" do
         let(:source_list) do
-          Bundler::SourceList.new.tap do |source_list|
+          Lic::SourceList.new.tap do |source_list|
             source_list.global_rubygems_source = "file://#{gem_repo4}"
           end
         end
@@ -273,32 +273,32 @@ RSpec.describe Bundler::Definition do
               shared_owner_b
               isolated_owner
 
-            BUNDLED WITH
+            LICD WITH
                1.13.0
           L
         end
 
-        it "should not eagerly unlock shared dependency with bundle install conservative updating behavior" do
-          updated_deps_in_gemfile = [Bundler::Dependency.new("isolated_owner", ">= 0"),
-                                     Bundler::Dependency.new("shared_owner_a", "3.0.2"),
-                                     Bundler::Dependency.new("shared_owner_b", ">= 0")]
-          unlock_hash_for_bundle_install = {}
-          definition = Bundler::Definition.new(
-            bundled_app("Gemfile.lock"),
+        it "should not eagerly unlock shared dependency with lic install conservative updating behavior" do
+          updated_deps_in_gemfile = [Lic::Dependency.new("isolated_owner", ">= 0"),
+                                     Lic::Dependency.new("shared_owner_a", "3.0.2"),
+                                     Lic::Dependency.new("shared_owner_b", ">= 0")]
+          unlock_hash_for_lic_install = {}
+          definition = Lic::Definition.new(
+            licd_app("Gemfile.lock"),
             updated_deps_in_gemfile,
             source_list,
-            unlock_hash_for_bundle_install
+            unlock_hash_for_lic_install
           )
           locked = definition.send(:converge_locked_specs).map(&:name)
           expect(locked).to include "shared_dep"
         end
 
-        it "should not eagerly unlock shared dependency with bundle update conservative updating behavior" do
-          updated_deps_in_gemfile = [Bundler::Dependency.new("isolated_owner", ">= 0"),
-                                     Bundler::Dependency.new("shared_owner_a", ">= 0"),
-                                     Bundler::Dependency.new("shared_owner_b", ">= 0")]
-          definition = Bundler::Definition.new(
-            bundled_app("Gemfile.lock"),
+        it "should not eagerly unlock shared dependency with lic update conservative updating behavior" do
+          updated_deps_in_gemfile = [Lic::Dependency.new("isolated_owner", ">= 0"),
+                                     Lic::Dependency.new("shared_owner_a", ">= 0"),
+                                     Lic::Dependency.new("shared_owner_b", ">= 0")]
+          definition = Lic::Definition.new(
+            licd_app("Gemfile.lock"),
             updated_deps_in_gemfile,
             source_list,
             :gems => ["shared_owner_a"], :lock_shared_dependencies => true
@@ -313,8 +313,8 @@ RSpec.describe Bundler::Definition do
 
   describe "find_resolved_spec" do
     it "with no platform set in SpecSet" do
-      ss = Bundler::SpecSet.new([build_stub_spec("a", "1.0"), build_stub_spec("b", "1.0")])
-      dfn = Bundler::Definition.new(nil, [], mock_source_list, true)
+      ss = Lic::SpecSet.new([build_stub_spec("a", "1.0"), build_stub_spec("b", "1.0")])
+      dfn = Lic::Definition.new(nil, [], mock_source_list, true)
       dfn.instance_variable_set("@specs", ss)
       found = dfn.find_resolved_spec(build_spec("a", "0.9", "ruby").first)
       expect(found.name).to eq "a"
@@ -324,10 +324,10 @@ RSpec.describe Bundler::Definition do
 
   describe "find_indexed_specs" do
     it "with no platform set in indexed specs" do
-      index = Bundler::Index.new
+      index = Lic::Index.new
       %w[1.0.0 1.0.1 1.1.0].each {|v| index << build_stub_spec("foo", v) }
 
-      dfn = Bundler::Definition.new(nil, [], mock_source_list, true)
+      dfn = Lic::Definition.new(nil, [], mock_source_list, true)
       dfn.instance_variable_set("@index", index)
       found = dfn.find_indexed_specs(build_spec("foo", "0.9", "ruby").first)
       expect(found.length).to eq 3
@@ -335,7 +335,7 @@ RSpec.describe Bundler::Definition do
   end
 
   def build_stub_spec(name, version)
-    Bundler::StubSpecification.new(name, version, nil, nil)
+    Lic::StubSpecification.new(name, version, nil, nil)
   end
 
   def mock_source_list

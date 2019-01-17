@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-namespace :bundler_2 do
+namespace :lic_2 do
   task :install do
-    ENV["BUNDLER_SPEC_SUB_VERSION"] = "2.0.0.dev"
+    ENV["LIC_SPEC_SUB_VERSION"] = "2.0.0.dev"
     Rake::Task["override_version"].invoke
     Rake::Task["install"].invoke
-    sh("git", "checkout", "--", "lib/bundler/version.rb")
+    sh("git", "checkout", "--", "lib/lic/version.rb")
   end
 end

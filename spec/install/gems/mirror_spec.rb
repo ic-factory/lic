@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle install with a mirror configured" do
+RSpec.describe "lic install with a mirror configured" do
   describe "when the mirror does not match the gem source" do
     before :each do
       gemfile <<-G
@@ -8,13 +8,13 @@ RSpec.describe "bundle install with a mirror configured" do
 
         gem "rack"
       G
-      bundle "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
+      lic "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
     end
 
     it "installs from the normal location" do
-      bundle :install
+      lic :install
       expect(out).to include(normalize_uri_file("Fetching source index from file://localhost#{gem_repo1}"))
-      expect(the_bundle).to include_gems "rack 1.0"
+      expect(the_lic).to include_gems "rack 1.0"
     end
   end
 
@@ -26,14 +26,14 @@ RSpec.describe "bundle install with a mirror configured" do
 
         gem "rack"
       G
-      bundle "config --local mirror.file://localhost#{gem_repo2} file://localhost#{gem_repo1}"
+      lic "config --local mirror.file://localhost#{gem_repo2} file://localhost#{gem_repo1}"
     end
 
     it "installs the gem from the mirror" do
-      bundle :install
+      lic :install
       expect(out).to include(normalize_uri_file("Fetching source index from file://localhost#{gem_repo1}"))
       expect(out).not_to include(normalize_uri_file("Fetching source index from file://localhost#{gem_repo2}"))
-      expect(the_bundle).to include_gems "rack 1.0"
+      expect(the_lic).to include_gems "rack 1.0"
     end
   end
 end

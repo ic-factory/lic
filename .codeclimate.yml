@@ -15,11 +15,11 @@ ratings:
   - "bin/*"
   - "exe/*"
 exclude_paths:
-- bundler.gemspec
+- lic.gemspec
 - "*.md"
-- lib/bundler/ssl_certs/*.pem
-- lib/bundler/vendor/**/*
-- lib/bundler/templates/**/*.tt
+- lib/lic/ssl_certs/*.pem
+- lib/lic/vendor/**/*
+- lib/lic/templates/**/*.tt
 - man/*
 - spec/**/*
 - Rakefile

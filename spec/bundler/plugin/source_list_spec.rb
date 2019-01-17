@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Plugin::SourceList do
-  SourceList = Bundler::Plugin::SourceList
+RSpec.describe Lic::Plugin::SourceList do
+  SourceList = Lic::Plugin::SourceList
 
   before do
-    allow(Bundler).to receive(:root) { Pathname.new "/" }
+    allow(Lic).to receive(:root) { Pathname.new "/" }
   end
 
   subject(:source_list) { SourceList.new }
@@ -13,13 +13,13 @@ RSpec.describe Bundler::Plugin::SourceList do
     it "uses Plugin::Installer::Rubygems for rubygems sources" do
       source = source_list.
         add_rubygems_source("remotes" => ["https://existing-rubygems.org"])
-      expect(source).to be_instance_of(Bundler::Plugin::Installer::Rubygems)
+      expect(source).to be_instance_of(Lic::Plugin::Installer::Rubygems)
     end
 
     it "uses Plugin::Installer::Git for git sources" do
       source = source_list.
         add_git_source("uri" => "git://existing-git.org/path.git")
-      expect(source).to be_instance_of(Bundler::Plugin::Installer::Git)
+      expect(source).to be_instance_of(Lic::Plugin::Installer::Git)
     end
   end
 end

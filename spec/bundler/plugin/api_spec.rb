@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Plugin::API do
+RSpec.describe Lic::Plugin::API do
   context "plugin declarations" do
     before do
-      stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)
+      stub_const "UserPluginClass", Class.new(Lic::Plugin::API)
     end
 
     describe "#command" do
       it "declares a command plugin with same class as handler" do
-        expect(Bundler::Plugin).
+        expect(Lic::Plugin).
           to receive(:add_command).with("meh", UserPluginClass).once
 
         UserPluginClass.command "meh"
@@ -16,7 +16,7 @@ RSpec.describe Bundler::Plugin::API do
 
       it "accepts another class as argument that handles the command" do
         stub_const "NewClass", Class.new
-        expect(Bundler::Plugin).to receive(:add_command).with("meh", NewClass).once
+        expect(Lic::Plugin).to receive(:add_command).with("meh", NewClass).once
 
         UserPluginClass.command "meh", NewClass
       end
@@ -24,7 +24,7 @@ RSpec.describe Bundler::Plugin::API do
 
     describe "#source" do
       it "declares a source plugin with same class as handler" do
-        expect(Bundler::Plugin).
+        expect(Lic::Plugin).
           to receive(:add_source).with("a_source", UserPluginClass).once
 
         UserPluginClass.source "a_source"
@@ -32,7 +32,7 @@ RSpec.describe Bundler::Plugin::API do
 
       it "accepts another class as argument that handles the command" do
         stub_const "NewClass", Class.new
-        expect(Bundler::Plugin).to receive(:add_source).with("a_source", NewClass).once
+        expect(Lic::Plugin).to receive(:add_source).with("a_source", NewClass).once
 
         UserPluginClass.source "a_source", NewClass
       end
@@ -43,29 +43,29 @@ RSpec.describe Bundler::Plugin::API do
         foo = double("tester")
         expect(foo).to receive(:called)
 
-        expect(Bundler::Plugin).to receive(:add_hook).with("post-foo").and_yield
+        expect(Lic::Plugin).to receive(:add_hook).with("post-foo").and_yield
 
-        Bundler::Plugin::API.hook("post-foo") { foo.called }
+        Lic::Plugin::API.hook("post-foo") { foo.called }
       end
     end
   end
 
-  context "bundler interfaces provided" do
+  context "lic interfaces provided" do
     before do
-      stub_const "UserPluginClass", Class.new(Bundler::Plugin::API)
+      stub_const "UserPluginClass", Class.new(Lic::Plugin::API)
     end
 
     subject(:api) { UserPluginClass.new }
 
     # A test of delegation
-    it "provides the Bundler's functions" do
-      expect(Bundler).to receive(:an_unknown_function).once
+    it "provides the Lic's functions" do
+      expect(Lic).to receive(:an_unknown_function).once
 
       api.an_unknown_function
     end
 
-    it "includes Bundler::SharedHelpers' functions" do
-      expect(Bundler::SharedHelpers).to receive(:an_unknown_helper).once
+    it "includes Lic::SharedHelpers' functions" do
+      expect(Lic::SharedHelpers).to receive(:an_unknown_helper).once
 
       api.an_unknown_helper
     end

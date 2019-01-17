@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Plugin::Index do
-  Index = Bundler::Plugin::Index
+RSpec.describe Lic::Plugin::Index do
+  Index = Lic::Plugin::Index
 
   before do
     gemfile ""
@@ -118,7 +118,7 @@ RSpec.describe Bundler::Plugin::Index do
   describe "global index" do
     before do
       Dir.chdir(tmp) do
-        Bundler::Plugin.reset!
+        Lic::Plugin.reset!
         path = lib_path("gplugin")
         index.register_plugin("gplugin", path.to_s, [path.join("lib").to_s], [], ["glb_source"], [])
       end
@@ -189,9 +189,9 @@ RSpec.describe Bundler::Plugin::Index do
 
   describe "readonly disk without home" do
     it "ignores being unable to create temp home dir" do
-      expect_any_instance_of(Bundler::Plugin::Index).to receive(:global_index_file).
-        and_raise(Bundler::GenericSystemCallError.new("foo", "bar"))
-      Bundler::Plugin::Index.new
+      expect_any_instance_of(Lic::Plugin::Index).to receive(:global_index_file).
+        and_raise(Lic::GenericSystemCallError.new("foo", "bar"))
+      Lic::Plugin::Index.new
     end
   end
 end

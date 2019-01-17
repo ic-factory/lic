@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe ".bundle/config" do
+RSpec.describe ".lic/config" do
   describe "config" do
-    before { bundle "config foo bar" }
+    before { lic "config foo bar" }
 
     it "prints a detailed report of local and user configuration" do
-      bundle "config"
+      lic "config"
 
       expect(out).to include("Settings are listed in order of priority. The top value will be used")
       expect(out).to include("foo\nSet for the current user")
@@ -14,21 +14,21 @@ RSpec.describe ".bundle/config" do
 
     context "given --parseable flag" do
       it "prints a minimal report of local and user configuration" do
-        bundle "config --parseable"
+        lic "config --parseable"
         expect(out).to include("foo=bar")
       end
 
       context "with global config" do
         it "prints config assigned to local scope" do
-          bundle "config --local foo bar2"
-          bundle "config --parseable"
+          lic "config --local foo bar2"
+          lic "config --parseable"
           expect(out).to include("foo=bar2")
         end
       end
 
       context "with env overwrite" do
         it "prints config with env" do
-          bundle "config --parseable", :env => { "BUNDLE_FOO" => "bar3" }
+          lic "config --parseable", :env => { "LIC_FOO" => "bar3" }
           expect(out).to include("foo=bar3")
         end
       end
@@ -44,24 +44,24 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can be moved with an environment variable" do
-      ENV["BUNDLE_APP_CONFIG"] = tmp("foo/bar").to_s
-      bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
+      ENV["LIC_APP_CONFIG"] = tmp("foo/bar").to_s
+      lic "install", forgotten_command_line_options(:path => "vendor/lic")
 
-      expect(bundled_app(".bundle")).not_to exist
+      expect(licd_app(".lic")).not_to exist
       expect(tmp("foo/bar/config")).to exist
-      expect(the_bundle).to include_gems "rack 1.0.0"
+      expect(the_lic).to include_gems "rack 1.0.0"
     end
 
     it "can provide a relative path with the environment variable" do
-      FileUtils.mkdir_p bundled_app("omg")
-      Dir.chdir bundled_app("omg")
+      FileUtils.mkdir_p licd_app("omg")
+      Dir.chdir licd_app("omg")
 
-      ENV["BUNDLE_APP_CONFIG"] = "../foo"
-      bundle "install", forgotten_command_line_options(:path => "vendor/bundle")
+      ENV["LIC_APP_CONFIG"] = "../foo"
+      lic "install", forgotten_command_line_options(:path => "vendor/lic")
 
-      expect(bundled_app(".bundle")).not_to exist
-      expect(bundled_app("../foo/config")).to exist
-      expect(the_bundle).to include_gems "rack 1.0.0"
+      expect(licd_app(".lic")).not_to exist
+      expect(licd_app("../foo/config")).to exist
+      expect(the_lic).to include_gems "rack 1.0.0"
     end
   end
 
@@ -74,86 +74,86 @@ RSpec.describe ".bundle/config" do
     end
 
     it "is the default" do
-      bundle "config foo global"
-      run "puts Bundler.settings[:foo]"
+      lic "config foo global"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("global")
     end
 
     it "can also be set explicitly" do
-      bundle! "config --global foo global"
-      run! "puts Bundler.settings[:foo]"
+      lic! "config --global foo global"
+      run! "puts Lic.settings[:foo]"
       expect(out).to eq("global")
     end
 
     it "has lower precedence than local" do
-      bundle "config --local  foo local"
+      lic "config --local  foo local"
 
-      bundle "config --global foo global"
+      lic "config --global foo global"
       expect(out).to match(/Your application has set foo to "local"/)
 
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("local")
     end
 
     it "has lower precedence than env" do
       begin
-        ENV["BUNDLE_FOO"] = "env"
+        ENV["LIC_FOO"] = "env"
 
-        bundle "config --global foo global"
-        expect(out).to match(/You have a bundler environment variable for foo set to "env"/)
+        lic "config --global foo global"
+        expect(out).to match(/You have a lic environment variable for foo set to "env"/)
 
-        run "puts Bundler.settings[:foo]"
+        run "puts Lic.settings[:foo]"
         expect(out).to eq("env")
       ensure
-        ENV.delete("BUNDLE_FOO")
+        ENV.delete("LIC_FOO")
       end
     end
 
     it "can be deleted" do
-      bundle "config --global foo global"
-      bundle "config --delete foo"
+      lic "config --global foo global"
+      lic "config --delete foo"
 
-      run "puts Bundler.settings[:foo] == nil"
+      run "puts Lic.settings[:foo] == nil"
       expect(out).to eq("true")
     end
 
     it "warns when overriding" do
-      bundle "config --global foo previous"
-      bundle "config --global foo global"
+      lic "config --global foo previous"
+      lic "config --global foo global"
       expect(out).to match(/You are replacing the current global value of foo/)
 
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("global")
     end
 
     it "does not warn when using the same value twice" do
-      bundle "config --global foo value"
-      bundle "config --global foo value"
+      lic "config --global foo value"
+      lic "config --global foo value"
       expect(out).not_to match(/You are replacing the current global value of foo/)
 
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("value")
     end
 
     it "expands the path at time of setting" do
-      bundle "config --global local.foo .."
-      run "puts Bundler.settings['local.foo']"
+      lic "config --global local.foo .."
+      run "puts Lic.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
 
     it "saves with parseable option" do
-      bundle "config --global --parseable foo value"
+      lic "config --global --parseable foo value"
       expect(out).to eq("foo=value")
-      run "puts Bundler.settings['foo']"
+      run "puts Lic.settings['foo']"
       expect(out).to eq("value")
     end
 
     context "when replacing a current value with the parseable flag" do
-      before { bundle "config --global foo value" }
+      before { lic "config --global foo value" }
       it "prints the current value in a parseable format" do
-        bundle "config --global --parseable foo value2"
+        lic "config --global --parseable foo value2"
         expect(out).to eq "foo=value2"
-        run "puts Bundler.settings['foo']"
+        run "puts Lic.settings['foo']"
         expect(out).to eq("value2")
       end
     end
@@ -168,51 +168,51 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can also be set explicitly" do
-      bundle "config --local foo local"
-      run "puts Bundler.settings[:foo]"
+      lic "config --local foo local"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("local")
     end
 
     it "has higher precedence than env" do
       begin
-        ENV["BUNDLE_FOO"] = "env"
-        bundle "config --local foo local"
+        ENV["LIC_FOO"] = "env"
+        lic "config --local foo local"
 
-        run "puts Bundler.settings[:foo]"
+        run "puts Lic.settings[:foo]"
         expect(out).to eq("local")
       ensure
-        ENV.delete("BUNDLE_FOO")
+        ENV.delete("LIC_FOO")
       end
     end
 
     it "can be deleted" do
-      bundle "config --local foo local"
-      bundle "config --delete foo"
+      lic "config --local foo local"
+      lic "config --delete foo"
 
-      run "puts Bundler.settings[:foo] == nil"
+      run "puts Lic.settings[:foo] == nil"
       expect(out).to eq("true")
     end
 
     it "warns when overriding" do
-      bundle "config --local foo previous"
-      bundle "config --local foo local"
+      lic "config --local foo previous"
+      lic "config --local foo local"
       expect(out).to match(/You are replacing the current local value of foo/)
 
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("local")
     end
 
     it "expands the path at time of setting" do
-      bundle "config --local local.foo .."
-      run "puts Bundler.settings['local.foo']"
+      lic "config --local local.foo .."
+      run "puts Lic.settings['local.foo']"
       expect(out).to eq(File.expand_path(Dir.pwd + "/.."))
     end
 
     it "can be deleted with parseable option" do
-      bundle "config --local foo value"
-      bundle "config --delete --parseable foo"
+      lic "config --local foo value"
+      lic "config --delete --parseable foo"
       expect(out).to eq ""
-      run "puts Bundler.settings['foo'] == nil"
+      run "puts Lic.settings['foo'] == nil"
       expect(out).to eq("true")
     end
   end
@@ -226,65 +226,65 @@ RSpec.describe ".bundle/config" do
     end
 
     it "can set boolean properties via the environment" do
-      ENV["BUNDLE_FROZEN"] = "true"
+      ENV["LIC_FROZEN"] = "true"
 
-      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      run "if Lic.settings[:frozen]; puts 'true' else puts 'false' end"
       expect(out).to eq("true")
     end
 
     it "can set negative boolean properties via the environment" do
-      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      run "if Lic.settings[:frozen]; puts 'true' else puts 'false' end"
       expect(out).to eq("false")
 
-      ENV["BUNDLE_FROZEN"] = "false"
+      ENV["LIC_FROZEN"] = "false"
 
-      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      run "if Lic.settings[:frozen]; puts 'true' else puts 'false' end"
       expect(out).to eq("false")
 
-      ENV["BUNDLE_FROZEN"] = "0"
+      ENV["LIC_FROZEN"] = "0"
 
-      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      run "if Lic.settings[:frozen]; puts 'true' else puts 'false' end"
       expect(out).to eq("false")
 
-      ENV["BUNDLE_FROZEN"] = ""
+      ENV["LIC_FROZEN"] = ""
 
-      run "if Bundler.settings[:frozen]; puts 'true' else puts 'false' end"
+      run "if Lic.settings[:frozen]; puts 'true' else puts 'false' end"
       expect(out).to eq("false")
     end
 
     it "can set properties with periods via the environment" do
-      ENV["BUNDLE_FOO__BAR"] = "baz"
+      ENV["LIC_FOO__BAR"] = "baz"
 
-      run "puts Bundler.settings['foo.bar']"
+      run "puts Lic.settings['foo.bar']"
       expect(out).to eq("baz")
     end
   end
 
   describe "parseable option" do
     it "prints an empty string" do
-      bundle "config foo --parseable"
+      lic "config foo --parseable"
 
       expect(out).to eq ""
     end
 
     it "only prints the value of the config" do
-      bundle "config foo local"
-      bundle "config foo --parseable"
+      lic "config foo local"
+      lic "config foo --parseable"
 
       expect(out).to eq "foo=local"
     end
 
     it "can print global config" do
-      bundle "config --global bar value"
-      bundle "config bar --parseable"
+      lic "config --global bar value"
+      lic "config bar --parseable"
 
       expect(out).to eq "bar=value"
     end
 
     it "prefers local config over global" do
-      bundle "config --local bar value2"
-      bundle "config --global bar value"
-      bundle "config bar --parseable"
+      lic "config --local bar value2"
+      lic "config --global bar value"
+      lic "config bar --parseable"
 
       expect(out).to eq "bar=value2"
     end
@@ -299,9 +299,9 @@ RSpec.describe ".bundle/config" do
     end
 
     it "configures mirrors using keys with `mirror.`" do
-      bundle "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
+      lic "config --local mirror.http://gems.example.org http://gem-mirror.example.org"
       run(<<-E)
-Bundler.settings.gem_mirrors.each do |k, v|
+Lic.settings.gem_mirrors.each do |k, v|
   puts "\#{k} => \#{v}"
 end
 E
@@ -317,42 +317,42 @@ E
     end
 
     it "saves quotes" do
-      bundle "config foo something\\'"
-      run "puts Bundler.settings[:foo]"
+      lic "config foo something\\'"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("something'")
     end
 
     it "doesn't return quotes around values", :ruby => "1.9" do
-      bundle "config foo '1'"
-      run "puts Bundler.settings.send(:global_config_file).read"
+      lic "config foo '1'"
+      run "puts Lic.settings.send(:global_config_file).read"
       expect(out).to include('"1"')
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq("1")
     end
 
     it "doesn't duplicate quotes around values", :if => (RUBY_VERSION >= "2.1") do
-      bundled_app(".bundle").mkpath
-      File.open(bundled_app(".bundle/config"), "w") do |f|
-        f.write 'BUNDLE_FOO: "$BUILD_DIR"'
+      licd_app(".lic").mkpath
+      File.open(licd_app(".lic/config"), "w") do |f|
+        f.write 'LIC_FOO: "$BUILD_DIR"'
       end
 
-      bundle "config bar baz"
-      run "puts Bundler.settings.send(:local_config_file).read"
+      lic "config bar baz"
+      run "puts Lic.settings.send(:local_config_file).read"
 
       # Starting in Ruby 2.1, YAML automatically adds double quotes
       # around some values, including $ and newlines.
-      expect(out).to include('BUNDLE_FOO: "$BUILD_DIR"')
+      expect(out).to include('LIC_FOO: "$BUILD_DIR"')
     end
 
     it "doesn't duplicate quotes around long wrapped values" do
-      bundle "config foo #{long_string}"
+      lic "config foo #{long_string}"
 
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq(long_string)
 
-      bundle "config bar baz"
+      lic "config bar baz"
 
-      run "puts Bundler.settings[:foo]"
+      run "puts Lic.settings[:foo]"
       expect(out).to eq(long_string)
     end
   end
@@ -376,119 +376,119 @@ E
     end
 
     it "doesn't wrap values" do
-      bundle "config foo #{long_string}"
-      run "puts Bundler.settings[:foo]"
+      lic "config foo #{long_string}"
+      run "puts Lic.settings[:foo]"
       expect(out).to match(long_string)
     end
 
     it "can read wrapped unquoted values" do
-      bundle "config foo #{long_string_without_special_characters}"
-      run "puts Bundler.settings[:foo]"
+      lic "config foo #{long_string_without_special_characters}"
+      run "puts Lic.settings[:foo]"
       expect(out).to match(long_string_without_special_characters)
     end
   end
 
   describe "subcommands" do
     it "list" do
-      bundle! "config list"
-      expect(last_command.stdout).to eq "Settings are listed in order of priority. The top value will be used.\nspec_run\nSet via BUNDLE_SPEC_RUN: \"true\""
+      lic! "config list"
+      expect(last_command.stdout).to eq "Settings are listed in order of priority. The top value will be used.\nspec_run\nSet via LIC_SPEC_RUN: \"true\""
 
-      bundle! "config list", :parseable => true
+      lic! "config list", :parseable => true
       expect(last_command.stdout).to eq "spec_run=true"
     end
 
     it "get" do
-      ENV["BUNDLE_BAR"] = "bar_val"
+      ENV["LIC_BAR"] = "bar_val"
 
-      bundle! "config get foo"
+      lic! "config get foo"
       expect(last_command.stdout).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
 
-      ENV["BUNDLE_FOO"] = "foo_val"
+      ENV["LIC_FOO"] = "foo_val"
 
-      bundle! "config get foo --parseable"
+      lic! "config get foo --parseable"
       expect(last_command.stdout).to eq "foo=foo_val"
 
-      bundle! "config get foo"
-      expect(last_command.stdout).to eq "Settings for `foo` in order of priority. The top value will be used\nSet via BUNDLE_FOO: \"foo_val\""
+      lic! "config get foo"
+      expect(last_command.stdout).to eq "Settings for `foo` in order of priority. The top value will be used\nSet via LIC_FOO: \"foo_val\""
     end
 
     it "set" do
-      bundle! "config set foo 1"
+      lic! "config set foo 1"
       expect(last_command.stdout).to eq ""
 
-      bundle! "config set --local foo 2"
+      lic! "config set --local foo 2"
       expect(last_command.stdout).to eq ""
 
-      bundle! "config set --global foo 3"
+      lic! "config set --global foo 3"
       expect(last_command.stdout).to eq "Your application has set foo to \"2\". This will override the global value you are currently setting"
 
-      bundle! "config set --parseable --local foo 4"
+      lic! "config set --parseable --local foo 4"
       expect(last_command.stdout).to eq "foo=4"
 
-      bundle! "config set --local foo 4.1"
+      lic! "config set --local foo 4.1"
       expect(last_command.stdout).to eq "You are replacing the current local value of foo, which is currently \"4\""
 
-      bundle "config set --global --local foo 5"
+      lic "config set --global --local foo 5"
       expect(last_command).to be_failure
-      expect(last_command.bundler_err).to eq "The options global and local were specified. Please only use one of the switches at a time."
+      expect(last_command.lic_err).to eq "The options global and local were specified. Please only use one of the switches at a time."
     end
 
     it "unset" do
-      bundle! "config unset foo"
+      lic! "config unset foo"
       expect(last_command.stdout).to eq ""
 
-      bundle! "config set foo 1"
-      bundle! "config unset foo --parseable"
+      lic! "config set foo 1"
+      lic! "config unset foo --parseable"
       expect(last_command.stdout).to eq ""
 
-      bundle! "config set --local foo 1"
-      bundle! "config set --global foo 2"
+      lic! "config set --local foo 1"
+      lic! "config set --global foo 2"
 
-      bundle! "config unset foo"
+      lic! "config unset foo"
       expect(last_command.stdout).to eq ""
-      expect(bundle!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
+      expect(lic!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
 
-      bundle! "config set --local foo 1"
-      bundle! "config set --global foo 2"
+      lic! "config set --local foo 1"
+      lic! "config set --global foo 2"
 
-      bundle! "config unset foo --local"
+      lic! "config unset foo --local"
       expect(last_command.stdout).to eq ""
-      expect(bundle!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nSet for the current user (#{home(".bundle/config")}): \"2\""
-      bundle! "config unset foo --global"
+      expect(lic!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nSet for the current user (#{home(".lic/config")}): \"2\""
+      lic! "config unset foo --global"
       expect(last_command.stdout).to eq ""
-      expect(bundle!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
+      expect(lic!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
 
-      bundle! "config set --local foo 1"
-      bundle! "config set --global foo 2"
+      lic! "config set --local foo 1"
+      lic! "config set --global foo 2"
 
-      bundle! "config unset foo --global"
+      lic! "config unset foo --global"
       expect(last_command.stdout).to eq ""
-      expect(bundle!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nSet for your local app (#{bundled_app(".bundle/config")}): \"1\""
-      bundle! "config unset foo --local"
+      expect(lic!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nSet for your local app (#{licd_app(".lic/config")}): \"1\""
+      lic! "config unset foo --local"
       expect(last_command.stdout).to eq ""
-      expect(bundle!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
+      expect(lic!("config get foo")).to eq "Settings for `foo` in order of priority. The top value will be used\nYou have not configured a value for `foo`"
 
-      bundle "config unset foo --local --global"
+      lic "config unset foo --local --global"
       expect(last_command).to be_failure
-      expect(last_command.bundler_err).to eq "The options global and local were specified. Please only use one of the switches at a time."
+      expect(last_command.lic_err).to eq "The options global and local were specified. Please only use one of the switches at a time."
     end
   end
 end
 
 RSpec.describe "setting gemfile via config" do
   context "when only the non-default Gemfile exists" do
-    it "persists the gemfile location to .bundle/config" do
-      File.open(bundled_app("NotGemfile"), "w") do |f|
+    it "persists the gemfile location to .lic/config" do
+      File.open(licd_app("NotGemfile"), "w") do |f|
         f.write <<-G
           source "file://#{gem_repo1}"
           gem 'rack'
         G
       end
 
-      bundle "config --local gemfile #{bundled_app("NotGemfile")}"
-      expect(File.exist?(".bundle/config")).to eq(true)
+      lic "config --local gemfile #{licd_app("NotGemfile")}"
+      expect(File.exist?(".lic/config")).to eq(true)
 
-      bundle "config"
+      lic "config"
       expect(out).to include("NotGemfile")
     end
   end

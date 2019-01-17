@@ -7,7 +7,7 @@ require "rubygems"
 module Gem
   if defined?(@path_to_default_spec_map)
     @path_to_default_spec_map.delete_if do |_path, spec|
-      spec.name == "bundler"
+      spec.name == "lic"
     end
   end
 end
@@ -23,16 +23,16 @@ rescue LoadError
   abort "Run rake spec:deps to install development dependencies"
 end
 
-require "bundler/psyched_yaml"
-require "bundler/vendored_fileutils"
+require "lic/psyched_yaml"
+require "lic/vendored_fileutils"
 require "uri"
 require "digest"
 
 if File.expand_path(__FILE__) =~ %r{([^\w/\.:\-])}
-  abort "The bundler specs cannot be run from a path that contains special characters (particularly #{$1.inspect})"
+  abort "The lic specs cannot be run from a path that contains special characters (particularly #{$1.inspect})"
 end
 
-require "bundler"
+require "lic"
 
 Dir["#{File.expand_path("../support", __FILE__)}/*.rb"].each do |file|
   file = file.gsub(%r{\A#{Regexp.escape File.expand_path("..", __FILE__)}/}, "")
@@ -45,7 +45,7 @@ Spec::Manpages.setup
 Spec::Rubygems.setup
 FileUtils.rm_rf(Spec::Path.gem_repo1)
 ENV["RUBYOPT"] = "#{ENV["RUBYOPT"]} -r#{Spec::Path.spec_dir}/support/hax.rb"
-ENV["BUNDLE_SPEC_RUN"] = "true"
+ENV["LIC_SPEC_RUN"] = "true"
 
 # Don't wrap output in tests
 ENV["THOR_COLUMNS"] = "10000"
@@ -76,35 +76,35 @@ RSpec.configure do |config|
 
   # Since failures cause us to keep a bunch of long strings in memory, stop
   # once we have a large number of failures (indicative of core pieces of
-  # bundler being broken) so that running the full test suite doesn't take
+  # lic being broken) so that running the full test suite doesn't take
   # forever due to memory constraints
   config.fail_fast ||= 25 if ENV["CI"]
 
-  if ENV["BUNDLER_SUDO_TESTS"] && Spec::Sudo.present?
+  if ENV["LIC_SUDO_TESTS"] && Spec::Sudo.present?
     config.filter_run :sudo => true
   else
     config.filter_run_excluding :sudo => true
   end
 
-  if ENV["BUNDLER_REALWORLD_TESTS"]
+  if ENV["LIC_REALWORLD_TESTS"]
     config.filter_run :realworld => true
   else
     config.filter_run_excluding :realworld => true
   end
 
-  git_version = Bundler::Source::Git::GitProxy.new(nil, nil, nil).version
+  git_version = Lic::Source::Git::GitProxy.new(nil, nil, nil).version
 
   config.filter_run_excluding :ruby => LessThanProc.with(RUBY_VERSION)
   config.filter_run_excluding :rubygems => LessThanProc.with(Gem::VERSION)
   config.filter_run_excluding :git => LessThanProc.with(git_version)
   config.filter_run_excluding :rubygems_master => (ENV["RGV"] != "master")
-  config.filter_run_excluding :bundler => LessThanProc.with(Bundler::VERSION.split(".")[0, 2].join("."))
-  config.filter_run_excluding :ruby_repo => !(ENV["BUNDLE_RUBY"] && ENV["BUNDLE_GEM"]).nil?
+  config.filter_run_excluding :lic => LessThanProc.with(Lic::VERSION.split(".")[0, 2].join("."))
+  config.filter_run_excluding :ruby_repo => !(ENV["LIC_RUBY"] && ENV["LIC_GEM"]).nil?
 
   config.filter_run_when_matching :focus unless ENV["CI"]
 
   original_wd  = Dir.pwd
-  original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Bundler::EnvironmentPreserver::BUNDLER_PREFIX) }
+  original_env = ENV.to_hash.delete_if {|k, _v| k.start_with?(Lic::EnvironmentPreserver::LIC_PREFIX) }
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
@@ -115,16 +115,16 @@ RSpec.configure do |config|
   end
 
   config.around :each do |example|
-    if ENV["BUNDLE_RUBY"]
+    if ENV["LIC_RUBY"]
       orig_ruby = Gem.ruby
-      Gem.ruby = ENV["BUNDLE_RUBY"]
+      Gem.ruby = ENV["LIC_RUBY"]
     end
     example.run
-    Gem.ruby = orig_ruby if ENV["BUNDLE_RUBY"]
+    Gem.ruby = orig_ruby if ENV["LIC_RUBY"]
   end
 
   config.before :suite do
-    if ENV["BUNDLE_RUBY"]
+    if ENV["LIC_RUBY"]
       FileUtils.cp_r Spec::Path.bindir, File.join(Spec::Path.root, "lib", "exe")
     end
   end
@@ -155,7 +155,7 @@ RSpec.configure do |config|
   end
 
   config.after :suite do
-    if ENV["BUNDLE_RUBY"]
+    if ENV["LIC_RUBY"]
       FileUtils.rm_rf File.join(Spec::Path.root, "lib", "exe")
     end
   end

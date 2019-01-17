@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
+RSpec.describe "lic install with gemfile that uses eval_gemfile" do
   before do
-    build_lib("gunks", :path => bundled_app.join("gems/gunks")) do |s|
+    build_lib("gunks", :path => licd_app.join("gems/gunks")) do |s|
       s.name    = "gunks"
       s.version = "0.0.1"
     end
@@ -22,7 +22,7 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
       expect(out).to include("Resolving dependencies")
       expect(out).to include("Bundle complete")
 
-      expect(the_bundle).to include_gem "gunks 0.0.1", :source => "path@#{bundled_app("gems", "gunks")}"
+      expect(the_lic).to include_gem "gunks 0.0.1", :source => "path@#{licd_app("gems", "gunks")}"
     end
   end
 
@@ -39,15 +39,15 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
     end
 
     it "installs the path gem" do
-      bundle! :install
-      expect(the_bundle).to include_gem("a 1.0")
+      lic! :install
+      expect(the_lic).to include_gem("a 1.0")
     end
 
     # Make sure that we are properly comparing path based gems between the
     # parsed lockfile and the evaluated gemfile.
-    it "bundles with --deployment" do
-      bundle! :install
-      bundle! :install, forgotten_command_line_options(:deployment => true)
+    it "lics with --deployment" do
+      lic! :install
+      lic! :install, forgotten_command_line_options(:deployment => true)
     end
   end
 
@@ -62,7 +62,7 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
       expect(out).to include("Resolving dependencies")
       expect(out).to include("Bundle complete")
 
-      expect(the_bundle).to include_gem "gunks 0.0.1", :source => "path@#{bundled_app("gems", "gunks")}"
+      expect(the_lic).to include_gem "gunks 0.0.1", :source => "path@#{licd_app("gems", "gunks")}"
     end
   end
 
@@ -76,7 +76,7 @@ RSpec.describe "bundle install with gemfile that uses eval_gemfile" do
       G
       install_gemfile! "eval_gemfile File.expand_path('Gemfile-alt')"
 
-      expect(the_bundle).to include_gem "rack 1.0.0"
+      expect(the_lic).to include_gem "rack 1.0.0"
     end
   end
 end

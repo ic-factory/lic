@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Source::Git::GitProxy do
+RSpec.describe Lic::Source::Git::GitProxy do
   let(:path) { Pathname("path") }
-  let(:uri) { "https://github.com/bundler/bundler.git" }
+  let(:uri) { "https://github.com/lic/lic.git" }
   let(:ref) { "HEAD" }
   let(:revision) { nil }
   let(:git_source) { nil }
@@ -10,29 +10,29 @@ RSpec.describe Bundler::Source::Git::GitProxy do
 
   context "with configured credentials" do
     it "adds username and password to URI" do
-      Bundler.settings.temporary(uri => "u:p") do
-        expect(subject).to receive(:git_retry).with(match("https://u:p@github.com/bundler/bundler.git"))
+      Lic.settings.temporary(uri => "u:p") do
+        expect(subject).to receive(:git_retry).with(match("https://u:p@github.com/lic/lic.git"))
         subject.checkout
       end
     end
 
     it "adds username and password to URI for host" do
-      Bundler.settings.temporary("github.com" => "u:p") do
-        expect(subject).to receive(:git_retry).with(match("https://u:p@github.com/bundler/bundler.git"))
+      Lic.settings.temporary("github.com" => "u:p") do
+        expect(subject).to receive(:git_retry).with(match("https://u:p@github.com/lic/lic.git"))
         subject.checkout
       end
     end
 
     it "does not add username and password to mismatched URI" do
-      Bundler.settings.temporary("https://u:p@github.com/bundler/bundler-mismatch.git" => "u:p") do
+      Lic.settings.temporary("https://u:p@github.com/lic/lic-mismatch.git" => "u:p") do
         expect(subject).to receive(:git_retry).with(match(uri))
         subject.checkout
       end
     end
 
     it "keeps original userinfo" do
-      Bundler.settings.temporary("github.com" => "u:p") do
-        original = "https://orig:info@github.com/bundler/bundler.git"
+      Lic.settings.temporary("github.com" => "u:p") do
+        original = "https://orig:info@github.com/lic/lic.git"
         subject = described_class.new(Pathname("path"), original, "HEAD")
         expect(subject).to receive(:git_retry).with(match(original))
         subject.checkout
@@ -132,11 +132,11 @@ RSpec.describe Bundler::Source::Git::GitProxy do
       it "fails gracefully when resetting to the revision fails" do
         expect(subject).to receive(:git_retry).with(start_with("clone ")) { destination.mkpath }
         expect(subject).to receive(:git_retry).with(start_with("fetch "))
-        expect(subject).to receive(:git).with("reset --hard #{revision}").and_raise(Bundler::Source::Git::GitCommandError, "command")
+        expect(subject).to receive(:git).with("reset --hard #{revision}").and_raise(Lic::Source::Git::GitCommandError, "command")
         expect(subject).not_to receive(:git)
 
         expect { subject.copy_to(destination, submodules) }.
-          to raise_error(Bundler::Source::Git::MissingGitRevisionError,
+          to raise_error(Lic::Source::Git::MissingGitRevisionError,
             "Revision #{revision} does not exist in the repository #{uri}. Maybe you misspelled it?")
       end
     end

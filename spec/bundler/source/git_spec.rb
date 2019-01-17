@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Source::Git do
+RSpec.describe Lic::Source::Git do
   before do
-    allow(Bundler).to receive(:root) { Pathname.new("root") }
+    allow(Lic).to receive(:root) { Pathname.new("root") }
   end
 
   let(:uri) { "https://github.com/foo/bar.git" }

@@ -1,16 +1,16 @@
 # Writing docs for man pages
 
-A primary source of help for Bundler users are the man pages: the output printed when you run `bundle help` (or `bundler help`). These pages can be a little tricky to format and preview, but are pretty straightforward once you get the hang of it.
+A primary source of help for Lic users are the man pages: the output printed when you run `lic help` (or `lic help`). These pages can be a little tricky to format and preview, but are pretty straightforward once you get the hang of it.
 
-_Note: `bundler` and `bundle` may be used interchangeably in the CLI. This guide uses `bundle` because it's cuter._
+_Note: `lic` and `lic` may be used interchangeably in the CLI. This guide uses `lic` because it's cuter._
 
 ## What goes in man pages?
 
-We use man pages for Bundler commands used in the CLI (command line interface). They can vary in length from large (see `bundle install`) to very short (see `bundle clean`).
+We use man pages for Lic commands used in the CLI (command line interface). They can vary in length from large (see `lic install`) to very short (see `lic clean`).
 
-To see a list of commands available in the Bundler CLI, type:
+To see a list of commands available in the Lic CLI, type:
 
-      $ bundle help
+      $ lic help
 
 Our goal is to have a man page for every command.
 
@@ -20,7 +20,7 @@ Don't see a man page for a command? Make a new page and send us a PR! We also we
 
 To create a new man page, simply create a new `.ronn` file in the `man/` directory.
 
-For example: to create a man page for the command `bundle cookies` (not a real command, sadly), I would create a file `man/bundle-cookies.ronn` and add my documentation there.
+For example: to create a man page for the command `lic cookies` (not a real command, sadly), I would create a file `man/lic-cookies.ronn` and add my documentation there.
 
 ## Formatting
 
@@ -34,15 +34,15 @@ If you're not sure if the formatting looks right, that's ok! Make a pull request
 
 ## Previewing
 
-To preview your changes as they will print out for Bundler users, you'll need to run a series of commands:
+To preview your changes as they will print out for Lic users, you'll need to run a series of commands:
 
 ```
 $ rake spec:deps
 $ rake man:build
-$ man man/bundle-cookies.1
+$ man man/lic-cookies.1
 ```
 
-If you make more changes to `bundle-cookies.ronn`, you'll need to run the `rake man:build` again before previewing.
+If you make more changes to `lic-cookies.ronn`, you'll need to run the `rake man:build` again before previewing.
 
 ## Testing
 
@@ -53,13 +53,13 @@ $ bin/rspec ./spec/commands/help_spec.rb
 $ bin/rspec ./spec/quality_spec.rb
 ```
 
-# Writing docs for [the Bundler documentation site](http://www.bundler.io)
+# Writing docs for [the Lic documentation site](http://www.lic.io)
 
-If you'd like to submit a pull request for any of the primary commands or utilities on [the Bundler documentation site](http://www.bundler.io), please follow the instructions above for writing documentation for man pages from the `bundler/bundler` repository. They are the same in each case.
+If you'd like to submit a pull request for any of the primary commands or utilities on [the Lic documentation site](http://www.lic.io), please follow the instructions above for writing documentation for man pages from the `lic/lic` repository. They are the same in each case.
 
-Note: Editing `.ronn` files from the `bundler/bundler` repository for the primary commands and utilities documentation is all you need 🎉. There is no need to manually change anything in the `bundler/bundler-site` repository, because the man pages and the docs for primary commands and utilities on [the Bundler documentation site](http://www.bundler.io) are one in the same. They are generated automatically from the `bundler/bundler` repository's `.ronn` files from the `rake man/build` command. In other words, after updating `.ronn` file and running `rake man/build` in `bundler`, `.ronn` files map to the auto-generated files in the `source/man` directory of `bundler-site`.
+Note: Editing `.ronn` files from the `lic/lic` repository for the primary commands and utilities documentation is all you need 🎉. There is no need to manually change anything in the `lic/lic-site` repository, because the man pages and the docs for primary commands and utilities on [the Lic documentation site](http://www.lic.io) are one in the same. They are generated automatically from the `lic/lic` repository's `.ronn` files from the `rake man/build` command. In other words, after updating `.ronn` file and running `rake man/build` in `lic`, `.ronn` files map to the auto-generated files in the `source/man` directory of `lic-site`.
 
-Additionally, if you'd like to add a guide or tutorial: in the `bundler/bundler-site` repository, go to `/bundler-site/source/current_version_of_bundler/guides` and add [a new Markdown file](https://guides.github.com/features/mastering-markdown/) (with an extension ending in `.md`). Be sure to correctly format the title of your new guide, like so:
+Additionally, if you'd like to add a guide or tutorial: in the `lic/lic-site` repository, go to `/lic-site/source/current_version_of_lic/guides` and add [a new Markdown file](https://guides.github.com/features/mastering-markdown/) (with an extension ending in `.md`). Be sure to correctly format the title of your new guide, like so:
 ```
 ---
 title: RubyGems.org SSL/TLS Troubleshooting Guide

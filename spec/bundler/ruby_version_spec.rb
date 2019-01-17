@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
-require "bundler/ruby_version"
+require "lic/ruby_version"
 
-RSpec.describe "Bundler::RubyVersion and its subclasses" do
+RSpec.describe "Lic::RubyVersion and its subclasses" do
   let(:version)              { "2.0.0" }
   let(:patchlevel)           { "645" }
   let(:engine)               { "jruby" }
   let(:engine_version)       { "2.0.1" }
 
-  describe Bundler::RubyVersion do
-    subject { Bundler::RubyVersion.new(version, patchlevel, engine, engine_version) }
+  describe Lic::RubyVersion do
+    subject { Lic::RubyVersion.new(version, patchlevel, engine, engine_version) }
 
     let(:ruby_version)         { subject }
     let(:other_version)        { version }
     let(:other_patchlevel)     { patchlevel }
     let(:other_engine)         { engine }
     let(:other_engine_version) { engine_version }
-    let(:other_ruby_version)   { Bundler::RubyVersion.new(other_version, other_patchlevel, other_engine, other_engine_version) }
+    let(:other_ruby_version)   { Lic::RubyVersion.new(other_version, other_patchlevel, other_engine, other_engine_version) }
 
     describe "#initialize" do
       context "no engine is passed" do
@@ -395,20 +395,20 @@ RSpec.describe "Bundler::RubyVersion and its subclasses" do
     end
 
     describe "#system" do
-      subject { Bundler::RubyVersion.system }
+      subject { Lic::RubyVersion.system }
 
-      let(:bundler_system_ruby_version) { subject }
+      let(:lic_system_ruby_version) { subject }
 
       before do
-        Bundler::RubyVersion.instance_variable_set("@ruby_version", nil)
+        Lic::RubyVersion.instance_variable_set("@ruby_version", nil)
       end
 
-      it "should return an instance of Bundler::RubyVersion" do
-        expect(subject).to be_kind_of(Bundler::RubyVersion)
+      it "should return an instance of Lic::RubyVersion" do
+        expect(subject).to be_kind_of(Lic::RubyVersion)
       end
 
-      it "memoizes the instance of Bundler::RubyVersion" do
-        expect(Bundler::RubyVersion).to receive(:new).once.and_call_original
+      it "memoizes the instance of Lic::RubyVersion" do
+        expect(Lic::RubyVersion).to receive(:new).once.and_call_original
         2.times { subject }
       end
 
@@ -447,8 +447,8 @@ RSpec.describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "should return a copy of the value of RUBY_VERSION" do
-            expect(bundler_system_ruby_version.engine_versions).to eq(["2.2.4"])
-            expect(bundler_system_ruby_version.engine_versions.first).to_not be(RUBY_VERSION)
+            expect(lic_system_ruby_version.engine_versions).to eq(["2.2.4"])
+            expect(lic_system_ruby_version.engine_versions.first).to_not be(RUBY_VERSION)
           end
         end
 
@@ -459,8 +459,8 @@ RSpec.describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "should return a copy of the value of Rubinius::VERSION" do
-            expect(bundler_system_ruby_version.engine_versions).to eq(["2.0.0"])
-            expect(bundler_system_ruby_version.engine_versions.first).to_not be(Rubinius::VERSION)
+            expect(lic_system_ruby_version.engine_versions).to eq(["2.0.0"])
+            expect(lic_system_ruby_version.engine_versions.first).to_not be(Rubinius::VERSION)
           end
         end
 
@@ -472,7 +472,7 @@ RSpec.describe "Bundler::RubyVersion and its subclasses" do
 
           it "should return a copy of the value of JRUBY_VERSION" do
             expect(subject.engine_versions).to eq(["2.1.1"])
-            expect(bundler_system_ruby_version.engine_versions.first).to_not be(JRUBY_VERSION)
+            expect(lic_system_ruby_version.engine_versions.first).to_not be(JRUBY_VERSION)
           end
         end
 
@@ -483,7 +483,7 @@ RSpec.describe "Bundler::RubyVersion and its subclasses" do
           end
 
           it "returns RUBY_ENGINE_VERSION" do
-            expect(bundler_system_ruby_version.engine_versions).to eq(["1.2.3"])
+            expect(lic_system_ruby_version.engine_versions).to eq(["1.2.3"])
           end
         end
       end

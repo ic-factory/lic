@@ -1,9 +1,9 @@
-bundle-inject(1) -- Add named gem(s) with version requirements to Gemfile
+lic-inject(1) -- Add named gem(s) with version requirements to Gemfile
 =========================================================================
 
 ## SYNOPSIS
 
-`bundle inject` [GEM] [VERSION]
+`lic inject` [GEM] [VERSION]
 
 ## DESCRIPTION
 
@@ -15,8 +15,8 @@ isn't listed yet.
 
 Example:
 
-    bundle install
-    bundle inject 'rack' '> 0'
+    lic install
+    lic inject 'rack' '> 0'
 
 This will inject the 'rack' gem with a version greater than 0 in your
 [`Gemfile(5)`][Gemfile(5)] and Gemfile.lock

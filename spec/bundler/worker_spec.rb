@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bundler/worker"
+require "lic/worker"
 
-RSpec.describe Bundler::Worker do
+RSpec.describe Lic::Worker do
   let(:size) { 5 }
   let(:name) { "Spec Worker" }
   let(:function) { proc {|object, worker_number| [object, worker_number] } }
@@ -15,7 +15,7 @@ RSpec.describe Bundler::Worker do
       it "raises when no threads can be created" do
         allow(Thread).to receive(:start).and_raise(ThreadError, "error creating thread")
 
-        expect { subject.enq "a" }.to raise_error(Bundler::ThreadCreationError, "Failed to create threads for the Spec Worker worker: error creating thread")
+        expect { subject.enq "a" }.to raise_error(Lic::ThreadCreationError, "Failed to create threads for the Spec Worker worker: error creating thread")
       end
     end
   end

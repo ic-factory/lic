@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::Index do
+RSpec.describe Lic::Index do
   let(:specs) { [] }
   subject { described_class.build {|i| i.use(specs) } }
 

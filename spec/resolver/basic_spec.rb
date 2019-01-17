@@ -104,7 +104,7 @@ RSpec.describe "Resolving" do
     dep "chef_app_error"
     expect do
       resolve
-    end.to raise_error(Bundler::VersionConflict)
+    end.to raise_error(Lic::VersionConflict)
   end
 
   it "raises an exception with the minimal set of conflicting dependencies" do
@@ -118,8 +118,8 @@ RSpec.describe "Resolving" do
     dep "c"
     expect do
       resolve
-    end.to raise_error(Bundler::VersionConflict, <<-E.strip)
-Bundler could not find compatible versions for gem "a":
+    end.to raise_error(Lic::VersionConflict, <<-E.strip)
+Lic could not find compatible versions for gem "a":
   In Gemfile:
     b was resolved to 1.0, which depends on
       a (>= 2)
@@ -135,7 +135,7 @@ Bundler could not find compatible versions for gem "a":
 
     expect do
       resolve
-    end.to raise_error(Bundler::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
+    end.to raise_error(Lic::CyclicDependencyError, /please remove either gem 'bar' or gem 'foo'/i)
   end
 
   # Issue #3459
@@ -176,7 +176,7 @@ Bundler could not find compatible versions for gem "a":
 
     deps = []
     @deps.each do |d|
-      deps << Bundler::DepProxy.new(d, "ruby")
+      deps << Lic::DepProxy.new(d, "ruby")
     end
 
     should_resolve_and_include %w[foo-1.0.0 bar-1.0.0], [[]]
@@ -198,7 +198,7 @@ Bundler could not find compatible versions for gem "a":
       dep "foo"
 
       # base represents declared dependencies in the Gemfile that are still satisfied by the lockfile
-      @base = Bundler::SpecSet.new([])
+      @base = Lic::SpecSet.new([])
 
       # locked represents versions in lockfile
       @locked = locked(%w[foo 1.4.3], %w[bar 2.0.3])
@@ -225,8 +225,8 @@ Bundler could not find compatible versions for gem "a":
       # declared as a dependency in the Gemfile. In this case, locks don't apply to _changing_
       # dependencies and since the dependency of the selected foo gem changes, the latest matching
       # dependency of "bar", "~> 2.1" -- bar-2.1.1 -- is selected. This is not a bug and follows
-      # the long-standing documented Conservative Updating behavior of bundle install.
-      # http://bundler.io/v1.12/man/bundle-install.1.html#CONSERVATIVE-UPDATING
+      # the long-standing documented Conservative Updating behavior of lic install.
+      # http://lic.io/v1.12/man/lic-install.1.html#CONSERVATIVE-UPDATING
       should_conservative_resolve_and_include :patch, ["foo"], %w[foo-1.4.5 bar-2.1.1]
     end
 
@@ -280,7 +280,7 @@ Bundler could not find compatible versions for gem "a":
         dep "foo"
 
         # base represents declared dependencies in the Gemfile that are still satisfied by the lockfile
-        @base = Bundler::SpecSet.new([])
+        @base = Lic::SpecSet.new([])
 
         # locked represents versions in lockfile
         @locked = locked(%w[foo 1.4.3], %w[bar 2.2.3])

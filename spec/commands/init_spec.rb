@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-RSpec.describe "bundle init" do
-  it "generates a Gemfile", :bundler => "< 2" do
-    bundle! :init
+RSpec.describe "lic init" do
+  it "generates a Gemfile", :lic => "< 2" do
+    lic! :init
     expect(out).to include("Writing new Gemfile")
-    expect(bundled_app("Gemfile")).to be_file
+    expect(licd_app("Gemfile")).to be_file
   end
 
-  it "generates a gems.rb", :bundler => "2" do
-    bundle! :init
+  it "generates a gems.rb", :lic => "2" do
+    lic! :init
     expect(out).to include("Writing new gems.rb")
-    expect(bundled_app("gems.rb")).to be_file
+    expect(licd_app("gems.rb")).to be_file
   end
 
-  context "when a Gemfile already exists", :bundler => "< 2" do
+  context "when a Gemfile already exists", :lic => "< 2" do
     before do
       create_file "Gemfile", <<-G
         gem "rails"
@@ -21,16 +21,16 @@ RSpec.describe "bundle init" do
     end
 
     it "does not change existing Gemfiles" do
-      expect { bundle :init }.not_to change { File.read(bundled_app("Gemfile")) }
+      expect { lic :init }.not_to change { File.read(licd_app("Gemfile")) }
     end
 
     it "notifies the user that an existing Gemfile already exists" do
-      bundle :init
+      lic :init
       expect(out).to include("Gemfile already exists")
     end
   end
 
-  context "when gems.rb already exists", :bundler => ">= 2" do
+  context "when gems.rb already exists", :lic => ">= 2" do
     before do
       create_file("gems.rb", <<-G)
         gem "rails"
@@ -38,29 +38,29 @@ RSpec.describe "bundle init" do
     end
 
     it "does not change existing Gemfiles" do
-      expect { bundle :init }.not_to change { File.read(bundled_app("gems.rb")) }
+      expect { lic :init }.not_to change { File.read(licd_app("gems.rb")) }
     end
 
     it "notifies the user that an existing gems.rb already exists" do
-      bundle :init
+      lic :init
       expect(out).to include("gems.rb already exists")
     end
   end
 
-  context "when a Gemfile exists in a parent directory", :bundler => "< 2" do
+  context "when a Gemfile exists in a parent directory", :lic => "< 2" do
     let(:subdir) { "child_dir" }
 
     it "lets users generate a Gemfile in a child directory" do
-      bundle! :init
+      lic! :init
 
-      FileUtils.mkdir bundled_app(subdir)
+      FileUtils.mkdir licd_app(subdir)
 
-      Dir.chdir bundled_app(subdir) do
-        bundle! :init
+      Dir.chdir licd_app(subdir) do
+        lic! :init
       end
 
       expect(out).to include("Writing new Gemfile")
-      expect(bundled_app("#{subdir}/Gemfile")).to be_file
+      expect(licd_app("#{subdir}/Gemfile")).to be_file
     end
   end
 
@@ -68,38 +68,38 @@ RSpec.describe "bundle init" do
     let(:subdir) { "child_dir" }
 
     it "notifies the user that it can not write to it" do
-      FileUtils.mkdir bundled_app(subdir)
+      FileUtils.mkdir licd_app(subdir)
       # chmod a-w it
-      mode = File.stat(bundled_app(subdir)).mode ^ 0o222
-      FileUtils.chmod mode, bundled_app(subdir)
+      mode = File.stat(licd_app(subdir)).mode ^ 0o222
+      FileUtils.chmod mode, licd_app(subdir)
 
-      Dir.chdir bundled_app(subdir) do
-        bundle :init
+      Dir.chdir licd_app(subdir) do
+        lic :init
       end
 
       expect(out).to include("directory is not writable")
-      expect(Dir[bundled_app("#{subdir}/*")]).to be_empty
+      expect(Dir[licd_app("#{subdir}/*")]).to be_empty
     end
   end
 
-  context "when a gems.rb file exists in a parent directory", :bundler => ">= 2" do
+  context "when a gems.rb file exists in a parent directory", :lic => ">= 2" do
     let(:subdir) { "child_dir" }
 
     it "lets users generate a Gemfile in a child directory" do
-      bundle! :init
+      lic! :init
 
-      FileUtils.mkdir bundled_app(subdir)
+      FileUtils.mkdir licd_app(subdir)
 
-      Dir.chdir bundled_app(subdir) do
-        bundle! :init
+      Dir.chdir licd_app(subdir) do
+        lic! :init
       end
 
       expect(out).to include("Writing new gems.rb")
-      expect(bundled_app("#{subdir}/gems.rb")).to be_file
+      expect(licd_app("#{subdir}/gems.rb")).to be_file
     end
   end
 
-  context "given --gemspec option", :bundler => "< 2" do
+  context "given --gemspec option", :lic => "< 2" do
     let(:spec_file) { tmp.join("test.gemspec") }
 
     it "should generate from an existing gemspec" do
@@ -113,12 +113,12 @@ RSpec.describe "bundle init" do
         S
       end
 
-      bundle :init, :gemspec => spec_file
+      lic :init, :gemspec => spec_file
 
-      gemfile = if Bundler::VERSION[0, 2] == "1."
-        bundled_app("Gemfile").read
+      gemfile = if Lic::VERSION[0, 2] == "1."
+        licd_app("Gemfile").read
       else
-        bundled_app("gems.rb").read
+        licd_app("gems.rb").read
       end
       expect(gemfile).to match(%r{source 'https://rubygems.org'})
       expect(gemfile.scan(/gem "rack", "= 1.0.1"/).size).to eq(1)
@@ -137,16 +137,16 @@ RSpec.describe "bundle init" do
           S
         end
 
-        bundle :init, :gemspec => spec_file
-        expect(last_command.bundler_err).to include("There was an error while loading `test.gemspec`")
+        lic :init, :gemspec => spec_file
+        expect(last_command.lic_err).to include("There was an error while loading `test.gemspec`")
       end
     end
   end
 
   context "when init_gems_rb setting is enabled" do
-    before { bundle "config init_gems_rb true" }
+    before { lic "config init_gems_rb true" }
 
-    context "given --gemspec option", :bundler => "< 2" do
+    context "given --gemspec option", :lic => "< 2" do
       let(:spec_file) { tmp.join("test.gemspec") }
 
       before do
@@ -162,9 +162,9 @@ RSpec.describe "bundle init" do
       end
 
       it "should generate from an existing gemspec" do
-        bundle :init, :gemspec => spec_file
+        lic :init, :gemspec => spec_file
 
-        gemfile = bundled_app("gems.rb").read
+        gemfile = licd_app("gems.rb").read
         expect(gemfile).to match(%r{source 'https://rubygems.org'})
         expect(gemfile.scan(/gem "rack", "= 1.0.1"/).size).to eq(1)
         expect(gemfile.scan(/gem "rspec", "= 1.2"/).size).to eq(1)
@@ -172,7 +172,7 @@ RSpec.describe "bundle init" do
       end
 
       it "prints message to user" do
-        bundle :init, :gemspec => spec_file
+        lic :init, :gemspec => spec_file
 
         expect(out).to include("Writing new gems.rb")
       end

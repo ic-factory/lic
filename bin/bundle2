@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-module Bundler
+module Lic
   VERSION = "2.0.0.dev".freeze
 end
 
-load File.expand_path("../bundle", __FILE__)
+load File.expand_path("../lic", __FILE__)

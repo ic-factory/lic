@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::UI do
-  describe Bundler::UI::Silent do
+RSpec.describe Lic::UI do
+  describe Lic::UI::Silent do
     it "has the same instance methods as Shell", :ruby => ">= 1.9" do
-      shell = Bundler::UI::Shell
+      shell = Lic::UI::Shell
       methods = proc do |cls|
         cls.instance_methods.map do |i|
           m = shell.instance_method(i)
@@ -14,7 +14,7 @@ RSpec.describe Bundler::UI do
     end
 
     it "has the same instance class as Shell", :ruby => ">= 1.9" do
-      shell = Bundler::UI::Shell
+      shell = Lic::UI::Shell
       methods = proc do |cls|
         cls.methods.map do |i|
           m = shell.method(i)
@@ -25,7 +25,7 @@ RSpec.describe Bundler::UI do
     end
   end
 
-  describe Bundler::UI::Shell do
+  describe Lic::UI::Shell do
     let(:options) { {} }
     subject { described_class.new(options) }
     describe "debug?" do

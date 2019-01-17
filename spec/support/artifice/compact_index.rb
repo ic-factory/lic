@@ -10,7 +10,7 @@ class CompactIndexAPI < Endpoint
     def load_spec(name, version, platform, gem_repo)
       full_name = "#{name}-#{version}"
       full_name += "-#{platform}" if platform != "ruby"
-      Marshal.load(Bundler.rubygems.inflate(File.open(gem_repo.join("quick/Marshal.4.8/#{full_name}.gemspec.rz")).read))
+      Marshal.load(Lic.rubygems.inflate(File.open(gem_repo.join("quick/Marshal.4.8/#{full_name}.gemspec.rz")).read))
     end
 
     def etag_response
@@ -67,7 +67,7 @@ class CompactIndexAPI < Endpoint
     def gems(gem_repo = GEM_REPO)
       @gems ||= {}
       @gems[gem_repo] ||= begin
-        specs = Bundler::Deprecate.skip_during do
+        specs = Lic::Deprecate.skip_during do
           %w[specs.4.8 prerelease_specs.4.8].map do |filename|
             Marshal.load(File.open(gem_repo.join(filename)).read).map do |name, version, platform|
               load_spec(name, version, platform, gem_repo)

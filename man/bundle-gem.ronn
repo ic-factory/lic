@@ -1,9 +1,9 @@
-bundle-gem(1) -- Generate a project skeleton for creating a rubygem
+lic-gem(1) -- Generate a project skeleton for creating a rubygem
 ====================================================================
 
 ## SYNOPSIS
 
-`bundle gem` <GEM_NAME> [OPTIONS]
+`lic gem` <GEM_NAME> [OPTIONS]
 
 ## DESCRIPTION
 
@@ -15,7 +15,7 @@ Run `rake -T` in the resulting project for a list of Rake tasks that can be used
 to test and publish the gem to rubygems.org.
 
 The generated project skeleton can be customized with OPTIONS, as explained
-below. Note that these options can also be specified via Bundler's global
+below. Note that these options can also be specified via Lic's global
 configuration file using the following names:
 
 * `gem.coc`
@@ -25,7 +25,7 @@ configuration file using the following names:
 ## OPTIONS
 
 * `--exe` or `-b` or `--bin`:
-  Specify that Bundler should create a binary executable (as `exe/GEM_NAME`)
+  Specify that Lic should create a binary executable (as `exe/GEM_NAME`)
   in the generated rubygem project. This binary will also be added to the
   `GEM_NAME.gemspec` manifest. This behavior is disabled by default.
 
@@ -35,7 +35,7 @@ configuration file using the following names:
 * `--coc`:
   Add a `CODE_OF_CONDUCT.md` file to the root of the generated project. If
   this option is unspecified, an interactive prompt will be displayed and the
-  answer will be saved in Bundler's global config for future `bundle gem` use.
+  answer will be saved in Lic's global config for future `lic gem` use.
 
 * `--no-coc`:
   Do not create a `CODE_OF_CONDUCT.md` (overrides `--coc` specified in the
@@ -53,26 +53,26 @@ configuration file using the following names:
   Add an MIT license to a `LICENSE.txt` file in the root of the generated
   project. Your name from the global git config is used for the copyright
   statement. If this option is unspecified, an interactive prompt will be
-  displayed and the answer will be saved in Bundler's global config for future
-  `bundle gem` use.
+  displayed and the answer will be saved in Lic's global config for future
+  `lic gem` use.
 
 * `--no-mit`:
   Do not create a `LICENSE.txt` (overrides `--mit` specified in the global
   config).
 
 * `-t`, `--test=minitest`, `--test=rspec`:
-  Specify the test framework that Bundler should use when generating the
+  Specify the test framework that Lic should use when generating the
   project. Acceptable values are `minitest` and `rspec`. The `GEM_NAME.gemspec`
   will be configured and a skeleton test/spec directory will be created based
   on this option. If this option is unspecified, an interactive prompt will be
-  displayed and the answer will be saved in Bundler's global config for future
-  `bundle gem` use.
+  displayed and the answer will be saved in Lic's global config for future
+  `lic gem` use.
   If no option is specified, the default testing framework is RSpec.
 
 * `-e`, `--edit[=EDITOR]`:
   Open the resulting GEM_NAME.gemspec in EDITOR, or the default editor if not
-  specified. The default is `$BUNDLER_EDITOR`, `$VISUAL`, or `$EDITOR`.
+  specified. The default is `$LIC_EDITOR`, `$VISUAL`, or `$EDITOR`.
 
 ## SEE ALSO
 
-* [bundle config(1)](bundle-config.1.html)
+* [lic config(1)](lic-config.1.html)

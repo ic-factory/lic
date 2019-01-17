@@ -1,32 +1,32 @@
-bundle-list(1) -- List all the gems in the bundle
+lic-list(1) -- List all the gems in the lic
 =========================================================================
 
 ## SYNOPSIS
 
-`bundle list` [--name-only] [--paths] [--without-group=GROUP] [--only-group=GROUP]
+`lic list` [--name-only] [--paths] [--without-group=GROUP] [--only-group=GROUP]
 
 ## DESCRIPTION
 
-Prints a list of all the gems in the bundle including their version.
+Prints a list of all the gems in the lic including their version.
 
 Example:
 
-bundle list --name-only
+lic list --name-only
 
-bundle list --paths
+lic list --paths
 
-bundle list --without-group test
+lic list --without-group test
 
-bundle list --only-group dev
+lic list --only-group dev
 
-bundle list --only-group dev --paths
+lic list --only-group dev --paths
 
 ## OPTIONS
 
 * `--name-only`:
   Print only the name of each gem.
 * `--paths`:
-  Print the path to each gem in the bundle.
+  Print the path to each gem in the lic.
 * `--without-group`:
   Print all gems expect from a group.
 * `--only-group`:

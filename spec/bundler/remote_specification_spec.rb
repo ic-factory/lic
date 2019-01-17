@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Bundler::RemoteSpecification do
+RSpec.describe Lic::RemoteSpecification do
   let(:name)         { "foo" }
   let(:version)      { Gem::Version.new("1.0.0") }
   let(:platform)     { Gem::Platform::RUBY }
@@ -13,7 +13,7 @@ RSpec.describe Bundler::RemoteSpecification do
   end
 
   it "can match platforms" do
-    expect(described_class.ancestors).to include(Bundler::MatchPlatform)
+    expect(described_class.ancestors).to include(Lic::MatchPlatform)
   end
 
   describe "#fetch_platform" do
@@ -92,9 +92,9 @@ RSpec.describe Bundler::RemoteSpecification do
       end
     end
 
-    context "comparing another Bundler::RemoteSpecification" do
+    context "comparing another Lic::RemoteSpecification" do
       let(:other) do
-        Bundler::RemoteSpecification.new(other_name, other_version,
+        Lic::RemoteSpecification.new(other_name, other_version,
           other_platform, nil)
       end
 

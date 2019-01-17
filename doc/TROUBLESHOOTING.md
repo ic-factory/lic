@@ -1,67 +1,39 @@
 # Troubleshooting common issues
 
-Stuck using Bundler? Browse these common issues before [filing a new issue](contributing/ISSUES.md).
+Stuck using Lic? Browse these common issues before [filing a new issue]
 
-## Permission denied when installing bundler
+## Permission denied when installing Lic
 
 Certain operating systems such as MacOS and Ubuntu have versions of Ruby that require elevated privileges to install gems.
 
     ERROR:  While executing gem ... (Gem::FilePermissionError)
       You don't have write permissions for the /Library/Ruby/Gems/2.0.0 directory.
 
-There are multiple ways to solve this issue. You can install bundler with elevated privileges using `sudo` or `su`.
+There are multiple ways to solve this issue. You can install Lib with elevated privileges using `sudo` or `su`.
 
-    sudo gem install bundler
+    sudo gem install lib
 
-If you cannot elevate your privileges or do not want to globally install Bundler, you can use the `--user-install` option.
+If you cannot elevate your privileges or do not want to globally install Lib, you can use the `--user-install` option.
 
-    gem install bundler --user-install
+    gem install lib --user-install
 
-This will install Bundler into your home directory. Note that you will need to append `~/.gem/ruby/<ruby version>/bin` to your `$PATH` variable to use `bundle`.
-
-## Heroku errors
-
-Please open a ticket with [Heroku](https://www.heroku.com) if you're having trouble deploying. They have a professional support team who can help you resolve Heroku issues far better than the Bundler team can. If the problem that you are having turns out to be a bug in Bundler itself, [Heroku support](https://www.heroku.com/support) can get the exact details to us.
+This will install Lib into your home directory. Note that you will need to append `~/.gem/ruby/<ruby version>/bin` to your `$PATH` variable to use `lib`.
 
 ## Other problems
 
-First, figure out exactly what it is that you're trying to do (see [XY Problem](http://xyproblem.info/)). Then, go to the [Bundler documentation website](http://bundler.io) and see if we have instructions on how to do that.
-
-Second, check [the compatibility
-list](http://bundler.io/compatibility.html), and make sure that the version of Bundler that you are using works with the versions of Ruby and RubyGems that you are using. To see your versions:
-
-    # Bundler version
-    bundle -v
-
-    # Ruby version
-    ruby -v
-
-    # RubyGems version
-    gem -v
-
 If these instructions don't work, or you can't find any appropriate instructions, you can try these troubleshooting steps:
 
-    # Update to the latest version of bundler
-    gem install bundler
-
-    # Remove user-specific gems and git repos
-    rm -rf ~/.bundle/ ~/.gem/bundler/ ~/.gems/cache/bundler/
-
-    # Remove system-wide git repos and git checkouts
-    rm -rf $GEM_HOME/bundler/ $GEM_HOME/cache/bundler/
+    # Update to the latest version of lic
+    gem install lic
 
     # Remove project-specific settings
-    rm -rf .bundle/
+    rm -rf .lib/
 
-    # Remove project-specific cached gems and repos
+    # Remove project-specific cached libraries and repos
     rm -rf vendor/cache/
 
-    # Remove the saved resolve of the Gemfile
-    rm -rf Gemfile.lock
-
-    # Uninstall the rubygems-bundler and open_gem gems
-    rvm gemset use global # if using rvm
-    gem uninstall rubygems-bundler open_gem
+    # Remove the saved resolve of Libraries
+    rm -rf Libraries.lock
 
     # Try to install one more time
-    bundle install
+    lic install

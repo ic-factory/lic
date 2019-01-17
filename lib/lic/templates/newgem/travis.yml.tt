@@ -1,0 +1,7 @@
+---
+sudo: false
+language: ruby
+cache: lic
+rvm:
+  - <%= RUBY_VERSION %>
+before_install: gem install lic -v <%= Lic::VERSION %>

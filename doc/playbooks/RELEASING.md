@@ -1,11 +1,11 @@
 # Releasing
 
-Bundler uses [Semantic Versioning](https://semver.org/).
+Lic uses [Semantic Versioning](https://semver.org/).
 
 _Note: In the documentation listed below, the *current* minor version number is
 1.11 and the *next* minor version number is 1.12_
 
-Regardless of the version, *all releases* must update the `CHANGELOG.md` and `lib/bundler/version.rb`
+Regardless of the version, *all releases* must update the `CHANGELOG.md` and `lib/lic/version.rb`
 files. The changelog for the first stable minor release (`1.12.0`) is a sum of all
 the preceding pre-release versions (`1.12.pre.1`, `1.12.pre.2`, etc) for that
 minor version. The changelog for the first stable minor release is left blank
@@ -21,13 +21,13 @@ In general, `master` will accept PRs for:
 
 ### Breaking releases
 
-Bundler cares a lot about preserving compatibility. As a result, changes that
+Lic cares a lot about preserving compatibility. As a result, changes that
 break backwards compatibility should (whenever this is possible) include a feature
 release that is backwards compatible, and issue warnings for all options and
 behaviors that will change.
 
 We try very hard to only release breaking changes when incrementing the _major_
-version of Bundler.
+version of Lic.
 
 ### Cherry picking
 
@@ -39,9 +39,9 @@ When we cherry-pick, we cherry-pick the merge commits using the following comman
 $ git cherry-pick -m 1 MERGE_COMMIT_SHAS
 ```
 
-For example, for PR [#5029](https://github.com/bundler/bundler/pull/5029), we
-cherry picked commit [dd6aef9](https://github.com/bundler/bundler/commit/dd6aef97a5f2e7173f406267256a8c319d6134ab),
-not [4fe9291](https://github.com/bundler/bundler/commit/4fe92919f51e3463f0aad6fa833ab68044311f03)
+For example, for PR [#5029](https://github.com/lic/lic/pull/5029), we
+cherry picked commit [dd6aef9](https://github.com/lic/lic/commit/dd6aef97a5f2e7173f406267256a8c319d6134ab),
+not [4fe9291](https://github.com/lic/lic/commit/4fe92919f51e3463f0aad6fa833ab68044311f03)
 using:
 
 ```bash
@@ -52,21 +52,21 @@ The `rake release:patch` command will automatically handle cherry-picking, and i
 
 ## Changelog
 
-Bundler maintains a list of changes present in each version in the `CHANGELOG.md` file.
-Entries should not be added in pull requests, but are rather written by the Bundler
-maintainers in the [bundler-changelog repo](https://github.com/bundler/bundler-changelog).
+Lic maintains a list of changes present in each version in the `CHANGELOG.md` file.
+Entries should not be added in pull requests, but are rather written by the Lic
+maintainers in the [lic-changelog repo](https://github.com/lic/lic-changelog).
 That repository tracks changes by pull requests, with each entry having an associated version,
 PR, section, author(s), issue(s) closed, and message.
 
 Ensure that repo has been updated with all new PRs before releasing a new version,
-and copy over the new sections to the `CHANGELOG.md` in the Bundler repo.
+and copy over the new sections to the `CHANGELOG.md` in the Lic repo.
 
 ## Releases
 
 ### Minor releases
 
 While pushing a gem version to RubyGems.org is as simple as `rake release`,
-releasing a new version of Bundler includes a lot of communication: team consensus,
+releasing a new version of Lic includes a lot of communication: team consensus,
 git branching, changelog writing, documentation site updates, and a blog post.
 
 Dizzy yet? Us too.
@@ -79,7 +79,7 @@ Here's the checklist for releasing new minor versions:
 * [ ] Create a new stable branch from master (see **Branching** below)
 * [ ] Update `version.rb` to a prerelease number, e.g. `1.12.pre.1`
 * [ ] Update `CHANGELOG.md` to include all of the features, bugfixes, etc for that
-  version, from the [bundler-changelog](https://github.com/bundler/bundler-changelog)
+  version, from the [lic-changelog](https://github.com/lic/lic-changelog)
   repo.
 * [ ] Run `rake release`, tweet, blog, let people know about the prerelease!
 * [ ] Wait a **minimum of 7 days**
@@ -90,13 +90,13 @@ Here's the checklist for releasing new minor versions:
 Wait! You're not done yet! After your prelease looks good:
 
 * [ ] Update `version.rb` to a final version (i.e. 1.12.0)
-* [ ] In the [bundler/bundler-site](https://github.com/bundler/bundler-site) repo,
+* [ ] In the [lic/lic-site](https://github.com/lic/lic-site) repo,
   copy the previous version's docs to create a new version (e.g. `cp -r v1.11 v1.12`)
 * [ ] Update the new docs as needed, paying special attention to the "What's new"
   page for this version
 * [ ] Write a blog post announcing the new version, highlighting new features and
   notable bugfixes
-* [ ] Run `rake release` in the bundler repo, tweet, link to the blog post, etc.
+* [ ] Run `rake release` in the lic repo, tweet, link to the blog post, etc.
 
 At this point, you're a release manager! Pour yourself several tasty drinks and
 think about taking a vacation in the tropics.
@@ -119,7 +119,7 @@ or major release.
 ### Patch releases (bug fixes!)
 
 Releasing new bugfix versions is really straightforward. Increment the tiny version
-number in `lib/bundler/version.rb`, and in `CHANGELOG.md` add one bullet point
+number in `lib/lic/version.rb`, and in `CHANGELOG.md` add one bullet point
 per bug fixed. Then run `rake release` from the `-stable` branch,
 and pour yourself a tasty drink!
 
@@ -138,10 +138,10 @@ and run `rake release`!
 ## Beta testing
 
 Early releases require heavy testing, especially across various system setups.
-We :heart: testers, and are big fans of anyone who can run `gem install bundler --pre`
+We :heart: testers, and are big fans of anyone who can run `gem install lic --pre`
 and try out upcoming releases in their development and staging environments.
 
-There may not always be prereleases or beta versions of Bundler.
-The Bundler team will tweet from the [@bundlerio account](http://twitter.com/bundlerio)
+There may not always be prereleases or beta versions of Lic.
+The Lic team will tweet from the [@licio account](http://twitter.com/licio)
 when a prerelease or beta version becomes available. You are also always welcome to try
 checking out master and building a gem yourself if you want to try out the latest changes.

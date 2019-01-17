@@ -27,8 +27,8 @@ module Spec
       @stdboth ||= [stderr, stdout].join("\n").strip
     end
 
-    def bundler_err
-      if Bundler::VERSION.start_with?("1.")
+    def lic_err
+      if Lic::VERSION.start_with?("1.")
         stdout
       else
         stderr

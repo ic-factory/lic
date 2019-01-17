@@ -26,19 +26,19 @@ Layout/IndentHeredoc:
 # SupportedStyles: aligned, indented, indented_relative_to_receiver
 Layout/MultilineMethodCallIndentation:
   Exclude:
-    - 'lib/bundler/cli/common.rb'
-    - 'spec/bundler/plugin/source_list_spec.rb'
+    - 'lib/lic/cli/common.rb'
+    - 'spec/lic/plugin/source_list_spec.rb'
 
 # Offense count: 31
 Lint/AmbiguousBlockAssociation:
   Exclude:
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'spec/bundler/compact_index_client/updater_spec.rb'
+    - 'lib/lic/definition.rb'
+    - 'lib/lic/resolver.rb'
+    - 'spec/lic/compact_index_client/updater_spec.rb'
     - 'spec/commands/init_spec.rb'
     - 'spec/commands/install_spec.rb'
     - 'spec/install/gems/flex_spec.rb'
-    - 'spec/lock/lockfile_bundler_1_spec.rb'
+    - 'spec/lock/lockfile_lic_1_spec.rb'
     - 'spec/lock/lockfile_spec.rb'
     - 'spec/other/major_deprecation_spec.rb'
     - 'spec/runtime/setup_spec.rb'
@@ -48,25 +48,25 @@ Lint/AmbiguousBlockAssociation:
 # Offense count: 2
 Lint/EmptyWhen:
   Exclude:
-    - 'lib/bundler/friendly_errors.rb'
+    - 'lib/lic/friendly_errors.rb'
     - 'spec/support/builders.rb'
 
 # Offense count: 3
 Lint/HandleExceptions:
   Exclude:
-    - 'lib/bundler/psyched_yaml.rb'
-    - 'lib/bundler/vendored_persistent.rb'
+    - 'lib/lic/psyched_yaml.rb'
+    - 'lib/lic/vendored_persistent.rb'
 
 # Offense count: 1
 Lint/IneffectiveAccessModifier:
   Exclude:
-    - 'lib/bundler/settings.rb'
+    - 'lib/lic/settings.rb'
 
 # Offense count: 6
 Lint/InterpolationCheck:
   Exclude:
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/installer/standalone.rb'
+    - 'lib/lic/dsl.rb'
+    - 'lib/lic/installer/standalone.rb'
     - 'spec/commands/binstubs_spec.rb'
     - 'spec/install/gems/standalone_spec.rb'
     - 'spec/other/major_deprecation_spec.rb'
@@ -74,17 +74,17 @@ Lint/InterpolationCheck:
 # Offense count: 3
 Lint/NestedMethodDefinition:
   Exclude:
-    - 'lib/bundler/inline.rb'
+    - 'lib/lic/inline.rb'
     - 'spec/support/builders.rb'
 
 # Offense count: 5
 Lint/RescueException:
   Exclude:
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/worker.rb'
+    - 'lib/lic/cli.rb'
+    - 'lib/lic/dsl.rb'
+    - 'lib/lic/friendly_errors.rb'
+    - 'lib/lic/rubygems_integration.rb'
+    - 'lib/lic/worker.rb'
 
 # Offense count: 29
 Lint/RescueWithoutErrorClass:
@@ -93,20 +93,20 @@ Lint/RescueWithoutErrorClass:
 # Offense count: 2
 Lint/ShadowedException:
   Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/rubygems_integration.rb'
+    - 'lib/lic.rb'
+    - 'lib/lic/rubygems_integration.rb'
 
 # Offense count: 1
 # Configuration parameters: ContextCreatingMethods, MethodCreatingMethods.
 Lint/UselessAccessModifier:
   Exclude:
-    - 'lib/bundler/fetcher.rb'
+    - 'lib/lic/fetcher.rb'
 
 # Offense count: 6
 Lint/UselessAssignment:
   Exclude:
-    - 'lib/bundler/index.rb'
-    - 'lib/bundler/installer.rb'
+    - 'lib/lic/index.rb'
+    - 'lib/lic/installer.rb'
 
 # Offense count: 2564
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
@@ -117,7 +117,7 @@ Metrics/LineLength:
 # Offense count: 1
 Naming/AccessorMethodName:
   Exclude:
-    - 'lib/bundler/source/git.rb'
+    - 'lib/lic/source/git.rb'
 
 # Offense count: 31
 # Configuration parameters: Blacklist.
@@ -133,17 +133,17 @@ Naming/HeredocDelimiterNaming:
 Naming/PredicateName:
   Exclude:
     - 'spec/**/*'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/installer/parallel_installer.rb'
-    - 'lib/bundler/settings.rb'
-    - 'lib/bundler/source/git.rb'
-    - 'lib/bundler/source/git/git_proxy.rb'
-    - 'lib/bundler/source/path.rb'
+    - 'lib/lic/definition.rb'
+    - 'lib/lic/installer/parallel_installer.rb'
+    - 'lib/lic/settings.rb'
+    - 'lib/lic/source/git.rb'
+    - 'lib/lic/source/git/git_proxy.rb'
+    - 'lib/lic/source/path.rb'
 
 # Offense count: 2
 Performance/Caller:
   Exclude:
-    - 'lib/bundler/rubygems_integration.rb'
+    - 'lib/lic/rubygems_integration.rb'
     - 'spec/support/builders.rb'
 
 # Offense count: 9
@@ -151,11 +151,11 @@ Performance/Caller:
 # Configuration parameters: AutoCorrect.
 Performance/HashEachMethods:
   Exclude:
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dependency.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/index.rb'
-    - 'lib/bundler/plugin.rb'
+    - 'lib/lic/definition.rb'
+    - 'lib/lic/dependency.rb'
+    - 'lib/lic/dsl.rb'
+    - 'lib/lic/index.rb'
+    - 'lib/lic/plugin.rb'
     - 'spec/install/gems/standalone_spec.rb'
     - 'spec/support/builders.rb'
     - 'spec/support/helpers.rb'
@@ -164,36 +164,36 @@ Performance/HashEachMethods:
 # Cop supports --auto-correct.
 Performance/RedundantBlockCall:
   Exclude:
-    - 'lib/bundler/gem_helper.rb'
-    - 'lib/bundler/retry.rb'
-    - 'lib/bundler/shared_helpers.rb'
+    - 'lib/lic/gem_helper.rb'
+    - 'lib/lic/retry.rb'
+    - 'lib/lic/shared_helpers.rb'
     - 'spec/support/helpers.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
 Performance/RedundantMatch:
   Exclude:
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/lockfile_parser.rb'
+    - 'lib/lic/definition.rb'
+    - 'lib/lic/lockfile_parser.rb'
 
 # Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: MaxKeyValuePairs.
 Performance/RedundantMerge:
   Exclude:
-    - 'lib/bundler/cli/gem.rb'
+    - 'lib/lic/cli/gem.rb'
 
 # Offense count: 4
 Security/Eval:
   Exclude:
-    - 'lib/bundler.rb'
-    - 'lib/bundler/endpoint_specification.rb'
+    - 'lib/lic.rb'
+    - 'lib/lic/endpoint_specification.rb'
     - 'spec/support/streams.rb'
 
 # Offense count: 6
 Security/MarshalLoad:
   Exclude:
-    - 'lib/bundler.rb'
+    - 'lib/lic.rb'
     - 'spec/install/gems/resolving_spec.rb'
     - 'spec/support/artifice/compact_index.rb'
     - 'spec/support/artifice/endpoint.rb'
@@ -201,8 +201,8 @@ Security/MarshalLoad:
 # Offense count: 3
 Style/CaseEquality:
   Exclude:
-    - 'lib/bundler/match_platform.rb'
-    - 'lib/bundler/rubygems_ext.rb'
+    - 'lib/lic/match_platform.rb'
+    - 'lib/lic/rubygems_ext.rb'
 
 # Offense count: 27
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -216,15 +216,15 @@ Style/ClassAndModuleChildren:
 # SupportedStyles: assign_to_condition, assign_inside_condition
 Style/ConditionalAssignment:
   Exclude:
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/cli/platform.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/lazy_specification.rb'
-    - 'lib/bundler/psyched_yaml.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/source/git.rb'
-    - 'lib/bundler/source/rubygems.rb'
+    - 'lib/lic/cli.rb'
+    - 'lib/lic/cli/gem.rb'
+    - 'lib/lic/cli/platform.rb'
+    - 'lib/lic/dsl.rb'
+    - 'lib/lic/lazy_specification.rb'
+    - 'lib/lic/psyched_yaml.rb'
+    - 'lib/lic/rubygems_integration.rb'
+    - 'lib/lic/source/git.rb'
+    - 'lib/lic/source/rubygems.rb'
 
 # Offense count: 167
 Style/Documentation:
@@ -236,11 +236,11 @@ Style/Documentation:
 # SupportedStyles: compact, expanded
 Style/EmptyMethod:
   Exclude:
-    - 'exe/bundle_ruby'
-    - 'lib/bundler/cli.rb'
-    - 'lib/bundler/plugin/api/source.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/ui/silent.rb'
+    - 'exe/lic_ruby'
+    - 'lib/lic/cli.rb'
+    - 'lib/lic/plugin/api/source.rb'
+    - 'lib/lic/rubygems_integration.rb'
+    - 'lib/lic/ui/silent.rb'
     - 'spec/support/artifice/fail.rb'
 
 # Offense count: 5
@@ -250,9 +250,9 @@ Style/EmptyMethod:
 Style/Encoding:
   Exclude:
     - 'Rakefile'
-    - 'bundler.gemspec'
-    - 'lib/bundler/friendly_errors.rb'
-    - 'spec/bundler/bundler_spec.rb'
+    - 'lic.gemspec'
+    - 'lib/lic/friendly_errors.rb'
+    - 'spec/lic/lic_spec.rb'
     - 'spec/install/gemfile_spec.rb'
     - 'spec/install/gemspecs_spec.rb'
     - 'spec/quality_es_spec.rb'
@@ -267,22 +267,22 @@ Style/FormatStringToken:
 # Configuration parameters: AllowedVariables.
 Style/GlobalVars:
   Exclude:
-    - 'lib/bundler/cli.rb'
+    - 'lib/lic/cli.rb'
     - 'spec/spec_helper.rb'
 
 # Offense count: 12
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
   Exclude:
-    - 'lib/bundler/cli/cache.rb'
-    - 'lib/bundler/cli/install.rb'
-    - 'lib/bundler/cli/outdated.rb'
-    - 'lib/bundler/cli/package.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/installer.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/source/path/installer.rb'
-    - 'lib/bundler/source_list.rb'
+    - 'lib/lic/cli/cache.rb'
+    - 'lib/lic/cli/install.rb'
+    - 'lib/lic/cli/outdated.rb'
+    - 'lib/lic/cli/package.rb'
+    - 'lib/lic/definition.rb'
+    - 'lib/lic/installer.rb'
+    - 'lib/lic/runtime.rb'
+    - 'lib/lic/source/path/installer.rb'
+    - 'lib/lic/source_list.rb'
     - 'spec/commands/newgem_spec.rb'
     - 'spec/support/sometimes.rb'
 
@@ -291,21 +291,21 @@ Style/GuardClause:
 # Configuration parameters: InverseMethods, InverseBlocks.
 Style/InverseMethods:
   Exclude:
-    - 'lib/bundler/cli/doctor.rb'
-    - 'lib/bundler/definition.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/index.rb'
-    - 'lib/bundler/resolver.rb'
-    - 'lib/bundler/resolver/spec_group.rb'
+    - 'lib/lic/cli/doctor.rb'
+    - 'lib/lic/definition.rb'
+    - 'lib/lic/dsl.rb'
+    - 'lib/lic/index.rb'
+    - 'lib/lic/resolver.rb'
+    - 'lib/lic/resolver/spec_group.rb'
 
 # Offense count: 6
 Style/MethodMissing:
   Exclude:
-    - 'lib/bundler/dep_proxy.rb'
-    - 'lib/bundler/dsl.rb'
-    - 'lib/bundler/lazy_specification.rb'
-    - 'lib/bundler/plugin/dsl.rb'
-    - 'lib/bundler/remote_specification.rb'
+    - 'lib/lic/dep_proxy.rb'
+    - 'lib/lic/dsl.rb'
+    - 'lib/lic/lazy_specification.rb'
+    - 'lib/lic/plugin/dsl.rb'
+    - 'lib/lic/remote_specification.rb'
     - 'spec/support/builders.rb'
 
 # Offense count: 2
@@ -313,7 +313,7 @@ Style/MethodMissing:
 # SupportedStyles: module_function, extend_self
 Style/ModuleFunction:
   Exclude:
-    - 'lib/bundler/shared_helpers.rb'
+    - 'lib/lic/shared_helpers.rb'
     - 'spec/support/path.rb'
 
 # Offense count: 10
@@ -321,11 +321,11 @@ Style/ModuleFunction:
 Style/MultilineIfModifier:
   Exclude:
     - 'bin/with_rubygems'
-    - 'lib/bundler/installer.rb'
-    - 'lib/bundler/psyched_yaml.rb'
-    - 'lib/bundler/rubygems_ext.rb'
-    - 'lib/bundler/runtime.rb'
-    - 'lib/bundler/source/rubygems.rb'
+    - 'lib/lic/installer.rb'
+    - 'lib/lic/psyched_yaml.rb'
+    - 'lib/lic/rubygems_ext.rb'
+    - 'lib/lic/runtime.rb'
+    - 'lib/lic/source/rubygems.rb'
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -334,9 +334,9 @@ Style/MultilineIfModifier:
 Style/NumericPredicate:
   Exclude:
     - 'spec/**/*'
-    - 'lib/bundler/gem_helper.rb'
-    - 'lib/bundler/mirror.rb'
-    - 'lib/bundler/source/path.rb'
+    - 'lib/lic/gem_helper.rb'
+    - 'lib/lic/mirror.rb'
+    - 'lib/lic/source/path.rb'
 
 # Offense count: 24
 # Cop supports --auto-correct.
@@ -344,21 +344,21 @@ Style/NumericPredicate:
 # SupportedStyles: compact, exploded
 Style/RaiseArgs:
   Exclude:
-    - 'lib/bundler/cli/install.rb'
-    - 'lib/bundler/deployment.rb'
-    - 'lib/bundler/fetcher/downloader.rb'
-    - 'lib/bundler/fetcher/index.rb'
-    - 'lib/bundler/installer/standalone.rb'
-    - 'lib/bundler/rubygems_integration.rb'
-    - 'lib/bundler/shared_helpers.rb'
-    - 'lib/bundler/source/git/git_proxy.rb'
-    - 'lib/bundler/source/rubygems/remote.rb'
-    - 'spec/bundler/endpoint_specification_spec.rb'
-    - 'spec/bundler/fetcher/dependency_spec.rb'
-    - 'spec/bundler/fetcher/downloader_spec.rb'
-    - 'spec/bundler/fetcher/index_spec.rb'
-    - 'spec/bundler/rubygems_integration_spec.rb'
-    - 'spec/bundler/shared_helpers_spec.rb'
+    - 'lib/lic/cli/install.rb'
+    - 'lib/lic/deployment.rb'
+    - 'lib/lic/fetcher/downloader.rb'
+    - 'lib/lic/fetcher/index.rb'
+    - 'lib/lic/installer/standalone.rb'
+    - 'lib/lic/rubygems_integration.rb'
+    - 'lib/lic/shared_helpers.rb'
+    - 'lib/lic/source/git/git_proxy.rb'
+    - 'lib/lic/source/rubygems/remote.rb'
+    - 'spec/lic/endpoint_specification_spec.rb'
+    - 'spec/lic/fetcher/dependency_spec.rb'
+    - 'spec/lic/fetcher/downloader_spec.rb'
+    - 'spec/lic/fetcher/index_spec.rb'
+    - 'spec/lic/rubygems_integration_spec.rb'
+    - 'spec/lic/shared_helpers_spec.rb'
 
 # Offense count: 9
 # Cop supports --auto-correct.
@@ -366,20 +366,20 @@ Style/RaiseArgs:
 # SupportedStylesForMultiline: comma, consistent_comma, no_comma
 Style/TrailingCommaInLiteral:
   Exclude:
-    - 'lib/bundler/cli/gem.rb'
-    - 'lib/bundler/fetcher.rb'
-    - 'lib/bundler/gem_helpers.rb'
-    - 'lib/bundler/graph.rb'
-    - 'lib/bundler/ruby_version.rb'
-    - 'lib/bundler/similarity_detector.rb'
+    - 'lib/lic/cli/gem.rb'
+    - 'lib/lic/fetcher.rb'
+    - 'lib/lic/gem_helpers.rb'
+    - 'lib/lic/graph.rb'
+    - 'lib/lic/ruby_version.rb'
+    - 'lib/lic/similarity_detector.rb'
     - 'spec/support/artifice/endpoint.rb'
 
 # Offense count: 14
 # Cop supports --auto-correct.
 Style/UnneededInterpolation:
   Exclude:
-    - 'lib/bundler/cli/config.rb'
-    - 'lib/bundler/env.rb'
-    - 'spec/bundler/shared_helpers_spec.rb'
+    - 'lib/lic/cli/config.rb'
+    - 'lib/lic/env.rb'
+    - 'spec/lic/shared_helpers_spec.rb'
     - 'spec/cache/git_spec.rb'
     - 'spec/commands/exec_spec.rb'
